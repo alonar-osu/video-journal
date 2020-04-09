@@ -7,6 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
 public class SQLiteDBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "videoinfo_database";
@@ -37,8 +42,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
        SQLiteDatabase db = new SQLiteDBHelper(context).getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(SQLiteDBHelper.VIDEOINFO_COLUMN_PATH, videoUri.toString());
-        // TODO: update to get current date
-        values.put(SQLiteDBHelper.VIDEOINFO_COLUMN_DATE, "2020-04-08");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+        String currDateTime = sdf.format(new Date());
+        values.put(SQLiteDBHelper.VIDEOINFO_COLUMN_DATE, currDateTime);
         long newRowId = db.insert(SQLiteDBHelper.VIDEO_TABLE_NAME, null, values);
 
         Toast.makeText(context, "The new Row Id is " + newRowId, Toast.LENGTH_LONG).show();
