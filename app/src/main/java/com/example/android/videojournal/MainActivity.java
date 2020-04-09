@@ -1,6 +1,7 @@
 package com.example.android.videojournal;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         Log.d(TAG, "in onCreate");
         //ArrayList<String> galleryImages = getAllShownImagesPath(MainActivity.this);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(linearLayoutManager);
         CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, dinoImages);
@@ -136,6 +137,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),
                     ""+ videoUri,
                     Toast.LENGTH_LONG).show();
+            SQLiteDBHelper sqliteDB = new SQLiteDBHelper(MainActivity.this);
+            if (videoUri != null) {
+                sqliteDB.saveToDB(MainActivity.this, videoUri);
+            }
 
            // showVideo(videoUri);
         }
