@@ -1,21 +1,25 @@
 package com.example.android.videojournal;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-//import android.support.v7.widget.RecyclerView;
 
 import android.provider.MediaStore;
 import android.util.Log;
@@ -27,19 +31,15 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     static final int REQUEST_VIDEO_CAPTURE = 1;
-    ArrayList dinoImages = new ArrayList<>(Arrays.asList(R.drawable.dino1, R.drawable.dino2, R.drawable.dino3, R.drawable.dino4,
-            R.drawable.dino5, R.drawable.dino7, R.drawable.dino8, R.drawable.dino9, R.drawable.dino10, R.drawable.dino11,
-            R.drawable.dino12, R.drawable.dino13, R.drawable.dino14, R.drawable.dino15, R.drawable.dino16, R.drawable.dino17,
-            R.drawable.dino18, R.drawable.dino19, R.drawable.dino20));
+    private final static int READ_EXTERNAL_STORAGE_PERMISSION_RESULT = 0;
 
+    ArrayList videoPaths;
     VideoView mOneVideoView;
-    MediaController mMediaControls;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,14 +48,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Log.d(TAG, "in onCreate");
-        //ArrayList<String> galleryImages = getAllShownImagesPath(MainActivity.this);
-        RecyclerView recyclerView = findViewById(R.id.recyclerView);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(linearLayoutManager);
-        CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, dinoImages);
-        recyclerView.setAdapter(customAdapter);
 
-
+        // check permissions for thumbnails
+        if (checkReadExternalStoragePermission()) {
+            RecyclerView recyclerView = findViewById(R.id.recyclerView);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+            recyclerView.setLayoutManager(linearLayoutManager);
+            videoPaths = SQLiteDBHelper.getPathsFromDB(MainActivity.this);
+            if (videoPaths != null) {
+                CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, videoPaths);
+                recyclerView.setAdapter(customAdapter);
+            }
+        }
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -69,44 +73,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    /*
-    // get image Uris for displaying
-    private ArrayList<String> getAllShownImagesPath(Activity activity) {
-        Log.d(TAG, "at start of get - ImagesPath()");
-        Uri uri;
-        Cursor cursor;
-        int column_index_data, column_index_folder_name;
-        ArrayList<String> listOfAllImages = new ArrayList<String>();
-        String absolutePathOfImage = null;
-        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-        Log.d(TAG, "after getting uri - ImagesPath()");
 
-        String[] projection = {MediaStore.MediaColumns.DATA, MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
-        Log.d(TAG, "after projection - ImagesPath()");
-
-        cursor = activity.getContentResolver().query(uri, projection, null, null, null);
-        Log.d(TAG, "after cursor - ImagesPath()");
-
-        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        //column_index_folder_name = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
-        Log.d(TAG, "after getcolumnindex - ImagesPath()");
-
-        try {
-            Log.d(TAG, "before while - ImagesPath()");
-           // while (cursor.moveToNext()) {
-            cursor.moveToFirst();
-                Log.d(TAG, "INSIDE WHILE - ImagesPath()");
-                absolutePathOfImage = cursor.getString(column_index_data);
-                Log.d(TAG, absolutePathOfImage);
-                listOfAllImages.add(absolutePathOfImage);
-          //  }
-        } finally {
-            cursor.close();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode) {
+            case READ_EXTERNAL_STORAGE_PERMISSION_RESULT:
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    // call cursor loader
+                    Toast.makeText(getApplicationContext(), "Permission granted to use thumbnails", Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
-        // while (cursor.moveToNext()) {
-                return listOfAllImages;
     }
-     */
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -141,10 +121,30 @@ public class MainActivity extends AppCompatActivity {
             if (videoUri != null) {
                 sqliteDB.saveToDB(MainActivity.this, videoUri);
             }
-
+            // restart activity to show new video thumbnail
+            finish();
+            startActivity(getIntent());
            // showVideo(videoUri);
         }
     }
+
+    private boolean checkReadExternalStoragePermission() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    Toast.makeText(getApplicationContext(), "App needs to view thumbnails", Toast.LENGTH_LONG).show();
+                }
+                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_PERMISSION_RESULT);
+            }
+        }
+            return true;
+    }
+
+
+
 /**
     private void showVideo(Uri videoUri) {
         mOneVideoView = (VideoView) findViewById(R.id.oneVideoView);
@@ -159,5 +159,4 @@ public class MainActivity extends AppCompatActivity {
         mOneVideoView.start();
     }
 */
-
 }

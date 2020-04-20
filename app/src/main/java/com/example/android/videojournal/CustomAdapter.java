@@ -1,28 +1,31 @@
 package com.example.android.videojournal;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import java.util.ArrayList;
-import java.util.List;
 
-import androidx.annotation.NonNull;
+import java.io.File;
+import java.util.ArrayList;
+
+
 import androidx.recyclerview.widget.RecyclerView;
-import static android.content.ContentValues.TAG;
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
 
     private static final String TAG = CustomAdapter.class.getSimpleName();
 
-    ArrayList dinoImages;
+    ArrayList videoPaths;
     Context context;
 
-    public CustomAdapter(Context context, ArrayList dinoImages) {
+    public CustomAdapter(Context context, ArrayList videoPaths) {
        this.context = context;
-       this.dinoImages = dinoImages;
+       this.videoPaths = videoPaths;
     }
 
     @Override
@@ -32,19 +35,30 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         return vh;
     }
 
-
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         Log.d(TAG, "#" + position);
-       // holder.image.setImageResource(galleryImages.get(position));
-       // holder.image.setImageResource(R.drawable.dino1);
-        holder.image.setImageResource((int) dinoImages.get(position));
-       // holder.bind(position);
+        String videoPath = (String) videoPaths.get(position);
+        Log.d(TAG, "Path is: " + videoPath);
+
+        Bitmap bitmap = null;
+        try {
+           bitmap = ThumbnailUtils.createVideoThumbnail(videoPath,  MediaStore.Images.Thumbnails.MINI_KIND);
+
+        } catch (Exception e) {
+            Log.d(TAG, "Exception happened when getting bitmap");
+        }
+        if (bitmap != null) {
+            bitmap = Bitmap.createScaledBitmap(bitmap, 240, 750, false);
+            holder.image.setImageBitmap(bitmap);
+        } else {
+            Log.d(TAG, "Video thumbnail does not exist");
+        }
     }
 
     @Override
     public int getItemCount() {
-        return dinoImages.size();
+        return videoPaths.size();
     }
 
 
@@ -63,4 +77,5 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
         }
         */
     }
+
 }
