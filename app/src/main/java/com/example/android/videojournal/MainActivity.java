@@ -17,7 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,10 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.MediaController;
 import android.widget.Toast;
-import android.widget.VideoView;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private final static int READ_EXTERNAL_STORAGE_PERMISSION_RESULT = 0;
 
     ArrayList videoPaths;
-    VideoView mOneVideoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
