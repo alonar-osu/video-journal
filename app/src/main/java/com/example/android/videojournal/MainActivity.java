@@ -1,17 +1,13 @@
 package com.example.android.videojournal;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     static final int REQUEST_VIDEO_CAPTURE = 1;
     private final static int READ_EXTERNAL_STORAGE_PERMISSION_RESULT = 0;
 
-    ArrayList videoPaths;
+    ArrayList mVideoEntries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +43,14 @@ public class MainActivity extends AppCompatActivity {
         // check permissions for thumbnails
         if (checkReadExternalStoragePermission()) {
             RecyclerView recyclerView = findViewById(R.id.recyclerView);
+            recyclerView.setItemViewCacheSize(20);
+            //recyclerView.setHasFixedSize(true);
+
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
             recyclerView.setLayoutManager(linearLayoutManager);
-            videoPaths = SQLiteDBHelper.getPathsFromDB(MainActivity.this);
-            if (videoPaths != null) {
-                CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, videoPaths);
+            mVideoEntries = SQLiteDBHelper.getVideoEntriesFromDB(MainActivity.this);
+            if (mVideoEntries != null) {
+                CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, mVideoEntries);
                 recyclerView.setAdapter(customAdapter);
             }
         }
@@ -138,20 +137,4 @@ public class MainActivity extends AppCompatActivity {
             return true;
     }
 
-
-
-/**
-    private void showVideo(Uri videoUri) {
-        mOneVideoView = (VideoView) findViewById(R.id.oneVideoView);
-
-        if (mMediaControls == null) {
-            mMediaControls = new MediaController(MainActivity.this);
-            mMediaControls.setAnchorView(mOneVideoView);
-        }
-
-        mOneVideoView.setMediaController(mMediaControls);
-        mOneVideoView.setVideoURI(videoUri);
-        mOneVideoView.start();
-    }
-*/
 }

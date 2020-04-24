@@ -5,9 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
-import android.os.Build;
-import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.widget.Toast;
 import java.text.SimpleDateFormat;
@@ -24,6 +23,8 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     private static final String VIDEOINFO_COLUMN_ID = "_id";
     private static final String VIDEOINFO_COLUMN_DATE = "datetime";
     private static final String VIDEOINFO_COLUMN_PATH = "path";
+    private static final String VIDEOINFO_COLUMN_HEIGHT = "videoheight";
+    private static final String VIDEOINFO_COLUMN_WIDTH = "videowidth";
 
     public SQLiteDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,7 +35,9 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + VIDEO_TABLE_NAME + " (" +
                 VIDEOINFO_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 VIDEOINFO_COLUMN_PATH + " TEXT, " +
-                VIDEOINFO_COLUMN_DATE + " TEXT" + ")");
+                VIDEOINFO_COLUMN_DATE + " TEXT," +
+                VIDEOINFO_COLUMN_HEIGHT + " INTEGER," +
+                VIDEOINFO_COLUMN_WIDTH + " INTEGER" + ")");
     }
 
     @Override
@@ -46,13 +49,21 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     protected void saveToDB(Context context, Uri videoUri){
        SQLiteDatabase db = new SQLiteDBHelper(context).getWritableDatabase();
         ContentValues values = new ContentValues();
-
         String realPath = getRealPathFromURI(context, videoUri);
-       // String realPath = getPath(context, videoUri);
+
+        // get dimensions
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(realPath);
+        int videowidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        int videoheight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+        retriever.release();
+
         values.put(SQLiteDBHelper.VIDEOINFO_COLUMN_PATH, realPath);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         String currDateTime = sdf.format(new Date());
         values.put(SQLiteDBHelper.VIDEOINFO_COLUMN_DATE, currDateTime);
+        values.put(SQLiteDBHelper.VIDEOINFO_COLUMN_HEIGHT, videoheight);
+        values.put(SQLiteDBHelper.VIDEOINFO_COLUMN_WIDTH, videowidth);
         long newRowId = db.insert(SQLiteDBHelper.VIDEO_TABLE_NAME, null, values);
 
         Toast.makeText(context, "The new Row Id is " + newRowId, Toast.LENGTH_LONG).show();
@@ -70,73 +81,22 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         return result;
     }
 
-
-
-/*
-    public static String getPath(final Context context, final Uri uri) {
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-
-        String result = uri+"";
-        // DocumentProvider
-        //  if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
-        if (isKitKat && (result.contains("media.documents"))) {
-            String[] ary = result.split("/");
-            int length = ary.length;
-            String imgary = ary[length-1];
-            final String[] dat = imgary.split("%3A");
-            final String docId = dat[1];
-            final String type = dat[0];
-            Uri contentUri = null;
-            if ("image".equals(type)) {
-                contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            } else if ("video".equals(type)) {
-            } else if ("audio".equals(type)) {
-            }
-            final String selection = "_id=?";
-            final String[] selectionArgs = new String[] {
-                    dat[1]
-            };
-            return getDataColumn(context, contentUri, selection, selectionArgs);
-        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-            return getDataColumn(context, uri, null, null);
-        }
-        // File
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-        return null;
-    }
-
-    public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
-        Cursor cursor = null;
-        final String column = "_data";
-        final String[] projection = {
-                column
-        };
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs, null);
-            if (cursor != null && cursor.moveToFirst()) {
-                final int column_index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(column_index);
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return null;
-    }
-   */
-
-
-    protected static ArrayList<String> getPathsFromDB(Context context) {
+    protected static ArrayList<VideoEntry> getVideoEntriesFromDB(Context context) {
+        ArrayList<VideoEntry> videoEntryList = new ArrayList<>();
         SQLiteDatabase db = new SQLiteDBHelper(context).getWritableDatabase();
-        ArrayList<String> videoPathsList = new ArrayList<>();
-        String query = "SELECT path FROM " + VIDEO_TABLE_NAME;
+        String query = "SELECT path, datetime, videoheight, videowidth FROM " + VIDEO_TABLE_NAME;
         Cursor cursor = db.rawQuery(query, null);
+
         while (cursor.moveToNext()) {
-            videoPathsList.add(cursor.getString(cursor.getColumnIndex(VIDEOINFO_COLUMN_PATH)));
+            String videoPath = cursor.getString(cursor.getColumnIndex(VIDEOINFO_COLUMN_PATH));
+            String date = cursor.getString(cursor.getColumnIndex(VIDEOINFO_COLUMN_DATE));
+            int videoHeight = cursor.getInt(cursor.getColumnIndex(VIDEOINFO_COLUMN_HEIGHT));
+            int videoWidth = cursor.getInt(cursor.getColumnIndex(VIDEOINFO_COLUMN_WIDTH));
+
+            VideoEntry videoEntry = new VideoEntry(videoPath,date,videoHeight,videoWidth);
+            videoEntryList.add(videoEntry);
         }
-        return videoPathsList;
+        return videoEntryList;
     }
 
 

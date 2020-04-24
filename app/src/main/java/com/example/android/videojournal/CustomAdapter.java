@@ -19,35 +19,34 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
 
     private static final String TAG = CustomAdapter.class.getSimpleName();
 
-    ArrayList videoPaths;
+    ArrayList mVideoEntries;
     Context context;
 
-    public CustomAdapter(Context context, ArrayList videoPaths) {
+    public CustomAdapter(Context context, ArrayList videoEntries) {
        this.context = context;
-       this.videoPaths = videoPaths;
+       this.mVideoEntries = videoEntries;
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rowlayout, parent, false);
-        MyViewHolder vh = new MyViewHolder(v);
-        return vh;
+        return new MyViewHolder(v);
+
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
         Log.d(TAG, "#" + position);
+        // debugging slow scrolling in recyclerview - looks like doing too much work in this method
+        long startTime = System.currentTimeMillis();
 
+        // TODO: see if need to make this method faster. debug slow scrolling on first run of app
+        VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
 
-        String videoPath = (String) videoPaths.get(position);
+        String videoPath = videoEntry.getVideopath();
         Log.d(TAG, "Path is: " + videoPath);
-
-        // obtain video width and height for thumbnail
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(videoPath);
-        int videowidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-        int videoheight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-        retriever.release();
+        int videoheight = videoEntry.getVideoHeight();
+        int videowidth = videoEntry.getmVideoWidth();
 
         Bitmap bitmap = null;
         try {
@@ -64,11 +63,13 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
             Log.d(TAG, "Video thumbnail does not exist");
         }
 
+        // debugging
+        Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime));
     }
 
     @Override
     public int getItemCount() {
-        return videoPaths.size();
+        return mVideoEntries.size();
     }
 
 
