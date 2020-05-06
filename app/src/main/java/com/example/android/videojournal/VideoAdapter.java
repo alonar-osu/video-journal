@@ -2,6 +2,7 @@ package com.example.android.videojournal;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -50,14 +51,13 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
         String thumbnailFileName = videoEntry.getmThumbnailFileName();
         Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, context);
 
-        // DEBUGGING
-        Log.d(TAG, "thumbnail byte size 3: " + videoThumbnail.getByteCount());
-
         if (videoThumbnail != null) {
             holder.image.setImageBitmap(videoThumbnail);
         } else {
             Log.d(TAG, "Video thumbnail does not exist");
         }
+
+
 
         // DEBUGGING: getting time in onBindViewHolder method
         Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime));
@@ -87,7 +87,18 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
         public MyViewHolder(View itemView) {
             super(itemView);
             image = (ImageView) itemView.findViewById(R.id.image);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context = v.getContext();
+                    Intent intent = new Intent(context, PlayVideoActivity.class);
+                    context.startActivity(intent);
+                }
+            });
         }
+
+
+
 
         /*
         void bind (int position) {

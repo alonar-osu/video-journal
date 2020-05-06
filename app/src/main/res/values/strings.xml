@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Video Journal</string>
     <string name="action_settings">Settings</string>
+
+    <string name="title_activity_play_video">PlayVideoActivity</string>
+    <string name="dummy_content">play video...</string>
 </resources>
