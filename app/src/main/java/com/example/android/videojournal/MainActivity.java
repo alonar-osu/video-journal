@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setLayoutManager(linearLayoutManager);
             mVideoEntries = SQLiteDBHelper.getVideoEntriesFromDB(MainActivity.this);
             if (mVideoEntries != null) {
-                CustomAdapter customAdapter = new CustomAdapter(MainActivity.this, mVideoEntries);
-                recyclerView.setAdapter(customAdapter);
+                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, mVideoEntries);
+                recyclerView.setAdapter(videoAdapter);
             }
         }
 

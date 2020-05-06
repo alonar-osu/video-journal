@@ -18,14 +18,14 @@ import java.util.ArrayList;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHolder> {
+public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder> {
 
-    private static final String TAG = CustomAdapter.class.getSimpleName();
+    private static final String TAG = VideoAdapter.class.getSimpleName();
 
     ArrayList mVideoEntries;
     Context context;
 
-    public CustomAdapter(Context context, ArrayList videoEntries) {
+    public VideoAdapter(Context context, ArrayList videoEntries) {
        this.context = context;
        this.mVideoEntries = videoEntries;
     }
