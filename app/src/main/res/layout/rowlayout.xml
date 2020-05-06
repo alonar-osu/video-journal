@@ -4,20 +4,15 @@
     android:layout_height="220dp"
     android:background="@drawable/custom_item_layout"
     android:padding="5dp">
-    <!--
-    grid items for RecyclerView
-    -->
+
+     <!--
+     grid items for RecyclerView
+     -->
     <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="fitXY"
         android:src="@mipmap/ic_launcher" />
-
-    <!--VideoView
-    android:id="@+id/oneVideoView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" /-->
-
 
 </RelativeLayout>
