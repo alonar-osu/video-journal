@@ -47,6 +47,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
         // get video info
         VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
 
+        String videoPath = videoEntry.getVideopath();
         // get video thumbnail from internal storage
         String thumbnailFileName = videoEntry.getmThumbnailFileName();
         Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, context);
@@ -56,8 +57,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
         } else {
             Log.d(TAG, "Video thumbnail does not exist");
         }
-
-
+        holder.videoPath = videoPath;
 
         // DEBUGGING: getting time in onBindViewHolder method
         Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime));
@@ -83,6 +83,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
 
     class MyViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
+        String videoPath;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -92,6 +93,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
                 public void onClick(View v) {
                     Context context = v.getContext();
                     Intent intent = new Intent(context, PlayVideoActivity.class);
+                    intent.putExtra("VIDEO_PATH", videoPath);
                     context.startActivity(intent);
                 }
             });

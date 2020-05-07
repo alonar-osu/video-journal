@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
                     ""+ videoUri,
                     Toast.LENGTH_LONG).show();
             String videoRealPath = getRealPathFromURI(MainActivity.this, videoUri);
+            Log.d(TAG, "video path: " + videoRealPath);
 
             // generate bitmap from video
             Bitmap videoThumbnail = null;
@@ -146,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Log.d(TAG, "Video thumbnail does not exist");
             }
-
-            // DEBUGGING
-            Log.d(TAG, "thumbnail byte size 2: " + videoThumbnail.getByteCount());
 
             // save bitmap to file, get path
             String videoThumbnailName = generateThumbnailFileName();
