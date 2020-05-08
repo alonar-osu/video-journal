@@ -53,7 +53,7 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
         Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, context);
 
         if (videoThumbnail != null) {
-            holder.image.setImageBitmap(videoThumbnail);
+            holder.thumbnailView.setImageBitmap(videoThumbnail);
         } else {
             Log.d(TAG, "Video thumbnail does not exist");
         }
@@ -82,12 +82,13 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView image;
+        ImageView thumbnailView;
         String videoPath;
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            image = (ImageView) itemView.findViewById(R.id.image);
+            thumbnailView = (ImageView) itemView.findViewById(R.id.thumbnail);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
