@@ -1,6 +1,11 @@
 package com.example.android.videojournal;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -18,12 +23,15 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
@@ -34,15 +42,19 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
-    static final int REQUEST_VIDEO_CAPTURE = 1;
     private final static int READ_EXTERNAL_STORAGE_PERMISSION_RESULT = 0;
     private static final float THUMBNAIL_ROW_HEIGHT = 220; // in dp
+
+    static final int REQUEST_VIDEO_CAPTURE = 1;
+    private int REC_NOTIF_ID = 100;
+    static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
 
     ArrayList mVideoEntries;
     private int mRequiredHeight;
@@ -83,6 +95,26 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // create channel for notifications
+        createNotificationChannel();
+
+        int hour = 23, minute = 0;
+        setUpReminderNotification(MainActivity.this, hour, minute, AlarmReceiver.class);
+
+    }
+
+    public void setUpReminderNotification(Context context, int hour, int minute, Class receiver) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+
+        Intent intent = new Intent(context, receiver);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        // interval currently 15min for debugging
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 
     @Override
@@ -227,8 +259,25 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
-        // TODO: see if I need this path or not
-        // possibly no need to save it in database
+
+        // possibly no need to save this path
         return directory.getAbsolutePath();
     }
+
+    private void createNotificationChannel() {
+        // create channel only on API 26+ otherwise not in support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID_REC_NOTIF, name, importance);
+            channel.setDescription(description);
+            //register channel with system
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+
+
 }
