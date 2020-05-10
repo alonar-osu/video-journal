@@ -5,7 +5,6 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -23,15 +22,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
-import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
@@ -104,19 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void setUpReminderNotification(Context context, int hour, int minute, Class receiver) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-
-        Intent intent = new Intent(context, receiver);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        // interval currently 15min for debugging
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch(requestCode) {
@@ -149,15 +132,22 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+
+        if (id == R.id.action_reminder) {
+            Intent startReminderActivity = new Intent(this, ReminderActivity.class);
+            startActivity(startReminderActivity);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             Uri videoUri = intent.getData();
             Toast.makeText(getApplicationContext(),
-                    ""+ videoUri,
+                    "" + videoUri,
                     Toast.LENGTH_LONG).show();
             String videoRealPath = getRealPathFromURI(MainActivity.this, videoUri);
             Log.d(TAG, "video path: " + videoRealPath);
@@ -165,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             // generate bitmap from video
             Bitmap videoThumbnail = null;
             try {
-                videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoRealPath,  MediaStore.Images.Thumbnails.MINI_KIND);
+                videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoRealPath, MediaStore.Images.Thumbnails.MINI_KIND);
             } catch (Exception e) {
                 Log.d(TAG, "Exception happened when making bitmap for video thumbnail");
             }
@@ -196,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             // restart activity to show new video thumbnail
             finish();
             startActivity(getIntent());
-           // showVideo(videoUri);
+            // showVideo(videoUri);
         }
     }
 
@@ -276,6 +266,19 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    public void setUpReminderNotification(Context context, int hour, int minute, Class receiver) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+
+        Intent intent = new Intent(context, receiver);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        // interval currently 15min for debugging
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 
 

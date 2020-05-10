@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ReminderActivity"
+            android:label="@string/title_activity_reminder"></activity>
+        <activity
             android:name=".PlayVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_play_video"
@@ -37,7 +40,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".AlarmReceiver"/>
+        <receiver android:name=".AlarmReceiver" />
     </application>
 
 </manifest>
