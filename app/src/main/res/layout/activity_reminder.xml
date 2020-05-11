@@ -17,10 +17,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        android:onClick="showTimePickerDialog"
         android:layout_centerHorizontal="true"
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"
+        android:onClick="showTimePickerDialog"
         android:text="@string/pick_time" />
 
 

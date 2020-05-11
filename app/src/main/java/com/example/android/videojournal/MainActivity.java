@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private static final float THUMBNAIL_ROW_HEIGHT = 220; // in dp
 
     static final int REQUEST_VIDEO_CAPTURE = 1;
-    private int REC_NOTIF_ID = 100;
+    private static int REC_NOTIF_ID = 100;
     static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
 
     ArrayList mVideoEntries;
@@ -95,8 +95,10 @@ public class MainActivity extends AppCompatActivity {
         // create channel for notifications
         createNotificationChannel();
 
-        int hour = 23, minute = 0;
-        setUpReminderNotification(MainActivity.this, hour, minute, AlarmReceiver.class);
+       // int hour = 23, minute = 0;
+
+        //TODO: get hour and minute from TimePickerFragment
+      //  setUpReminderNotification(MainActivity.this, hour, minute, AlarmReceiver.class);
 
     }
 
@@ -268,18 +270,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setUpReminderNotification(Context context, int hour, int minute, Class receiver) {
+    public static void setUpReminderNotification(Context context, int hour, int minute, Class receiver) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
 
+        Toast.makeText(context, "in Main Activity: Time set at hours= " + hour + " and min= " + minute, Toast.LENGTH_LONG).show();
+
         Intent intent = new Intent(context, receiver);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
 
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         // interval currently 15min for debugging
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
+
+
 
 
 
