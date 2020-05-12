@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:key="notifications_category"
+        app:title="Notification">
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="@string/pref_activate_reminder_key"
+        android:summaryOff="OFF"
+        android:summaryOn="ACTIVE"
+        android:title="@string/pref_activate_reminder_label" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_reminder_time_default"
+        android:key="@string/pref_reminder_time_key"
+        android:title="@string/pref_reminder_time_label" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

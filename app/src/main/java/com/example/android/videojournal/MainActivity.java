@@ -95,11 +95,6 @@ public class MainActivity extends AppCompatActivity {
         // create channel for notifications
         createNotificationChannel();
 
-       // int hour = 23, minute = 0;
-
-        //TODO: get hour and minute from TimePickerFragment
-      //  setUpReminderNotification(MainActivity.this, hour, minute, AlarmReceiver.class);
-
     }
 
     @Override
@@ -125,21 +120,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
             return true;
         }
 
-        if (id == R.id.action_reminder) {
-            Intent startReminderActivity = new Intent(this, ReminderActivity.class);
-            startActivity(startReminderActivity);
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -281,8 +268,8 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        // interval currently 15min for debugging
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        // interval currently shorter for debugging
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY, pendingIntent);
     }
 
 

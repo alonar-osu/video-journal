@@ -28,8 +28,8 @@ public class TimePickerFragment extends DialogFragment
         // Required empty public constructor
     }
 
-    // TODO: implement fragment
-    // then, on button click
+
+    //  on button click
     // will just need an event that adds an instance of this fragment to ReminderActivity
 
     @Override
@@ -45,22 +45,9 @@ public class TimePickerFragment extends DialogFragment
     }
 
 
-
-    /*
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        TextView textView = new TextView(getActivity());
-        textView.setText(R.string.hello_blank_fragment);
-        return textView;
-    }
-    */
-
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        // TODO: implement
         // use the time chosen by user
-
         MainActivity.setUpReminderNotification(getContext(), hourOfDay, minute, AlarmReceiver.class);
 
        // Toast.makeText(getContext(), "Time set at hours= " + hourOfDay + " and min= " + minute, Toast.LENGTH_LONG).show();

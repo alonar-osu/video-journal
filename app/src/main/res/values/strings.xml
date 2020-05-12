@@ -13,7 +13,13 @@
     <string name="sync_header">Sync</string>
 
     <!-- Settings Preferences -->
-    <string name="pick_time">Pick Time</string>
+    <string name="pref_activate_reminder_label">Daily Reminder</string>
+    <string name="pref_activate_reminder_key">set_reminder</string>
+
+    <string name="pref_reminder_time_label">Pick Daily Reminder Time</string>
+    <string name="pref_reminder_time_key">time</string>
+    <string name="pref_reminder_time_default">hello</string>
+
 
 
 </resources>
