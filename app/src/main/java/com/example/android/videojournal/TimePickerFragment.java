@@ -28,10 +28,6 @@ public class TimePickerFragment extends DialogFragment
         // Required empty public constructor
     }
 
-
-    //  on button click
-    // will just need an event that adds an instance of this fragment to ReminderActivity
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current time as the default values for the picker

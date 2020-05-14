@@ -11,13 +11,20 @@
         android:key="@string/pref_activate_reminder_key"
         android:summaryOff="OFF"
         android:summaryOn="ACTIVE"
-        android:title="@string/pref_activate_reminder_label" />
+        android:title="@string/pref_activate_reminder_label"
+        app:iconSpaceReserved="true" />
 
-    <EditTextPreference
-        android:defaultValue="@string/pref_reminder_time_default"
-        android:key="@string/pref_reminder_time_key"
-        android:title="@string/pref_reminder_time_label" />
+    <!-- add custom time picker for daily reminder  -->
+    <com.example.android.videojournal.TimePreference
+        android:key="key4"
+        android:title="Pick Daily Reminder Time"
+        android:summary="When to make daily entries"
+        android:defaultValue="810"
+        style="@style/AppPreference.DialogPreference"
+        app:iconSpaceReserved="true"
+        app:allowDividerAbove="false" />
 
-    </PreferenceCategory>
+
+</PreferenceCategory>
 
 </PreferenceScreen>
