@@ -7,22 +7,23 @@
         app:title="Notification">
 
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="@bool/pref_activate_reminder_default"
         android:key="@string/pref_activate_reminder_key"
-        android:summaryOff="OFF"
-        android:summaryOn="ACTIVE"
+        android:summaryOff="@string/pref_show_false"
+        android:summaryOn="@string/pref_show_true"
         android:title="@string/pref_activate_reminder_label"
         app:iconSpaceReserved="true" />
 
     <!-- add custom time picker for daily reminder  -->
     <com.example.android.videojournal.TimePreference
-        android:key="key4"
-        android:title="Pick Daily Reminder Time"
-        android:summary="When to make daily entries"
+        android:key="@string/pref_reminder_time_key"
+        android:title="@string/pref_reminder_time_label"
         android:defaultValue="810"
         style="@style/AppPreference.DialogPreference"
         app:iconSpaceReserved="true"
         app:allowDividerAbove="false" />
+
+        <!-- android:summary="@string/pref_reminder_time_default" -->
 
 
 </PreferenceCategory>

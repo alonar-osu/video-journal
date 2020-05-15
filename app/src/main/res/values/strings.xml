@@ -4,21 +4,27 @@
     <string name="action_reminder">Daily Reminder</string>
 
     <string name="title_activity_play_video">PlayVideoActivity</string>
+    <string name="title_activity_reminder">Daily Reminder</string>
     <string name="channel_name">Reminder notif channel</string>
     <string name="channel_description">Notif channel for creating a reminder to take video</string>
-    <string name="title_activity_reminder">Daily Reminder</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
-    <string name="sync_header">Sync</string>
 
     <!-- Settings Preferences -->
-    <string name="pref_activate_reminder_label">Daily Reminder</string>
-    <string name="pref_activate_reminder_key">set_reminder</string>
+    <!-- Label for reminder checkbox preference -->
+    <string name="pref_activate_reminder_label" translatable="false">Daily Reminder</string>
+    <!-- Key name for storing reminder in SharedPreferences -->
+    <string name="pref_activate_reminder_key" translatable="false">set_reminder</string>
 
-    <string name="pref_reminder_time_label">Pick Daily Reminder Time</string>
-    <string name="pref_reminder_time_key">time</string>
-    <string name="pref_reminder_time_default">hello</string>
+    <!-- Ssummary for Checkboxes -->
+    <string name="pref_show_true">Active</string>
+    <string name="pref_show_false">Off</string>
+
+    <!-- Label for reminder time selection preference -->
+    <string name="pref_reminder_time_label" translatable="false">Pick Daily Reminder Time</string>
+    <!-- Key name for storing reminder time in SharedPreferences -->
+    <string name="pref_reminder_time_key" translatable="false">time</string>
+
+    <string name="pref_reminder_time_default">When to make daily entries</string>
 
 
 

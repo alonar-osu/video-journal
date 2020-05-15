@@ -1,11 +1,14 @@
 package com.example.android.videojournal;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 
 import android.util.AttributeSet;
 
 import androidx.preference.DialogPreference;
+
+// adapted from https://medium.com/@JakobUlbrich/building-a-settings-screen-for-android-part-3-ae9793fd31ec
 
 public class TimePreference extends DialogPreference {
 

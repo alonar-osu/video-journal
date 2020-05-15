@@ -1,8 +1,11 @@
 package com.example.android.videojournal;
 
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
 
@@ -51,8 +54,13 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
             mTimePicker.setIs24HourView(is24hour);
             mTimePicker.setCurrentHour(hours);
             mTimePicker.setCurrentMinute(minutes);
+            // TEMP - testing
+            // TODO: need to do this so that summary persists
+            preference.setSummary("" + hours + "H" + minutes);
         }
     }
+
+
 
     @Override
     public void onDialogClosed(boolean positiveResult) {
@@ -72,11 +80,30 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
                         minutesAfterMidnight)) {
                     // Save the value
                     timePreference.setTime(minutesAfterMidnight);
+                    timePreference.setSummary("" + hours + "H" + minutes);
+                    updateNotificationTime();
                 }
             }
         }
     }
 
+    private void updateNotificationTime() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        // if activate checkmark is on
+        if (sharedPreferences.getBoolean(getString(R.string.pref_activate_reminder_key), getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
+            int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
+            // get hours and mins from savedTime
+            int hours = minutesAfterMidnight / 60;
+            int minutes = minutesAfterMidnight % 60;
+            MainActivity.setUpReminderNotification(getContext(), hours, minutes, AlarmReceiver.class);
+        }
+    }
+
+   // @Override
+   // public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+
+   // }
+  //  }
 
 
 }

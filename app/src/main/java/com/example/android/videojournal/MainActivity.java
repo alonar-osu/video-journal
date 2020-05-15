@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -28,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
@@ -41,7 +43,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
@@ -95,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
         // create channel for notifications
         createNotificationChannel();
 
+        setupSharedPreferences();
     }
 
     @Override
@@ -269,11 +272,52 @@ public class MainActivity extends AppCompatActivity {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         // interval currently shorter for debugging
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_HALF_DAY, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        // activate checkmark status changed
+        if (key.equals(getString(R.string.pref_activate_reminder_key))) {
+            // was checked - turn on notification
+            if (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
+                int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
+                // get hours and mins from savedTime
+                int hours = minutesAfterMidnight / 60;
+                int minutes = minutesAfterMidnight % 60;
+                setUpReminderNotification(MainActivity.this, hours, minutes, AlarmReceiver.class);
+                Log.d(TAG, "onSharedChanged - reminder time is: " + minutesAfterMidnight);
+            } else { // was unchecked - turn off notifications
+                Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, REC_NOTIF_ID, intent, 0);
+                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                alarmManager.cancel(pendingIntent);
+                Log.d(TAG, "onSharedChanged - cancelled alarm");
+            }
+        }
+    }
 
+    private void setupSharedPreferences() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        boolean reminderActive = sharedPreferences.getBoolean(getString(R.string.pref_activate_reminder_key),
+                getResources().getBoolean(R.bool.pref_activate_reminder_default));
+        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
+        // get hours and mins from savedTime
+        int hours = minutesAfterMidnight / 60;
+        int minutes = minutesAfterMidnight % 60;
+        if (reminderActive) {
+            setUpReminderNotification(MainActivity.this, hours, minutes, AlarmReceiver.class);
+        }
 
+        // register listener for preference changes
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
 }
