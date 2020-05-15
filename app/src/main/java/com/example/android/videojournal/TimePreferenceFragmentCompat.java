@@ -4,10 +4,12 @@ package com.example.android.videojournal;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDialogFragmentCompat;
@@ -54,9 +56,7 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
             mTimePicker.setIs24HourView(is24hour);
             mTimePicker.setCurrentHour(hours);
             mTimePicker.setCurrentMinute(minutes);
-            // TEMP - testing
-            // TODO: need to do this so that summary persists
-            preference.setSummary("" + hours + "H" + minutes);
+
         }
     }
 
@@ -80,12 +80,29 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
                         minutesAfterMidnight)) {
                     // Save the value
                     timePreference.setTime(minutesAfterMidnight);
-                    timePreference.setSummary("" + hours + "H" + minutes);
+
                     updateNotificationTime();
+
+                    // update time pref's summary with chosen time
+                    String summary = "";
+                    if (hours >= 12) {
+                        if (hours >= 13) summary += hours - 12;
+                        else summary += hours;
+                        summary += " : " + minutes + " PM";
+                    } else {
+                        if (hours == 0) summary += hours + 12;
+                        else summary += hours;
+                        summary += " : " + minutes + " AM";
+                    }
+                    timePreference.setSummary(summary);
                 }
             }
         }
     }
+
+
+
+
 
     private void updateNotificationTime() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());

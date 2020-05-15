@@ -22,57 +22,31 @@ public class SettingsFragment extends PreferenceFragmentCompat  {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_journal);
 
-/*
-        DialogPreference preference = getPreference();
-        Integer minutesAfterMidnight = null;
-        if (preference instanceof TimePreference) {
-            minutesAfterMidnight =
-                    ((TimePreference) preference).getTime();
-        }
-        */
-
-   //     TimePreference timepref = (TimePreference) findPreference(R.string.pref_reminder_time_key);
-        // instead of below, actually get a Time Preference object
-
-        // get custom preference instance
-        // then
-        // TimePreference timePreference = (TimePreference) preference;
-        // timePreference.setSummary("test 5h10");
-
-/*
-        PreferenceScreen prefScreen = getPreferenceScreen();
-     //   int count = prefScreen.getPreferenceCount();
-     //   Log.d(TAG, "count of prefs: " + count);
-
-       // for (int i = 0; i < count + 1; i++) {
-            Preference p = prefScreen.getPreference(1);
-            if (p instanceof com.example.android.videojournal.TimePreference) {
-                Log.d(TAG, "found timepreference!");
-                //setPreferenceSummary(p, getContext());
-        //    }
-        }
-            */
-
-      //  DialogPreference preference = getPreference();
-     //   if (preference instanceof TimePreference) {
-
+        setTimePickerPreferenceSummary();
 
     }
 
-/*
-    private void setPreferenceSummary(Preference preference, Context context) {
-        if (preference instanceof TimePreference) {
-            TimePreference timePreference = (TimePreference) preference;
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
-            // get hours and mins from savedTime
-            int hours = minutesAfterMidnight / 60;
-            int minutes = minutesAfterMidnight % 60;
-            timePreference.setSummary("test 5h10");
-            // "" + hours + "H" + minutes
+    private void setTimePickerPreferenceSummary() {
+        Preference timePreference = findPreference(getString(R.string.pref_reminder_time_key));
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
+        // get hours and mins from savedTime
+        int hours = minutesAfterMidnight / 60;
+        int minutes = minutesAfterMidnight % 60;
+        // show chosen time in summary of pref
+        String summary = "";
+        if (hours >= 12) {
+            if (hours >= 13) summary += hours - 12;
+            else summary += hours;
+            summary += " : " + minutes + " PM";
+        } else {
+            if (hours == 0) summary += hours + 12;
+            else summary += hours;
+            summary += " : " + minutes + " AM";
         }
+        timePreference.setSummary(summary);
     }
-    */
+
 
     // launch custom time picker pref dialog
     @Override
