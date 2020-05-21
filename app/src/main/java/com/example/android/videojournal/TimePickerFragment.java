@@ -18,14 +18,11 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-/**
- * A simple {@link Fragment} subclass.
- */
+
 public class TimePickerFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener {
 
     public TimePickerFragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -45,7 +42,5 @@ public class TimePickerFragment extends DialogFragment
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // use the time chosen by user
         MainActivity.setUpReminderNotification(getContext(), hourOfDay, minute, AlarmReceiver.class);
-
-       // Toast.makeText(getContext(), "Time set at hours= " + hourOfDay + " and min= " + minute, Toast.LENGTH_LONG).show();
     }
 }

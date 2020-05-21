@@ -20,13 +20,16 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <!-- custom recyclerview with autoplay -->
+    <com.example.android.videojournal.VideoRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="?attr/actionBarSize"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="?attr/colorPrimary" />
+        android:background="?attr/colorPrimary" >
+
+    </com.example.android.videojournal.VideoRecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -38,7 +41,7 @@
         android:layout_marginTop="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
-        app:backgroundTint="@android:color/holo_orange_dark"
+        app:backgroundTint="?attr/colorAccent"
         app:srcCompat="@android:drawable/ic_input_add" />
 
 </RelativeLayout>

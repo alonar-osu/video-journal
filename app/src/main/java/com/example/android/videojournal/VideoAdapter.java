@@ -2,14 +2,12 @@ package com.example.android.videojournal;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,9 +15,10 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder> {
+public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = VideoAdapter.class.getSimpleName();
 
@@ -31,18 +30,18 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
        this.mVideoEntries = videoEntries;
     }
 
+    @NonNull
     @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.rowlayout, parent, false);
-        return new MyViewHolder(v);
+    public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rowlayout, viewGroup, false);
+        return new VideoViewHolder(v);
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, final int position) {
-        // DEBUGGING: showing view's number
-        Log.d(TAG, "view #" + position);
-        // DEBUGGING: getting time in onBindViewHolder method
-        long startTime = System.currentTimeMillis();
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
+
+        Log.d(TAG, "view #" + position); // view's number
+        long startTime = System.currentTimeMillis(); // getting time in onBindViewHolder method
 
         // get video info
         VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
@@ -53,14 +52,13 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
         Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, context);
 
         if (videoThumbnail != null) {
-            holder.thumbnailView.setImageBitmap(videoThumbnail);
+            ((VideoViewHolder) holder).thumbnailView.setImageBitmap(videoThumbnail);
         } else {
             Log.d(TAG, "Video thumbnail does not exist");
         }
-        holder.videoPath = videoPath;
+        ((VideoViewHolder) holder).videoPath = videoPath;
 
-        // DEBUGGING: getting time in onBindViewHolder method
-        Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime));
+        Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime)); // time in method
     }
 
     @Override
@@ -80,35 +78,4 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.MyViewHolder
         }
         return thumbnail;
     }
-
-    class MyViewHolder extends RecyclerView.ViewHolder {
-        ImageView thumbnailView;
-        String videoPath;
-
-        public MyViewHolder(View itemView) {
-            super(itemView);
-            thumbnailView = (ImageView) itemView.findViewById(R.id.thumbnail);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Context context = v.getContext();
-                    Intent intent = new Intent(context, PlayVideoActivity.class);
-                    intent.putExtra("VIDEO_PATH", videoPath);
-                    context.startActivity(intent);
-                }
-            });
-        }
-
-
-
-
-        /*
-        void bind (int position) {
-           // image.setImageResource(galleryImages.get(position));
-            image.setImageResource(dinoImages.get(position));
-        }
-        */
-    }
-
 }

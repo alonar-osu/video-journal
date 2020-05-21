@@ -26,7 +26,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.preference.PreferenceManager;
@@ -53,8 +52,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     static final int REQUEST_VIDEO_CAPTURE = 1;
     private static int REC_NOTIF_ID = 100;
     static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
+    private static int DEFAULT_NOTIF_TIME_MINS = 60;
 
     ArrayList mVideoEntries;
+    private VideoRecyclerView mRecyclerView;
     private int mRequiredHeight;
     private int mRequiredWidth;
 
@@ -67,15 +68,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         // check permissions for thumbnails
         if (checkReadExternalStoragePermission()) {
-            RecyclerView recyclerView = findViewById(R.id.recyclerView);
-            recyclerView.setItemViewCacheSize(20);
+            mRecyclerView = findViewById(R.id.recyclerView);
+            mRecyclerView.setItemViewCacheSize(20);
 
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-            recyclerView.setLayoutManager(linearLayoutManager);
+            mRecyclerView.setLayoutManager(linearLayoutManager);
             mVideoEntries = SQLiteDBHelper.getVideoEntriesFromDB(MainActivity.this);
+            mRecyclerView.setVideoEntries(mVideoEntries);
             if (mVideoEntries != null) {
                 VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, mVideoEntries);
-                recyclerView.setAdapter(videoAdapter);
+                mRecyclerView.setAdapter(videoAdapter);
             }
         }
 
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
 
-        // create channel for notifications
+        // channel for notifications
         createNotificationChannel();
 
         setupSharedPreferences();
@@ -129,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             startActivity(startSettingsActivity);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -178,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // restart activity to show new video thumbnail
             finish();
             startActivity(getIntent());
-            // showVideo(videoUri);
         }
     }
 
@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         // interval currently shorter for debugging
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     @Override
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if (key.equals(getString(R.string.pref_activate_reminder_key))) {
             // was checked - turn on notification
             if (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
-                int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
+                int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
                 // get hours and mins from savedTime
                 int hours = minutesAfterMidnight / 60;
                 int minutes = minutesAfterMidnight % 60;
@@ -302,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         boolean reminderActive = sharedPreferences.getBoolean(getString(R.string.pref_activate_reminder_key),
                 getResources().getBoolean(R.bool.pref_activate_reminder_default));
-        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
+        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
         // get hours and mins from savedTime
         int hours = minutesAfterMidnight / 60;
         int minutes = minutesAfterMidnight % 60;
@@ -319,5 +319,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onDestroy();
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
+
+        if (mRecyclerView != null) {
+            mRecyclerView.releasePlayer();
+        }
     }
 }

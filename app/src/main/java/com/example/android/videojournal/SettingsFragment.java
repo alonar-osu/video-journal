@@ -1,18 +1,12 @@
 package com.example.android.videojournal;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import androidx.preference.DialogPreference;
 
 import androidx.fragment.app.DialogFragment;
-import androidx.preference.DialogPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
-import androidx.preference.PreferenceScreen;
 
 public class SettingsFragment extends PreferenceFragmentCompat  {
 

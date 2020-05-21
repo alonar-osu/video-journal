@@ -10,11 +10,12 @@
     app:cardPreventCornerOverlap="true">
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/media_container"
     android:layout_width="match_parent"
     android:layout_height="220dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-     <!--items for RecyclerView-->
+     <!--video thumbnails for RecyclerView-->
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="match_parent"
@@ -29,6 +30,15 @@
         android:layout_height="match_parent"
         android:scaleType="centerInside"
         app:srcCompat="@drawable/ic_play_circle" />
+
+    <!--progress bar-->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        style="?android:attr/progressBarStyle"
+        android:visibility="gone"
+        android:layout_gravity="center"/>
 
 </RelativeLayout>
 </androidx.cardview.widget.CardView>
