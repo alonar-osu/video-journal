@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,14 +17,12 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
     View parent;
     ImageView thumbnailView;
     String videoPath;
-    ProgressBar progressBar;
 
     public VideoViewHolder(View itemView) {
         super(itemView);
         parent = itemView;
         media_container = itemView.findViewById(R.id.media_container);
         thumbnailView = (ImageView) itemView.findViewById(R.id.thumbnail);
-        progressBar = itemView.findViewById(R.id.progressBar);
 
         itemView.setTag(this);
 

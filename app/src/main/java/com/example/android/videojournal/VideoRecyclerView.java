@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -49,7 +48,6 @@ public class VideoRecyclerView extends RecyclerView {
     private static final String TAG = VideoRecyclerView.class.getSimpleName();
 
     private ImageView thumbnailView;
-    private ProgressBar progressBar;
     private View viewHolderParent;
     private RelativeLayout relativeLayout;
     private PlayerView videoSurfaceView;
@@ -92,6 +90,8 @@ public class VideoRecyclerView extends RecyclerView {
         // bind player to view
         videoSurfaceView.setUseController(false);
         videoSurfaceView.setPlayer(videoPlayer);
+        // mute player
+        videoPlayer.setVolume(0f);
 
         addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -155,9 +155,6 @@ public class VideoRecyclerView extends RecyclerView {
 
                     case Player.STATE_BUFFERING:
                         Log.d(TAG, "onPlayerStateChanged: Buffering video");
-                        if (progressBar != null){
-                            progressBar.setVisibility(VISIBLE);
-                        }
                         break;
 
                     case Player.STATE_ENDED:
@@ -170,9 +167,6 @@ public class VideoRecyclerView extends RecyclerView {
 
                     case Player.STATE_READY:
                         Log.d(TAG, "onPlayerStateChanged: Ready to play");
-                        if (progressBar != null) {
-                            progressBar.setVisibility(GONE);
-                        }
                         if(!isVideoViewAdded) {
                             addVideoView();
                         }
@@ -268,7 +262,6 @@ public class VideoRecyclerView extends RecyclerView {
             return;
         }
         thumbnailView = holder.thumbnailView;
-        progressBar = holder.progressBar;
         viewHolderParent = holder.itemView;
         relativeLayout = holder.itemView.findViewById(R.id.media_container);
 
