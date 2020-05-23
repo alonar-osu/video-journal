@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -25,6 +26,8 @@ import com.google.android.exoplayer2.util.Util;
 
 
 public class PlayVideoActivity extends AppCompatActivity {
+
+    SimpleExoPlayer mVideoPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,19 +41,21 @@ public class PlayVideoActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        // PlayerView
         PlayerView fullscreenPlayVideoView = findViewById(R.id.fullscreenPlayVideoView);
 
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
 
-        SimpleExoPlayer videoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        // video player
+        mVideoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
 
-        fullscreenPlayVideoView.setUseController(false);
-        fullscreenPlayVideoView.setPlayer(videoPlayer);
-        videoPlayer.setVolume(1f); // volume ON
+        fullscreenPlayVideoView.setUseController(true);
+        fullscreenPlayVideoView.setPlayer(mVideoPlayer);
+        mVideoPlayer.setVolume(1f); // volume ON
 
-        fullscreenPlayVideoView.setPlayer(videoPlayer);
+        fullscreenPlayVideoView.setPlayer(mVideoPlayer);
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, Util.getUserAgent(context, "Video Journal"));
 
@@ -60,8 +65,21 @@ public class PlayVideoActivity extends AppCompatActivity {
         if (mediaUrl != null) {
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(mediaUrl));
-            videoPlayer.prepare(videoSource);
-            videoPlayer.setPlayWhenReady(true);
+            mVideoPlayer.prepare(videoSource);
+            mVideoPlayer.setPlayWhenReady(true);
         }
     }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mVideoPlayer != null) {
+            mVideoPlayer.release();
+            mVideoPlayer = null;
+        }
+    }
+
+
 }
