@@ -10,9 +10,12 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
+import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -47,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
     private final static int READ_EXTERNAL_STORAGE_PERMISSION_RESULT = 0;
-    private static final float THUMBNAIL_ROW_HEIGHT = 220; // in dp
 
     static final int REQUEST_VIDEO_CAPTURE = 1;
     private static int REC_NOTIF_ID = 100;
@@ -56,8 +58,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     ArrayList mVideoEntries;
     private VideoRecyclerView mRecyclerView;
-    private int mRequiredHeight;
-    private int mRequiredWidth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +80,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 mRecyclerView.setAdapter(videoAdapter);
             }
         }
-
-        // get dimensions for video thumbnails
-        findRequiredThumbnailDimensions();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -148,20 +145,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // generate bitmap from video
             Bitmap videoThumbnail = null;
             try {
-                videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoRealPath, MediaStore.Images.Thumbnails.MINI_KIND);
+                videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoRealPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
             } catch (Exception e) {
                 Log.d(TAG, "Exception happened when making bitmap for video thumbnail");
             }
-
             // DEBUGGING
-            Log.d(TAG, "thumbnail byte size 1: " + videoThumbnail.getByteCount());
-
-            if (videoThumbnail != null) {
-                videoThumbnail = ThumbnailUtils.extractThumbnail(videoThumbnail, mRequiredWidth, mRequiredHeight,
-                        ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
-            } else {
-                Log.d(TAG, "Video thumbnail does not exist");
-            }
+            Log.d(TAG, "thumbnail byte size: " + videoThumbnail.getByteCount());
 
             // save bitmap to file, get path
             String videoThumbnailName = generateThumbnailFileName();
@@ -171,8 +160,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             // save video info and bitmap to database
             SQLiteDBHelper sqliteDB = new SQLiteDBHelper(MainActivity.this);
             if (videoUri != null) {
-                // TODO: see if need the bitmapPath or not
-                // see if need to save thumbnailFolder in database
                 sqliteDB.saveToDB(MainActivity.this, videoUri, videoThumbnailPath, videoThumbnailName);
             }
 
@@ -206,18 +193,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         }
             return true;
-    }
-
-    private void findRequiredThumbnailDimensions() {
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        mRequiredWidth = size.x;
-        final float scale = getResources().getDisplayMetrics().density;
-        mRequiredHeight = (int) (THUMBNAIL_ROW_HEIGHT * scale);
-
-        Log.d("reqwidth :", String.valueOf(mRequiredWidth));
-        Log.d("reqheight :", String.valueOf(mRequiredHeight));
     }
 
     private String generateThumbnailFileName() {

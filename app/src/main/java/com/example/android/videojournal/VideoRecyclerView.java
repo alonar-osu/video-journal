@@ -274,6 +274,10 @@ public class VideoRecyclerView extends RecyclerView {
                     .createMediaSource(Uri.parse(mediaUrl));
             videoPlayer.prepare(videoSource);
             videoPlayer.setPlayWhenReady(true);
+
+            // DEBUGGING
+            Log.d(TAG, "video surface height: " + relativeLayout.getHeight());
+            Log.d(TAG, "video surface width: " + relativeLayout.getWidth());
         }
     }
 

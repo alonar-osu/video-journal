@@ -47,17 +47,19 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
 
         String videoPath = videoEntry.getVideopath();
+        ((VideoViewHolder) holder).videoPath = videoPath;
+
         // get video thumbnail from internal storage
         String thumbnailFileName = videoEntry.getmThumbnailFileName();
         Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, context);
 
         if (videoThumbnail != null) {
+            ((VideoViewHolder) holder).thumbnailView.setAdjustViewBounds(true);
+            // set bitmap thumbnail
             ((VideoViewHolder) holder).thumbnailView.setImageBitmap(videoThumbnail);
         } else {
             Log.d(TAG, "Video thumbnail does not exist");
         }
-        ((VideoViewHolder) holder).videoPath = videoPath;
-
         Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime)); // time in method
     }
 
