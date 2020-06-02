@@ -9,7 +9,7 @@
     app:cardElevation="8dp"
     app:cardPreventCornerOverlap="true">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/media_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -21,7 +21,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_launcher"
-        android:scaleType="fitCenter"/>
+        android:scaleType="fitCenter"
+        android:elevation="10dp"/>
     <!-- android:layout_centerInParent="true"-->
 
     <!--play icon overlay-->
@@ -29,8 +30,10 @@
         android:id="@+id/play_icon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:scaleType="centerInside"
-        app:srcCompat="@drawable/ic_play_circle" />
+        app:srcCompat="@drawable/ic_play_circle"
+        android:elevation="20dp" />
 
-</RelativeLayout>
+</FrameLayout>
 </androidx.cardview.widget.CardView>
