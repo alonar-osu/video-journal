@@ -158,7 +158,6 @@ public class VideoRecyclerView extends RecyclerView {
                         break;
 
                     case Player.STATE_ENDED:
-                        Log.d(TAG, "onPlayerStateChanged: Video ended");
                         videoPlayer.seekTo(0);
                         break;
 
@@ -167,6 +166,7 @@ public class VideoRecyclerView extends RecyclerView {
 
                     case Player.STATE_READY:
                         Log.d(TAG, "onPlayerStateChanged: Ready to play");
+
                         if(!isVideoViewAdded) {
                             addVideoView();
                         }
@@ -215,12 +215,19 @@ public class VideoRecyclerView extends RecyclerView {
 
         if (!isEndOfList) {
             int startPosition = ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
+            Log.d(TAG, "debug pos/height: startPosition: " + startPosition);
             int endPosition = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
+            Log.d(TAG, "debug pos/height: endPosition: " + endPosition);
+
 
             // if > 2 list-items on screen, set difference to 1
             if ((endPosition - startPosition) > 1) {
                 endPosition = startPosition + 1;
-            }
+
+            }  else if ((endPosition - startPosition) == 1 && startPosition > 0) { // BUG FIX
+                startPosition -= 1;
+                endPosition -= 1;
+            } //END BUG FIX
 
             // some error
             if (startPosition < 0 || endPosition < 0) return;
@@ -229,14 +236,18 @@ public class VideoRecyclerView extends RecyclerView {
             if (startPosition != endPosition) {
                 int startPositionVideoHeight = getVisibleVideoSurfaceHeight(startPosition);
                 int endPositionVideoHeight = getVisibleVideoSurfaceHeight(endPosition);
+                Log.d(TAG, "debug pos/height: startPosHeight: " + startPositionVideoHeight);
+                Log.d(TAG, "debug pos/height: endPosHeight: " + endPositionVideoHeight);
 
                 targetPosition = startPositionVideoHeight > endPositionVideoHeight ? startPosition : endPosition;
-            } else {
+            } else { // 1 item on screen
                 targetPosition = startPosition;
             }
         } else { // video is at the end of list
             targetPosition = mVideoEntries.size() - 1;
         }
+
+        Log.d(TAG, "pos debug - targetPos: " + targetPosition);
 
         Log.d(TAG, "autoplayVideo: target position: " + targetPosition);
 
@@ -248,10 +259,11 @@ public class VideoRecyclerView extends RecyclerView {
         if (videoSurfaceView == null) return;
 
         // remove any old surface views from previously playing videos
-        videoSurfaceView.setVisibility(INVISIBLE);
-        removeVideoView(videoSurfaceView);
+       removeVideoView(videoSurfaceView);
 
         int currentPosition = targetPosition - ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
+
+        Log.d(TAG, "pos debug - currPos: " + currentPosition);
 
         View child = getChildAt(currentPosition);
         if (child == null) return;
@@ -299,6 +311,7 @@ public class VideoRecyclerView extends RecyclerView {
     }
 
     private void removeVideoView(PlayerView videoView) {
+
         ViewGroup parent = (ViewGroup) videoView.getParent();
         if (parent == null) return;
 
@@ -310,20 +323,22 @@ public class VideoRecyclerView extends RecyclerView {
     }
 
     private void addVideoView() {
+
         relativeLayout.addView(videoSurfaceView);
         isVideoViewAdded = true;
         videoSurfaceView.requestFocus();
         videoSurfaceView.setVisibility(VISIBLE);
         videoSurfaceView.setAlpha(1);
-        thumbnailView.setVisibility(GONE);
+        thumbnailView.setVisibility(INVISIBLE); // changed GONE to INVISIBLE
     }
 
     private void resetVideoView() {
+
         if (isVideoViewAdded) {
             removeVideoView(videoSurfaceView);
             playPosition = -1;
-            videoSurfaceView.setVisibility(INVISIBLE);
             thumbnailView.setVisibility(VISIBLE);
+            videoSurfaceView.setVisibility(INVISIBLE);
         }
     }
 
