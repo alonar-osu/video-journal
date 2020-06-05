@@ -87,7 +87,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
 
-        // create player
         videoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
         // bind player to view
         videoSurfaceView.setUseController(false);
@@ -95,8 +94,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         // mute player
         videoPlayer.setVolume(0f);
 
-        // listener to detect when first video frame rendered
-        videoPlayer.getVideoComponent().addVideoListener(this);
+            // listener to detect when first video frame rendered
+            videoPlayer.getVideoComponent().addVideoListener(this);
 
         addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -348,7 +347,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         }
         viewHolderParent = null;
 
-        videoPlayer.getVideoComponent().removeVideoListener(this);
+        if (videoPlayer != null) videoPlayer.getVideoComponent().removeVideoListener(this);
     }
 
     public void setVideoEntries(ArrayList<VideoEntry> videoEntries) {
