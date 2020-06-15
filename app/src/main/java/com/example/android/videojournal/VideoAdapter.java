@@ -59,6 +59,9 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             Log.d(TAG, "Video thumbnail does not exist");
         }
         ((VideoViewHolder) holder).videoPath = videoPath;
+        ((VideoViewHolder) holder).thumbnailPath = videoEntry.getmThumbnailPath();
+        ((VideoViewHolder) holder).position = position;
+
         Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime)); // time in method
     }
 
@@ -79,4 +82,5 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
         return thumbnail;
     }
+
 }

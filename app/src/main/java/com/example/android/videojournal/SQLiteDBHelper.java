@@ -81,6 +81,29 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         Log.d(TAG, "Saved new video in DB with row Id: " + newRowId);
     }
 
+    protected void deleteFromDB(Context context, String videoPath) {
+        SQLiteDatabase db = new SQLiteDBHelper(context).getWritableDatabase();
+        Log.d(TAG, "SQL DB: before deleting countDBItems = " + countDBItems(context));
+
+
+      //  db.execSQL("DELETE FROM " + VIDEO_TABLE_NAME + " WHERE " + VIDEOINFO_COLUMN_THUMBNAIL_PATH + " = " + thumbnailPath);
+        db.delete(VIDEO_TABLE_NAME, VIDEOINFO_COLUMN_PATH + "=" + videoPath, null);
+
+        db.close();
+        Log.d(TAG, "SQL DB: after deleting countDBItems = " + countDBItems(context));
+       // db.close();
+        Log.d(TAG, "SQL DB: Deleted video entry with columnID: " + videoPath);
+    }
+
+
+    protected static int countDBItems(Context context) {
+        SQLiteDatabase db = new SQLiteDBHelper(context).getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + VIDEO_TABLE_NAME, null);
+        int numEntries = cursor.getCount();
+        cursor.close();
+        return numEntries;
+    }
+
     protected static ArrayList<VideoEntry> getVideoEntriesFromDB(Context context) {
         ArrayList<VideoEntry> videoEntryList = new ArrayList<>();
         SQLiteDatabase db = new SQLiteDBHelper(context).getWritableDatabase();

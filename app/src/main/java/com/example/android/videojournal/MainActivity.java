@@ -10,12 +10,8 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
-import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -26,6 +22,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -34,7 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,20 +39,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
-    private final static int READ_EXTERNAL_STORAGE_PERMISSION_RESULT = 0;
+    private final static int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
 
     static final int REQUEST_VIDEO_CAPTURE = 1;
     private static int REC_NOTIF_ID = 100;
     static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static int DEFAULT_NOTIF_TIME_MINS = 60;
 
-    ArrayList mVideoEntries;
+    private static ArrayList mVideoEntries;
     private VideoRecyclerView mRecyclerView;
 
     @Override
@@ -66,20 +63,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // check permissions for thumbnails
-        if (checkReadExternalStoragePermission()) {
-            mRecyclerView = findViewById(R.id.recyclerView);
-            mRecyclerView.setItemViewCacheSize(20);
+        Toast.makeText(getApplicationContext(), "onCreate() is runnning", Toast.LENGTH_LONG).show();
 
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-            mRecyclerView.setLayoutManager(linearLayoutManager);
-            mVideoEntries = SQLiteDBHelper.getVideoEntriesFromDB(MainActivity.this);
-            mRecyclerView.setVideoEntries(mVideoEntries);
-            if (mVideoEntries != null) {
-                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, mVideoEntries);
-                mRecyclerView.setAdapter(videoAdapter);
-            }
-        }
+
+        //
+
+
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,9 +76,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             public void onClick(View view) {
                 // on click action
                 Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                takeVideoIntent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
+                takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
+                takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
+
+
                 if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
                 }
+
             }
         });
 
@@ -100,16 +95,25 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
-            case READ_EXTERNAL_STORAGE_PERMISSION_RESULT:
-                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    // call cursor loader
-                    Toast.makeText(getApplicationContext(), "Permission granted to use thumbnails", Toast.LENGTH_LONG).show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    protected void onStart() {
+        super.onStart();
+
+        // check permissions for thumbnails
+        if (checkReadExternalStoragePermission()) {
+            mRecyclerView = findViewById(R.id.recyclerView);
+            mRecyclerView.setItemViewCacheSize(20);
+
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+            mRecyclerView.setLayoutManager(linearLayoutManager);
+            mVideoEntries = SQLiteDBHelper.getVideoEntriesFromDB(MainActivity.this);
+            Collections.reverse(mVideoEntries); // last video on top
+            mRecyclerView.setVideoEntries(mVideoEntries);
+            Log.d(TAG, "Rem DB test- in onStart: DB size is = " + SQLiteDBHelper.countDBItems(MainActivity.this));
+            Log.d(TAG, "Rem DB test- in onStart: videoEntries.size() = " + mVideoEntries.size());
+            if (mVideoEntries.size() > 0) {
+                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, mVideoEntries);
+                mRecyclerView.setAdapter(videoAdapter);
+            }
         }
     }
 
@@ -156,6 +160,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             String videoThumbnailName = generateThumbnailFileName();
             String videoThumbnailsFolder = THUMBNAIL_DIRECTORY_NAME;
             String videoThumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, videoThumbnailName);
+            videoThumbnailPath += "/" + videoThumbnailName;
 
             // save video info and bitmap to database
             SQLiteDBHelper sqliteDB = new SQLiteDBHelper(MainActivity.this);
@@ -186,13 +191,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     PackageManager.PERMISSION_GRANTED) {
                 return true;
             } else {
-                if (shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     Toast.makeText(getApplicationContext(), "App needs to view thumbnails", Toast.LENGTH_LONG).show();
                 }
-                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_PERMISSION_RESULT);
+                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_REQUEST_CODE);
             }
         }
             return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch(requestCode) {
+            case READ_EXTERNAL_STORAGE_REQUEST_CODE:
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    // call cursor loader
+                    Toast.makeText(getApplicationContext(), "Read Permission Granted", Toast.LENGTH_LONG).show();
+                }
+                break;
+                default:
+                    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     private String generateThumbnailFileName() {
@@ -299,4 +318,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mRecyclerView.releasePlayer();
         }
     }
+
+    public static void removeVideoEntry(int position) {
+        Log.d(TAG, "removeVideoEntry: before removing");
+        Log.d(TAG, "removeVideoEntry: mVideoEntries.size() = " + mVideoEntries.size());
+        mVideoEntries.remove(position);
+        Log.d(TAG, "removeVideoEntry: removed entry at position: " + position);
+
+        Log.d(TAG, "removeVideoEntry: mVideoEntries.size() = " + mVideoEntries.size());
+
+
+    }
+
 }

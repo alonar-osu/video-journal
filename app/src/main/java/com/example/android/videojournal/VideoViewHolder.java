@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +18,8 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
     ImageView thumbnailView;
     ImageView playIconView;
     String videoPath;
+    String thumbnailPath;
+    int position;
 
     public VideoViewHolder(View itemView) {
         super(itemView);
@@ -33,6 +36,8 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
                 Context context = v.getContext();
                 Intent intent = new Intent(context, PlayVideoActivity.class);
                 intent.putExtra("VIDEO_PATH", videoPath);
+                intent.putExtra("THUMBNAIL_PATH", thumbnailPath);
+                intent.putExtra("POSITION", position);
                 context.startActivity(intent);
             }
         });

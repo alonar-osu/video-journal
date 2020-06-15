@@ -94,8 +94,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         // mute player
         videoPlayer.setVolume(0f);
 
-            // listener to detect when first video frame rendered
-            videoPlayer.getVideoComponent().addVideoListener(this);
+        // listener to detect when first video frame rendered
+        videoPlayer.getVideoComponent().addVideoListener(this);
 
         addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -106,7 +106,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                     if(thumbnailView != null) { // show old thumbnail
                         thumbnailView.setVisibility(VISIBLE);
                         playIconView.setVisibility(VISIBLE);
-
                     }
 
                     // special case when end of list was reached
@@ -284,7 +283,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                     .createMediaSource(Uri.parse(mediaUrl));
             videoPlayer.prepare(videoSource);
             videoPlayer.setPlayWhenReady(true);
-
         }
     }
 
@@ -364,4 +362,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         thumbnailView.setVisibility(INVISIBLE);
         playIconView.setVisibility(INVISIBLE);
     }
+
+
 }
