@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static int DEFAULT_NOTIF_TIME_MINS = 60;
 
-    private static ArrayList mVideoEntries;
     private VideoRecyclerView mRecyclerView;
     private AppDatabase mDb; // database using Room
 
@@ -106,13 +105,26 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
             mRecyclerView.setLayoutManager(linearLayoutManager);
 
-            mVideoEntries = (ArrayList) mDb.videoDao().loadAllVideos();
-            Collections.reverse(mVideoEntries); // last video on top
-            mRecyclerView.setVideoEntries(mVideoEntries);
-            if (mVideoEntries.size() > 0) {
-                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, mVideoEntries);
-                mRecyclerView.setAdapter(videoAdapter);
-            }
+
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    final ArrayList<VideoEntry> videoEntries = (ArrayList) mDb.videoDao().loadAllVideos();
+                    Collections.reverse(videoEntries); // last video on top
+
+                    // simplify this later
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mRecyclerView.setVideoEntries(videoEntries);
+                            if (videoEntries.size() > 0) {
+                                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, videoEntries);
+                                mRecyclerView.setAdapter(videoAdapter);
+                            }
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -169,20 +181,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
             retriever.release();
 
-            VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName);
-            mDb.videoDao().insertVideo(videoEntry);
-
+            // save data to DB
+            final VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName);
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    mDb.videoDao().insertVideo(videoEntry);
+                    finish();
+                    // restart activity to show new video thumbnail
+                    startActivity(getIntent());
+                }
+            });
 
             // SQLite initial save
           //  SQLiteDBHelper sqliteDB = new SQLiteDBHelper(MainActivity.this);
            // if (videoUri != null) {
              //   sqliteDB.saveToDB(MainActivity.this, videoUri, videoThumbnailPath, videoThumbnailName);
            // }
-
-
-            // restart activity to show new video thumbnail
-            finish();
-            startActivity(getIntent());
         }
     }
 
