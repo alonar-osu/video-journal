@@ -34,6 +34,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
+import java.util.ArrayList;
 
 
 public class PlayVideoActivity extends AppCompatActivity {
@@ -45,6 +46,8 @@ public class PlayVideoActivity extends AppCompatActivity {
     String mThumbnailPath;
     int mPosition;
     Context context;
+    private AppDatabase mDb; // database using Room
+    private VideoAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +62,7 @@ public class PlayVideoActivity extends AppCompatActivity {
 
         }
 
-
+        mDb = AppDatabase.getInstance(getApplicationContext());
 
     }
 
@@ -141,33 +144,22 @@ public class PlayVideoActivity extends AppCompatActivity {
                 Log.d(TAG, "thumbnail file Deleted :" + mThumbnailPath);
             }
 
-           // Log.d(TAG, "Rem DB test- removeVideoEntry: before removing from DB");
-            // remove video entry from DB
-           // SQLiteDBHelper sqliteDB = new SQLiteDBHelper(PlayVideoActivity.this);
-           // int totalEntries = SQLiteDBHelper.countDBItems(PlayVideoActivity.this);
-           // sqliteDB.deleteFromDB(context, mVideoPath);
-           // Log.d(TAG, "Rem DB test- removeVideoEntry: after removing from DB");
+            AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    // delete video entry from db
+                    ArrayList<VideoEntry> videoEntries = VideoAdapter.getVideos();
+                    mDb.videoDao().deleteVideo(videoEntries.get(mPosition));
+                }
+            });
 
-
-
-            //  remove from mVideoEntries
-        //    Log.d(TAG, "removeVideoEntry: before removing from recyclerview");
-          //  MainActivity.removeVideoEntry(mPosition);
-
-
-          //  Intent restartMainAtivIntent = new Intent(this, MainActivity.class);
-       //     startActivity(restartMainAtivIntent);
-             finish();
-
-
-
+            //     finish();
+            Intent restartMainAtivIntent = new Intent(this, MainActivity.class);
+            startActivity(restartMainAtivIntent);
         } else {
             Log.d(TAG, "NO DELETE permission");
             Toast.makeText(getApplicationContext(), "NO Delete permission", Toast.LENGTH_LONG).show();
         }
-
-
-
     }
 
     private boolean checkWriteExternalStoragePermission() {
@@ -219,6 +211,4 @@ public class PlayVideoActivity extends AppCompatActivity {
                 break;
         }
     }
-
-
 }

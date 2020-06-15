@@ -87,9 +87,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             }
         });
 
-        // channel for notifications
         createNotificationChannel();
-
         setupSharedPreferences();
     }
 
@@ -130,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        // Inflate the menu - add items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -155,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     "" + videoUri,
                     Toast.LENGTH_LONG).show();
             String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
-            Log.d(TAG, "video path: " + videoPath);
 
             // generate bitmap
             Bitmap videoThumbnail = null;
@@ -188,16 +185,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 public void run() {
                     mDb.videoDao().insertVideo(videoEntry);
                     finish();
-                    // restart activity to show new video thumbnail
                     startActivity(getIntent());
                 }
             });
-
-            // SQLite initial save
-          //  SQLiteDBHelper sqliteDB = new SQLiteDBHelper(MainActivity.this);
-           // if (videoUri != null) {
-             //   sqliteDB.saveToDB(MainActivity.this, videoUri, videoThumbnailPath, videoThumbnailName);
-           // }
         }
     }
 
@@ -296,13 +286,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 int hours = minutesAfterMidnight / 60;
                 int minutes = minutesAfterMidnight % 60;
                 setUpReminderNotification(MainActivity.this, hours, minutes, AlarmReceiver.class);
-                Log.d(TAG, "onSharedChanged - reminder time is: " + minutesAfterMidnight);
             } else { // was unchecked - turn off notifications
                 Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, REC_NOTIF_ID, intent, 0);
                 AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
                 alarmManager.cancel(pendingIntent);
-                Log.d(TAG, "onSharedChanged - cancelled alarm");
             }
         }
     }

@@ -22,7 +22,7 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private static final String TAG = VideoAdapter.class.getSimpleName();
 
-    ArrayList mVideoEntries;
+    static ArrayList mVideoEntries;
     Context context;
 
     public VideoAdapter(Context context, ArrayList videoEntries) {
@@ -68,6 +68,10 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public int getItemCount() {
         return mVideoEntries.size();
+    }
+
+    public static ArrayList<VideoEntry> getVideos() {
+        return mVideoEntries;
     }
 
     private Bitmap loadBitmapFromStorage(String filename, Context context) {
