@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
@@ -37,9 +38,12 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private static ArrayList mVideoEntries;
     private VideoRecyclerView mRecyclerView;
+    private AppDatabase mDb; // database using Room
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +68,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mDb = AppDatabase.getInstance(getApplicationContext());
+
         Toast.makeText(getApplicationContext(), "onCreate() is runnning", Toast.LENGTH_LONG).show();
-
-
-        //
-
-
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -80,11 +82,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
                 takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
 
-
                 if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
                 }
-
             }
         });
 
@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
 
         // check permissions for thumbnails
         if (checkReadExternalStoragePermission()) {
@@ -105,11 +105,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
             mRecyclerView.setLayoutManager(linearLayoutManager);
-            mVideoEntries = SQLiteDBHelper.getVideoEntriesFromDB(MainActivity.this);
+
+            mVideoEntries = (ArrayList) mDb.videoDao().loadAllVideos();
             Collections.reverse(mVideoEntries); // last video on top
             mRecyclerView.setVideoEntries(mVideoEntries);
-            Log.d(TAG, "Rem DB test- in onStart: DB size is = " + SQLiteDBHelper.countDBItems(MainActivity.this));
-            Log.d(TAG, "Rem DB test- in onStart: videoEntries.size() = " + mVideoEntries.size());
             if (mVideoEntries.size() > 0) {
                 VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, mVideoEntries);
                 mRecyclerView.setAdapter(videoAdapter);
@@ -143,46 +142,48 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Toast.makeText(getApplicationContext(),
                     "" + videoUri,
                     Toast.LENGTH_LONG).show();
-            String videoRealPath = getRealPathFromURI(MainActivity.this, videoUri);
-            Log.d(TAG, "video path: " + videoRealPath);
+            String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
+            Log.d(TAG, "video path: " + videoPath);
 
-            // generate bitmap from video
+            // generate bitmap
             Bitmap videoThumbnail = null;
             try {
-                videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoRealPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
+                videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
             } catch (Exception e) {
                 Log.d(TAG, "Exception happened when making bitmap for video thumbnail");
             }
-            // DEBUGGING
-            Log.d(TAG, "thumbnail byte size: " + videoThumbnail.getByteCount());
 
             // save bitmap to file, get path
-            String videoThumbnailName = generateThumbnailFileName();
+            String thumbnailFileName = generateThumbnailFileName();
             String videoThumbnailsFolder = THUMBNAIL_DIRECTORY_NAME;
-            String videoThumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, videoThumbnailName);
-            videoThumbnailPath += "/" + videoThumbnailName;
+            String thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, thumbnailFileName);
+            thumbnailPath += "/" + thumbnailFileName;
 
-            // save video info and bitmap to database
-            SQLiteDBHelper sqliteDB = new SQLiteDBHelper(MainActivity.this);
-            if (videoUri != null) {
-                sqliteDB.saveToDB(MainActivity.this, videoUri, videoThumbnailPath, videoThumbnailName);
-            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+            String date = sdf.format(new Date());
+
+            // find video dimensions
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(videoPath);
+            int videoWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+            int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+            retriever.release();
+
+            VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName);
+            mDb.videoDao().insertVideo(videoEntry);
+
+
+            // SQLite initial save
+          //  SQLiteDBHelper sqliteDB = new SQLiteDBHelper(MainActivity.this);
+           // if (videoUri != null) {
+             //   sqliteDB.saveToDB(MainActivity.this, videoUri, videoThumbnailPath, videoThumbnailName);
+           // }
+
 
             // restart activity to show new video thumbnail
             finish();
             startActivity(getIntent());
         }
-    }
-
-    private String getRealPathFromURI(Context context, Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String result = cursor.getString(column_index);
-        cursor.close();
-        return result;
     }
 
     private boolean checkReadExternalStoragePermission() {
@@ -319,15 +320,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    public static void removeVideoEntry(int position) {
-        Log.d(TAG, "removeVideoEntry: before removing");
-        Log.d(TAG, "removeVideoEntry: mVideoEntries.size() = " + mVideoEntries.size());
-        mVideoEntries.remove(position);
-        Log.d(TAG, "removeVideoEntry: removed entry at position: " + position);
-
-        Log.d(TAG, "removeVideoEntry: mVideoEntries.size() = " + mVideoEntries.size());
-
-
+    private String getRealPathFromURI(Context context, Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
     }
 
 }

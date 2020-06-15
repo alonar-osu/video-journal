@@ -1,40 +1,60 @@
 package com.example.android.videojournal;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "journalvideo")
 public class VideoEntry {
 
-    private String mVideopath;
-    private String mDate;
-    private int mVideoHeight;
-    private int mVideoWidth;
-    private String mThumbnailPath;
-    private String mThumbnailFileName;
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+    private String videopath;
+    private String date;
+    private int videoHeight;
+    private int videoWidth;
+    private String thumbnailPath;
+    private String thumbnailFileName;
 
-    public VideoEntry(String cVideopath, String cDate, int cVideoHeight, int cVideoWidth, String cThumbnailPath, String cThumbnailFileName) {
-        mVideopath = cVideopath;
-        mDate = cDate;
-        mVideoHeight = cVideoHeight;
-        mVideoWidth = cVideoWidth;
-        mThumbnailPath = cThumbnailPath;
-        mThumbnailFileName = cThumbnailFileName;
+    @Ignore
+    public VideoEntry(String videopath, String date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName) {
+        this.videopath = videopath;
+        this.date = date;
+        this.videoHeight = videoHeight;
+        this.videoWidth = videoWidth;
+        this.thumbnailPath = thumbnailPath;
+        this.thumbnailFileName = thumbnailFileName;
     }
 
+    public VideoEntry(int id, String videopath, String date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName) {
+        this.id = id;
+        this.videopath = videopath;
+        this.date = date;
+        this.videoHeight = videoHeight;
+        this.videoWidth = videoWidth;
+        this.thumbnailPath = thumbnailPath;
+        this.thumbnailFileName = thumbnailFileName;
+    }
+
+    public int getId() {return id; }
+
     public String getVideopath() {
-        return mVideopath;
+        return videopath;
     }
 
     public String getDate() {
-        return mDate;
+        return date;
     }
 
     public int getVideoHeight() {
-        return mVideoHeight;
+        return videoHeight;
     }
 
-    public int getmVideoWidth() {
-        return mVideoWidth;
+    public int getVideoWidth() {
+        return videoWidth;
     }
 
-    public String getmThumbnailPath() {return mThumbnailPath; }
+    public String getThumbnailPath() {return thumbnailPath; }
 
-    public String getmThumbnailFileName() {return mThumbnailFileName; }
+    public String getThumbnailFileName() {return thumbnailFileName; }
 }
