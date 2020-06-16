@@ -93,21 +93,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         createNotificationChannel();
         setupSharedPreferences();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
 
         // check permissions for thumbnails
         if (checkReadExternalStoragePermission()) {
             mRecyclerView = findViewById(R.id.recyclerView);
             mRecyclerView.setItemViewCacheSize(20);
 
-
-
             retrieveVideos();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     private void retrieveVideos() {
@@ -158,43 +157,56 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             Toast.makeText(getApplicationContext(),
                     "" + videoUri,
                     Toast.LENGTH_LONG).show();
-            String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
 
-            // generate bitmap
-            Bitmap videoThumbnail = null;
-            try {
-                videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
-            } catch (Exception e) {
-                Log.d(TAG, "Exception happened when making bitmap for video thumbnail");
-            }
+            addVideo(videoUri);
 
-            // save bitmap to file, get path
-            String thumbnailFileName = generateThumbnailFileName();
-            String videoThumbnailsFolder = THUMBNAIL_DIRECTORY_NAME;
-            String thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, thumbnailFileName);
-            thumbnailPath += "/" + thumbnailFileName;
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
-            String date = sdf.format(new Date());
-
-            // find video dimensions
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(videoPath);
-            int videoWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-            int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-            retriever.release();
-
-            // save data to DB
-            final VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName);
-            AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    mDb.videoDao().insertVideo(videoEntry);
-                    finish();
-                    startActivity(getIntent());
-                }
-            });
         }
+    }
+
+    private void addVideo(Uri videoUri) {
+        String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
+        String thumbnailFileName = generateThumbnailFileName();
+        String thumbnailPath = generateThumbnail(videoPath, thumbnailFileName);
+        String date = todaysDateAsString();
+
+        // video dimensions
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(videoPath);
+        int videoWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+        retriever.release();
+
+        // save data to DB
+        final VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName);
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mDb.videoDao().insertVideo(videoEntry);
+                finish();
+                startActivity(getIntent());
+            }
+        });
+    }
+
+    private String todaysDateAsString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
+    private String generateThumbnail(String videoPath, String thumbnailFileName) {
+
+        Bitmap videoThumbnail = null;
+        try {
+            videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
+        } catch (Exception e) {
+            Log.d(TAG, "Exception happened when making bitmap for video thumbnail");
+        }
+        // save bitmap to file
+        String videoThumbnailsFolder = THUMBNAIL_DIRECTORY_NAME;
+        String thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, thumbnailFileName);
+        thumbnailPath += "/" + thumbnailFileName;
+
+        return thumbnailPath;
     }
 
     private boolean checkReadExternalStoragePermission() {
