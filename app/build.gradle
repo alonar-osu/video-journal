@@ -40,4 +40,6 @@ dependencies {
     implementation "com.google.android.exoplayer:exoplayer:$exoPlayerVersion" // ExoPlayer
     implementation "android.arch.persistence.room:runtime:1.0.0" // Room
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
+    implementation "android.arch.lifecycle:livedata:1.1.0" // LiveData
+    annotationProcessor "android.arch.lifecycle:compiler:1.1.0"
 }

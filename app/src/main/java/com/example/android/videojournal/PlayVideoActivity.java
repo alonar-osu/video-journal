@@ -153,9 +153,9 @@ public class PlayVideoActivity extends AppCompatActivity {
                 }
             });
 
-            //     finish();
-            Intent restartMainAtivIntent = new Intent(this, MainActivity.class);
-            startActivity(restartMainAtivIntent);
+            finish();
+          //  Intent restartMainAtivIntent = new Intent(this, MainActivity.class);
+        //    startActivity(restartMainAtivIntent);
         } else {
             Log.d(TAG, "NO DELETE permission");
             Toast.makeText(getApplicationContext(), "NO Delete permission", Toast.LENGTH_LONG).show();

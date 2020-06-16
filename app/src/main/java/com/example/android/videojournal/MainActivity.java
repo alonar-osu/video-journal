@@ -21,10 +21,13 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -43,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -100,30 +104,32 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mRecyclerView = findViewById(R.id.recyclerView);
             mRecyclerView.setItemViewCacheSize(20);
 
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-            mRecyclerView.setLayoutManager(linearLayoutManager);
 
 
-            AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    final ArrayList<VideoEntry> videoEntries = (ArrayList) mDb.videoDao().loadAllVideos();
-                    Collections.reverse(videoEntries); // last video on top
-
-                    // simplify this later
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mRecyclerView.setVideoEntries(videoEntries);
-                            if (videoEntries.size() > 0) {
-                                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, videoEntries);
-                                mRecyclerView.setAdapter(videoAdapter);
-                            }
-                        }
-                    });
-                }
-            });
+            retrieveVideos();
         }
+    }
+
+    private void retrieveVideos() {
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+        final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllVideos();
+        videoEntries.observe(MainActivity.this, new Observer<List<VideoEntry>>() {
+
+            @Override
+            public void onChanged(@Nullable List<VideoEntry> entries) {
+                Log.d(TAG, "Receiving database update from LiveData");
+                mRecyclerView.setVideoEntries((ArrayList) entries);
+                //   if (videoEntries.size() > 0) {
+                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, (ArrayList) entries);
+                mRecyclerView.setAdapter(videoAdapter);
+            }
+        });
+
     }
 
     @Override
