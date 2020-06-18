@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -115,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
-
     }
 
     @Override
@@ -135,8 +135,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
 
             case R.id.button_combine:
-                CombineVideos combineVids = new CombineVideos(getApplicationContext(), mDb);
-                combineVids.combineVideosForWeek();
+
+                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        CombineVideos combineVids = new CombineVideos(getApplicationContext(), mDb);
+                        String combinedVideoPath = combineVids.combineVideosForWeek();
+
+                        // add combined video
+                        VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
+                        vidAdder.addVideo(combinedVideoPath, true);
+                    }
+                });
+
+                finish();
+                startActivity(getIntent());
                 return true;
 
             default:
