@@ -47,7 +47,6 @@ public class PlayVideoActivity extends AppCompatActivity {
     int mPosition;
     Context context;
     private AppDatabase mDb; // database using Room
-    private VideoAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +58,9 @@ public class PlayVideoActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-
         }
 
         mDb = AppDatabase.getInstance(getApplicationContext());
-
     }
 
     @Override
@@ -109,13 +106,6 @@ public class PlayVideoActivity extends AppCompatActivity {
 
     public void onDeleteAction(MenuItem item) {
 
-        /*
-        boolean havePermission =  ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED;
-        // DEBUGGING
-        Toast.makeText(getApplicationContext(), "Write permission granted: " + havePermission, Toast.LENGTH_LONG).show();
-        */
-
         if (checkWriteExternalStoragePermission()) {
             Toast.makeText(getApplicationContext(), "Delete permission was granted", Toast.LENGTH_LONG).show();
 
@@ -154,8 +144,7 @@ public class PlayVideoActivity extends AppCompatActivity {
             });
 
             finish();
-          //  Intent restartMainAtivIntent = new Intent(this, MainActivity.class);
-        //    startActivity(restartMainAtivIntent);
+
         } else {
             Log.d(TAG, "NO DELETE permission");
             Toast.makeText(getApplicationContext(), "NO Delete permission", Toast.LENGTH_LONG).show();
@@ -170,7 +159,7 @@ public class PlayVideoActivity extends AppCompatActivity {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(PlayVideoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     Toast.makeText(getApplicationContext(), "App needs to delete videos", Toast.LENGTH_LONG).show();
                 }
-                //  requestPermissions(new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_PERMISSION_RESULT);
+
                 ActivityCompat.requestPermissions(PlayVideoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
                 Toast.makeText(getApplicationContext(), "Called requestPermissions", Toast.LENGTH_LONG).show();
                 return false;

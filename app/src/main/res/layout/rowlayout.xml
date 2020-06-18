@@ -23,7 +23,6 @@
         android:src="@mipmap/ic_launcher"
         android:scaleType="fitCenter"
         android:elevation="10dp"/>
-    <!-- android:layout_centerInParent="true"-->
 
     <!--play icon overlay-->
     <ImageView

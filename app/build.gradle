@@ -42,4 +42,5 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
     implementation "android.arch.lifecycle:livedata:1.1.0" // LiveData
     annotationProcessor "android.arch.lifecycle:compiler:1.1.0"
+    implementation 'com.googlecode.mp4parser:isoparser:1.1.9' // mp4parser
 }

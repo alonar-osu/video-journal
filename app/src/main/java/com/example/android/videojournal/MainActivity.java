@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.coremedia.iso.boxes.Container;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
@@ -38,17 +39,25 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+// TESTING
+import com.googlecode.mp4parser.authoring.Movie;
+import com.googlecode.mp4parser.authoring.Track;
+import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
+import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
+import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -106,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onResume() {
         super.onResume();
-
     }
 
     private void retrieveVideos() {
@@ -128,7 +136,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
-
     }
 
     @Override
@@ -140,13 +147,21 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
-            startActivity(startSettingsActivity);
-            return true;
+
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+                startActivity(startSettingsActivity);
+                return true;
+
+            case R.id.button_combine:
+                CombineVideos combineVids = new CombineVideos(getApplicationContext());
+                combineVids.mergeVideosForWeek();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -159,12 +174,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     Toast.LENGTH_LONG).show();
 
             addVideo(videoUri);
-
         }
     }
 
     private void addVideo(Uri videoUri) {
         String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
+        Log.d(TAG, "Merging: new videoPath= " + videoPath);
         String thumbnailFileName = generateThumbnailFileName();
         String thumbnailPath = generateThumbnail(videoPath, thumbnailFileName);
         String date = todaysDateAsString();
@@ -259,8 +274,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
-
-        // possibly no need to save this path
         return directory.getAbsolutePath();
     }
 
@@ -330,17 +343,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
-
-        if (mRecyclerView != null) {
-            mRecyclerView.releasePlayer();
-        }
-    }
-
     private String getRealPathFromURI(Context context, Uri contentUri) {
         String[] proj = { MediaStore.Images.Media.DATA };
         CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
@@ -352,4 +354,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         return result;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+
+        if (mRecyclerView != null) {
+            mRecyclerView.releasePlayer();
+        }
+    }
 }
