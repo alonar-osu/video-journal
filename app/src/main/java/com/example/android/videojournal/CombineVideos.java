@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,36 +33,42 @@ public class CombineVideos {
     public final static String VIDEO_EXTENSION = ".mp4";
 
     Context context;
+    private AppDatabase mDb; // database using Room
 
-    public CombineVideos(Context context) {
+    public CombineVideos(Context context, AppDatabase db) {
+
         this.context = context;
+        mDb = db;
     }
 
-    public void mergeVideosForWeek() {
+    public void combineVideosForWeek() {
 
         Toast.makeText(context, "Running mergeVideosForWeek() method", Toast.LENGTH_LONG).show();
 
-        String firstVideoPath = "/storage/emulated/0/DCIM/Camera/VID_20200618_101636.mp4";
-        String secondVideoPath = "/storage/emulated/0/DCIM/Camera/VID_20200618_101126.mp4";
-        String thirdVideoPath = "/storage/emulated/0/DCIM/Camera/VID_20200615_184735.mp4";
-
-        final String[] videos = new String[]{firstVideoPath, secondVideoPath, thirdVideoPath};
-
+        // get list of week's videos from db
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
+                @Override
+                public void run() {
 
-                try {
-                    String mergedVideoPath = combineVideos(videos);
-                    Log.d(TAG, "Merging: resulting combined video path= " + mergedVideoPath);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    // get videos to merge
+                    final List<VideoEntry> weekAgoEntries = mDb.videoDao().loadVideosForMerge(getPreviousWeekDate(), new Date());
+                    final String[] videos = new String[weekAgoEntries.size()];
+                    for (int i = 0; i < weekAgoEntries.size(); i++) {
+                        videos[i] = weekAgoEntries.get(i).getVideopath();
+                    }
+
+                    // merge videos
+                    try {
+                        String mergedVideoPath = mergeVideos(videos);
+                        Log.d(TAG, "Merging: resulting combined video path= " + mergedVideoPath);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
     }
 
-    private String combineVideos(String[] videos) throws IOException {
+    private String mergeVideos(String[] videos) throws IOException {
 
         Movie[] inMovies = new Movie[videos.length];
         int index = 0;
@@ -126,6 +133,14 @@ public class CombineVideos {
     private String todaysDateAsString() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
         return sdf.format(new Date());
+    }
+
+    private Date getMeYesterday(){
+        return new Date(System.currentTimeMillis()-24*60*60*1000);
+    }
+
+    private Date getPreviousWeekDate(){
+        return new Date(System.currentTimeMillis()-7*24*60*60*1000);
     }
 
 

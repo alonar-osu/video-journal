@@ -2,6 +2,7 @@ package com.example.android.videojournal;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import androidx.lifecycle.LiveData;
@@ -16,6 +17,9 @@ public interface VideoDao {
     @Query("SELECT * FROM journalvideo")
     LiveData<List<VideoEntry>> loadAllVideos();
 
+    @Query("SELECT * FROM journalvideo WHERE date BETWEEN :daystart AND :dayend")
+    List<VideoEntry> loadVideosForMerge(Date daystart, Date dayend);
+
     @Insert
     void insertVideo(VideoEntry videoEntry);
 
@@ -23,3 +27,5 @@ public interface VideoDao {
     void deleteVideo(VideoEntry videoEntry);
 
 }
+
+

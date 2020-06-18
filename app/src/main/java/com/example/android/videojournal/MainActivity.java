@@ -6,19 +6,14 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.media.MediaMetadataRetriever;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.coremedia.iso.boxes.Container;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
@@ -39,30 +34,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.Toast;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
-
-// TESTING
-import com.googlecode.mp4parser.authoring.Movie;
-import com.googlecode.mp4parser.authoring.Track;
-import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
-import com.googlecode.mp4parser.authoring.container.mp4.MovieCreator;
-import com.googlecode.mp4parser.authoring.tracks.AppendTrack;
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
     private final static int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
 
     static final int REQUEST_VIDEO_CAPTURE = 1;
@@ -125,17 +104,18 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
         final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllVideos();
+
         videoEntries.observe(MainActivity.this, new Observer<List<VideoEntry>>() {
 
             @Override
             public void onChanged(@Nullable List<VideoEntry> entries) {
                 Log.d(TAG, "Receiving database update from LiveData");
                 mRecyclerView.setVideoEntries((ArrayList) entries);
-                //   if (videoEntries.size() > 0) {
                 VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, (ArrayList) entries);
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
+
     }
 
     @Override
@@ -155,8 +135,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
 
             case R.id.button_combine:
-                CombineVideos combineVids = new CombineVideos(getApplicationContext());
-                combineVids.mergeVideosForWeek();
+                CombineVideos combineVids = new CombineVideos(getApplicationContext(), mDb);
+                combineVids.combineVideosForWeek();
                 return true;
 
             default:
@@ -173,55 +153,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     "" + videoUri,
                     Toast.LENGTH_LONG).show();
 
-            addVideo(videoUri);
+            String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
+
+            VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
+            vidAdder.addVideo(videoPath, false);
+
+            finish();
+            startActivity(getIntent());
         }
-    }
-
-    private void addVideo(Uri videoUri) {
-        String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
-        Log.d(TAG, "Merging: new videoPath= " + videoPath);
-        String thumbnailFileName = generateThumbnailFileName();
-        String thumbnailPath = generateThumbnail(videoPath, thumbnailFileName);
-        String date = todaysDateAsString();
-
-        // video dimensions
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(videoPath);
-        int videoWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-        int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-        retriever.release();
-
-        // save data to DB
-        final VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName);
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                mDb.videoDao().insertVideo(videoEntry);
-                finish();
-                startActivity(getIntent());
-            }
-        });
-    }
-
-    private String todaysDateAsString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
-        return sdf.format(new Date());
-    }
-
-    private String generateThumbnail(String videoPath, String thumbnailFileName) {
-
-        Bitmap videoThumbnail = null;
-        try {
-            videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
-        } catch (Exception e) {
-            Log.d(TAG, "Exception happened when making bitmap for video thumbnail");
-        }
-        // save bitmap to file
-        String videoThumbnailsFolder = THUMBNAIL_DIRECTORY_NAME;
-        String thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, thumbnailFileName);
-        thumbnailPath += "/" + thumbnailFileName;
-
-        return thumbnailPath;
     }
 
     private boolean checkReadExternalStoragePermission() {
@@ -253,30 +192,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    private String generateThumbnailFileName() {
-        Random generator = new Random();
-        int n = 10000;
-        n = generator.nextInt(n);
-        return "Thumbnail-" + n + ".jpg";
-    }
-
-    private String saveVideoThumbnailToAppFolder(Bitmap thumbnailBitmap, String folderName, String fileName) {
-        ContextWrapper cw = new ContextWrapper((getApplicationContext()));
-        File directory = cw.getDir(folderName, Context.MODE_PRIVATE);
-        if (!directory.exists()) directory.mkdir();
-        File thumbnailPath = new File(directory, fileName);
-
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(thumbnailPath);
-            thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.close();
-        } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-        }
-        return directory.getAbsolutePath();
-    }
-
     private void createNotificationChannel() {
         // create channel only on API 26+ otherwise not in support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -302,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        // interval currently shorter for debugging
+
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
