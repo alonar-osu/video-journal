@@ -6,6 +6,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -136,25 +138,71 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             case R.id.button_combine:
 
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        CombineVideos combineVids = new CombineVideos(getApplicationContext(), mDb);
-                        String combinedVideoPath = combineVids.combineVideosForWeek();
+                confirmAndCombineVideos();
 
-                        // add combined video
-                        VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
-                        vidAdder.addVideo(combinedVideoPath, true);
-                    }
-                });
+                /*
+                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            VideoCombiner combineVids = new VideoCombiner(getApplicationContext(), mDb);
+                            String combinedVideoPath = combineVids.combineVideosForWeek();
 
-                finish();
-                startActivity(getIntent());
+                            // add combined video
+                            VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
+                            vidAdder.addVideo(combinedVideoPath, true);
+                        }
+                    });
+                    */
+
+                  //  finish();
+                 //   startActivity(getIntent());
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void confirmAndCombineVideos() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.app_name);
+        builder.setMessage("Combine this week's videos?");
+       // builder.setIcon(R.drawable.);
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+
+                Toast.makeText(getApplicationContext(), "Combining videos", Toast.LENGTH_LONG).show();
+
+                // combine here
+                combineAndAddVideos();
+                finish();
+                startActivity(getIntent());
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Toast.makeText(getApplicationContext(), "User chose NO", Toast.LENGTH_LONG).show();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void combineAndAddVideos() {
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                VideoCombiner combineVids = new VideoCombiner(getApplicationContext(), mDb);
+                String combinedVideoPath = combineVids.combineVideosForWeek();
+
+                // add combined video
+                VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
+                vidAdder.addVideo(combinedVideoPath, true);
+            }
+        });
     }
 
     @Override
