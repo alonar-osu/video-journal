@@ -216,8 +216,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
             int startPosition = ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
             int endPosition = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
-            Log.d(TAG, "pos startPos= " + startPosition);
-            Log.d(TAG, "pos endPos= " + endPosition);
 
             // some error
             if (startPosition < 0 || endPosition < 0) return;
