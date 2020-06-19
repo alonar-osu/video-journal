@@ -1,7 +1,6 @@
 package com.example.android.videojournal;
 
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 

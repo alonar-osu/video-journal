@@ -1,6 +1,7 @@
 package com.example.android.videojournal;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,8 +10,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -76,6 +79,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
                 takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
 
+              //  takeVideoIntent.putExtra("android.intent.extras.screenOrientation", 2);
+
+
+
+
                 if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
                 }
@@ -93,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             retrieveVideos();
         }
     }
+
+
 
     @Override
     protected void onResume() {
@@ -139,23 +149,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case R.id.button_combine:
 
                 confirmAndCombineVideos();
-
-                /*
-                    AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            VideoCombiner combineVids = new VideoCombiner(getApplicationContext(), mDb);
-                            String combinedVideoPath = combineVids.combineVideosForWeek();
-
-                            // add combined video
-                            VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
-                            vidAdder.addVideo(combinedVideoPath, true);
-                        }
-                    });
-                    */
-
-                  //  finish();
-                 //   startActivity(getIntent());
                 return true;
 
             default:
@@ -175,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 Toast.makeText(getApplicationContext(), "Combining videos", Toast.LENGTH_LONG).show();
 
-                // combine here
                 combineAndAddVideos();
                 finish();
                 startActivity(getIntent());

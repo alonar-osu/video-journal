@@ -1,6 +1,5 @@
 package com.example.android.videojournal;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -9,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -46,7 +46,7 @@ public class PlayVideoActivity extends AppCompatActivity {
     String mThumbnailPath;
     int mPosition;
     Context context;
-    private AppDatabase mDb; // database using Room
+    private AppDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +107,6 @@ public class PlayVideoActivity extends AppCompatActivity {
     public void onDeleteAction(MenuItem item) {
 
         if (checkWriteExternalStoragePermission()) {
-            Toast.makeText(getApplicationContext(), "Delete permission was granted", Toast.LENGTH_LONG).show();
 
             // remove video file from storage
             File videoFile = new File(mVideoPath);

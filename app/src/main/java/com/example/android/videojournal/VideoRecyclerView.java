@@ -108,12 +108,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                         playIconView.setVisibility(VISIBLE);
                     }
 
-                    // special case when end of list was reached
-                    if (!recyclerView.canScrollVertically(1)) {
-                        playVideo(true);
-                    } else {
-                        playVideo(false);
-                    }
+                    playVideo();
                 }
             }
 
@@ -215,23 +210,14 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         });
     }
 
-    public void playVideo(boolean isEndOfList) {
+    public void playVideo() {
 
         int targetPosition;
 
-        if (!isEndOfList) {
             int startPosition = ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
             int endPosition = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
-
-
-            // if > 2 list-items on screen, set difference to 1
-            if ((endPosition - startPosition) > 1) {
-                endPosition = startPosition + 1;
-
-            }  else if ((endPosition - startPosition) == 1 && startPosition > 0) { // 2 items, adjust to get right video
-                startPosition -= 1;
-                endPosition -= 1;
-            }
+            Log.d(TAG, "pos startPos= " + startPosition);
+            Log.d(TAG, "pos endPos= " + endPosition);
 
             // some error
             if (startPosition < 0 || endPosition < 0) return;
@@ -245,9 +231,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
             } else { // 1 item on screen
                 targetPosition = startPosition;
             }
-        } else { // video is at the end of list
-            targetPosition = mVideoEntries.size() - 1;
-        }
 
         // video already playing, return
         if (targetPosition == playPosition) return;
