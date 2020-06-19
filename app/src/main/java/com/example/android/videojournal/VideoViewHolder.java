@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +18,7 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
     View parent;
     ImageView thumbnailView;
     ImageView playIconView;
+    TextView dateView;
     String videoPath;
     String thumbnailPath;
     int position;
@@ -27,6 +29,7 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
         media_container = itemView.findViewById(R.id.media_container);
         thumbnailView = (ImageView) itemView.findViewById(R.id.thumbnail);
         playIconView = (ImageView) itemView.findViewById(R.id.play_icon);
+        dateView = (TextView) itemView.findViewById(R.id.date_tv);
 
         itemView.setTag(this);
 

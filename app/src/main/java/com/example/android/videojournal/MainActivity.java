@@ -79,11 +79,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
                 takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
 
-              //  takeVideoIntent.putExtra("android.intent.extras.screenOrientation", 2);
-
-
-
-
                 if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
                     startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
                 }

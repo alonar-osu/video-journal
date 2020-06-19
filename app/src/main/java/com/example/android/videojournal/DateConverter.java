@@ -1,6 +1,9 @@
 package com.example.android.videojournal;
 
 import androidx.room.TypeConverter;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateConverter {
@@ -16,4 +19,11 @@ public class DateConverter {
     public static Long toTimestamp(Date date) {
         return date == null ? null : date.getTime();
     }
+
+    public static String dateToString(Date date) {
+
+        DateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy");
+        return dateFormat.format(date);
+    }
+
 }

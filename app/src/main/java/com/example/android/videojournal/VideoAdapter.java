@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 import androidx.annotation.NonNull;
@@ -46,6 +47,11 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         // get video info
         VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
         String videoPath = videoEntry.getVideopath();
+
+        // get date for video
+        Date videoDate = videoEntry.getDate();
+        String dateAsString = DateConverter.dateToString(videoDate);
+        ((VideoViewHolder) holder).dateView.setText(dateAsString);
 
         // get video thumbnail from internal storage
         String thumbnailFileName = videoEntry.getThumbnailFileName();

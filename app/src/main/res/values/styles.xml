@@ -15,8 +15,13 @@
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppTheme.Autoplay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:windowActionBarOverlay">true</item>
@@ -41,5 +46,6 @@
         <item name="negativeButtonText">@android:string/cancel</item>
 
     </style>
+
 
 </resources>
