@@ -97,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -142,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
 
             case R.id.button_combine:
-
                 confirmAndCombineVideos();
                 return true;
 

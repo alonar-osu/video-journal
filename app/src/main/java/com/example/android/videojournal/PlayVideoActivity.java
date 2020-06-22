@@ -8,7 +8,6 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -33,9 +32,6 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
-import java.io.File;
-import java.util.ArrayList;
-
 
 public class PlayVideoActivity extends AppCompatActivity {
 
@@ -59,7 +55,6 @@ public class PlayVideoActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
         mDb = AppDatabase.getInstance(getApplicationContext());
     }
 
@@ -104,49 +99,24 @@ public class PlayVideoActivity extends AppCompatActivity {
         return true;
     }
 
-    public void onDeleteAction(MenuItem item) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (checkWriteExternalStoragePermission()) {
+        switch (item.getItemId()) {
+            case R.id.buttonDelete:
 
-            // remove video file from storage
-            File videoFile = new File(mVideoPath);
-            boolean videoDeleted = videoFile.delete();
-            Log.d(TAG, "video file first attempt - deleted: " + videoDeleted);
-            if(!videoDeleted){
-                getApplicationContext().deleteFile(videoFile.getName());
-            }
-            if (videoFile.exists()) {
-                Log.d(TAG, "video file NOT Deleted :" + mVideoPath);
-            } else {
-                Log.d(TAG, "video file Deleted :" + mVideoPath);
-            }
-
-            // delete thumbnail
-            File thumbnailFile = new File(mThumbnailPath);
-            boolean thumbnailDeleted = thumbnailFile.delete();
-            if (!thumbnailDeleted) {
-                getApplicationContext().deleteFile(thumbnailFile.getName());
-            }
-            if (thumbnailFile.exists()) {
-                Log.d(TAG, "thumbnail file NOT Deleted :" + mThumbnailPath);
-            } else {
-                Log.d(TAG, "thumbnail file Deleted :" + mThumbnailPath);
-            }
-
-            AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    // delete video entry from db
-                    ArrayList<VideoEntry> videoEntries = VideoAdapter.getVideos();
-                    mDb.videoDao().deleteVideo(videoEntries.get(mPosition));
-                }
-            });
-
-            finish();
-
-        } else {
+                VideoDeleter vidDeleter = new VideoDeleter(getApplicationContext(), mDb);
+                if (checkWriteExternalStoragePermission()) {
+                    vidDeleter.deleteVideo(mVideoPath, mThumbnailPath, mPosition);
+                    finish();
+                } else {
             Log.d(TAG, "NO DELETE permission");
             Toast.makeText(getApplicationContext(), "NO Delete permission", Toast.LENGTH_LONG).show();
+        }
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -173,16 +143,6 @@ public class PlayVideoActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (mVideoPlayer != null) {
-            mVideoPlayer.release();
-            mVideoPlayer = null;
-        }
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
       //  super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode) {
@@ -197,6 +157,16 @@ public class PlayVideoActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Write Permission NOT Granted", Toast.LENGTH_LONG).show();
                 }
                 break;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (mVideoPlayer != null) {
+            mVideoPlayer.release();
+            mVideoPlayer = null;
         }
     }
 }
