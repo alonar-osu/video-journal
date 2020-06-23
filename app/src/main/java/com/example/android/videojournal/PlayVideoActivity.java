@@ -98,7 +98,7 @@ public class PlayVideoActivity extends AppCompatActivity {
             case R.id.buttonDelete:
 
                 VideoDeleter vidDeleter = new VideoDeleter(getApplicationContext(), mDb);
-                    vidDeleter.deleteVideo(mVideoPath, mThumbnailPath, mPosition);
+                    vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
                     finish();
                 return true;
 

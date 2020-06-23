@@ -26,6 +26,8 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -62,8 +64,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Toast.makeText(getApplicationContext(), "onCreate() is runnning", Toast.LENGTH_LONG).show();
 
-
-
         FloatingActionButton fab = findViewById(R.id.fab);
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             retrieveAllVideos();
         }
-
     }
 
     @Override
@@ -181,9 +180,23 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     addCombinedVideos(combinedVideoPath);
                 } else {
                    Log.d(TAG, "There are no videos this week");
+                    showNoVideosDialog();
+                   /*
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle(R.string.app_name);
+                    builder.setMessage("There are no new videos this week");
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    */
                 }
             }
         });
+    }
+
+    private void showNoVideosDialog() {
+
+        //
+
     }
 
     private void addCombinedVideos(String combinedVideoPath) {

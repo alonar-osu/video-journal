@@ -17,41 +17,57 @@ public class VideoDeleter {
         this.context = context;
     }
 
-    public void deleteVideo(String videoPath, String thumbnailPath, final int position) {
+    public void deleteJournalEntry(String videoPath, String thumbnailPath, final int position) {
 
-            // remove video file from storage
-            File videoFile = new File(videoPath);
-            boolean videoDeleted = videoFile.delete();
-            Log.d(TAG, "video file first attempt - deleted: " + videoDeleted);
-            if(!videoDeleted){
-                context.deleteFile(videoFile.getName());
-            }
-            if (videoFile.exists()) {
-                Log.d(TAG, "video file NOT Deleted :" + videoPath);
-            } else {
-                Log.d(TAG, "video file Deleted :" + videoPath);
-            }
+        deleteVideo (videoPath);
+        deleteThumbnail(thumbnailPath);
+        deleteEntryFromDB(position);
 
-            // delete thumbnail
-            File thumbnailFile = new File(thumbnailPath);
-            boolean thumbnailDeleted = thumbnailFile.delete();
-            if (!thumbnailDeleted) {
-                context.deleteFile(thumbnailFile.getName());
-            }
-            if (thumbnailFile.exists()) {
-                Log.d(TAG, "thumbnail file NOT Deleted :" + thumbnailPath);
-            } else {
-                Log.d(TAG, "thumbnail file Deleted :" + thumbnailPath);
-            }
-
-            AppExecutors.getInstance().diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    // delete video entry from db
-                    ArrayList<VideoEntry> videoEntries = VideoAdapter.getVideos();
-                    mDb.videoDao().deleteVideo(videoEntries.get(position));
-                }
-            });
     }
+
+    public void deleteVideo (String videoPath) {
+
+        // remove video file from storage
+        File videoFile = new File(videoPath);
+        boolean videoDeleted = videoFile.delete();
+        Log.d(TAG, "video file first attempt - deleted: " + videoDeleted);
+        if(!videoDeleted){
+            context.deleteFile(videoFile.getName());
+        }
+        if (videoFile.exists()) {
+            Log.d(TAG, "video file NOT Deleted :" + videoPath);
+        } else {
+            Log.d(TAG, "video file Deleted :" + videoPath);
+        }
+    }
+
+    public void deleteThumbnail(String thumbnailPath) {
+
+        File thumbnailFile = new File(thumbnailPath);
+        boolean thumbnailDeleted = thumbnailFile.delete();
+        if (!thumbnailDeleted) {
+            context.deleteFile(thumbnailFile.getName());
+        }
+        if (thumbnailFile.exists()) {
+            Log.d(TAG, "thumbnail file NOT Deleted :" + thumbnailPath);
+        } else {
+            Log.d(TAG, "thumbnail file Deleted :" + thumbnailPath);
+        }
+    }
+
+    public void deleteEntryFromDB(final int position) {
+
+        // delete from database
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                // delete video entry from db
+                ArrayList<VideoEntry> videoEntries = VideoAdapter.getVideos();
+                mDb.videoDao().deleteVideo(videoEntries.get(position));
+            }
+        });
+
+    }
+
 
 }
