@@ -3,6 +3,7 @@ package com.example.android.videojournal;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -96,15 +97,20 @@ public class PlayVideoActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.buttonDelete:
+// getApplicationContext()
+                VideoDeleter vidDeleter = new VideoDeleter(PlayVideoActivity.this, mDb);
+                vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
 
-                VideoDeleter vidDeleter = new VideoDeleter(getApplicationContext(), mDb);
-                    vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
-                    finish();
+                Intent doneDeleting = new Intent(context, MainActivity.class);
+              context.startActivity(doneDeleting);
+               // finish();
+                    // finish();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
         }
+
     }
 
     @Override

@@ -74,8 +74,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
                     takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
 
-                    if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+                    if (checkReadExternalStoragePermission()) {
+                        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+                            startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+                        }
+                    } else {
+                        askReadExternalPermission();
                     }
                 }
             });
@@ -83,13 +87,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         createNotificationChannel();
         setupSharedPreferences();
 
-        // check permissions
-        if (checkReadExternalStoragePermission()) {
-            mRecyclerView = findViewById(R.id.recyclerView);
-            mRecyclerView.setItemViewCacheSize(20);
+        mRecyclerView = findViewById(R.id.recyclerView);
+        mRecyclerView.setItemViewCacheSize(20);
 
-            retrieveAllVideos();
-        }
+        retrieveAllVideos();
+
     }
 
     @Override
@@ -226,15 +228,27 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 Log.d(TAG, "permissions: if checkSelfPermission was true");
                 return true;
             } else {
+                Log.d(TAG, "permissions: if checkSelfPermission was false");
+                return false;
+                /*
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     Toast.makeText(getApplicationContext(), "App needs to view thumbnails", Toast.LENGTH_LONG).show();
                 }
                 Log.d(TAG, "permissions: if checkSelfPermission was false");
                 requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_REQUEST_CODE);
-
+                */
             }
         }
             return true;
+    }
+
+    private void askReadExternalPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            Toast.makeText(getApplicationContext(), "App needs to view thumbnails", Toast.LENGTH_LONG).show();
+        }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_REQUEST_CODE);
+        }
     }
 
     @Override
