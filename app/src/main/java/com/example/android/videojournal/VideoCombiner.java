@@ -32,6 +32,7 @@ public class VideoCombiner {
 
     Context context;
     private AppDatabase mDb;
+    List<VideoEntry> mWeekAgoEntries;
 
     public VideoCombiner(Context context, AppDatabase db) {
 
@@ -39,14 +40,20 @@ public class VideoCombiner {
         mDb = db;
     }
 
+    public boolean haveVideos() {
+        mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(getPreviousWeekDate(), new Date());
+        if (mWeekAgoEntries.size() > 0) return true;
+        else return false;
+    }
+
     public String combineVideosForWeek() {
 
-        final List<VideoEntry> weekAgoEntries = mDb.videoDao().loadVideosForMerge(getPreviousWeekDate(), new Date());
-        final String[] videos = new String[weekAgoEntries.size()];
-        for (int i = 0; i < weekAgoEntries.size(); i++) {
-            videos[i] = weekAgoEntries.get(i).getVideopath();
+        final String[] videos = new String[mWeekAgoEntries.size()];
+        for (int i = 0; i < mWeekAgoEntries.size(); i++) {
+            videos[i] = mWeekAgoEntries.get(i).getVideopath();
         }
 
+        // TODO: handle empty path
         String mergedVideoPath = "";
         // merge videos
         try {
@@ -127,7 +134,7 @@ public class VideoCombiner {
         return sdf.format(new Date());
     }
 
-    private Date getPreviousWeekDate(){
+    public static Date getPreviousWeekDate(){
         return new Date(System.currentTimeMillis()-7*24*60*60*1000);
     }
 

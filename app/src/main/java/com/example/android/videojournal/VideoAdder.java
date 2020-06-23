@@ -2,9 +2,11 @@ package com.example.android.videojournal;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -13,6 +15,8 @@ import java.io.FileOutputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
+
+import androidx.loader.content.CursorLoader;
 
 public class VideoAdder {
 
@@ -30,6 +34,7 @@ public class VideoAdder {
         Log.d(TAG, "Adding: new videoPath= " + videoPath);
         String thumbnailFileName = generateThumbnailFileName();
         String thumbnailPath = generateThumbnail(videoPath, thumbnailFileName);
+        Log.d(TAG, "new thumbnail path= " + thumbnailPath);
         Date date = Calendar.getInstance().getTime();
 
         // video dimensions
@@ -84,12 +89,22 @@ public class VideoAdder {
         return directory.getAbsolutePath();
     }
 
-
     private String generateThumbnailFileName() {
         Random generator = new Random();
         int n = 10000;
         n = generator.nextInt(n);
         return "Thumbnail-" + n + ".jpg";
+    }
+
+    public String getRealPathFromURI(Context context, Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
+        Cursor cursor = loader.loadInBackground();
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String result = cursor.getString(column_index);
+        cursor.close();
+        return result;
     }
 
 

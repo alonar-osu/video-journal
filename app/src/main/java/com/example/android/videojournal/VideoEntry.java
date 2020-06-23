@@ -16,7 +16,7 @@ public class VideoEntry {
     private int videoWidth;
     private String thumbnailPath;
     private String thumbnailFileName;
-    private int combinedVideo;
+    private int combinedVideo; // 1 = combined
 
     @Ignore
     public VideoEntry(String videopath, Date date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName, int combinedVideo) {

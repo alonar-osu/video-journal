@@ -9,7 +9,6 @@ import java.util.ArrayList;
 public class VideoDeleter {
 
     private static final String TAG = VideoDeleter.class.getSimpleName();
-    private final static int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 3;
     private AppDatabase mDb;
     Context context;
 
@@ -53,7 +52,6 @@ public class VideoDeleter {
                     mDb.videoDao().deleteVideo(videoEntries.get(position));
                 }
             });
-
     }
 
 }

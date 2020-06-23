@@ -2,20 +2,13 @@ package com.example.android.videojournal;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -36,7 +29,6 @@ import com.google.android.exoplayer2.util.Util;
 public class PlayVideoActivity extends AppCompatActivity {
 
     private static final String TAG = PlayVideoActivity.class.getSimpleName();
-    private final static int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 3;
     SimpleExoPlayer mVideoPlayer;
     String mVideoPath;
     String mThumbnailPath;
@@ -106,57 +98,12 @@ public class PlayVideoActivity extends AppCompatActivity {
             case R.id.buttonDelete:
 
                 VideoDeleter vidDeleter = new VideoDeleter(getApplicationContext(), mDb);
-                if (checkWriteExternalStoragePermission()) {
                     vidDeleter.deleteVideo(mVideoPath, mThumbnailPath, mPosition);
                     finish();
-                } else {
-            Log.d(TAG, "NO DELETE permission");
-            Toast.makeText(getApplicationContext(), "NO Delete permission", Toast.LENGTH_LONG).show();
-        }
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private boolean checkWriteExternalStoragePermission() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(PlayVideoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                    PackageManager.PERMISSION_GRANTED) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(PlayVideoActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    Toast.makeText(getApplicationContext(), "App needs to delete videos", Toast.LENGTH_LONG).show();
-                }
-
-                ActivityCompat.requestPermissions(PlayVideoActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
-                Toast.makeText(getApplicationContext(), "Called requestPermissions", Toast.LENGTH_LONG).show();
-                return false;
-
-            } else {
-                // already granted
-                return true;
-            }
-        }
-        // automatically granted if sdk<23
-            return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-      //  super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch(requestCode) {
-
-            case WRITE_EXTERNAL_STORAGE_REQUEST_CODE:
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
-                        PackageManager.PERMISSION_GRANTED
-                        && grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                { Toast.makeText(getApplicationContext(), "Write Permission Granted", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Write Permission NOT Granted", Toast.LENGTH_LONG).show();
-                }
-                break;
         }
     }
 

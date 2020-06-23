@@ -1,7 +1,6 @@
 package com.example.android.videojournal;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,10 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,10 +25,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
-import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
-
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -69,32 +62,35 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         Toast.makeText(getApplicationContext(), "onCreate() is runnning", Toast.LENGTH_LONG).show();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // on click action
-                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                takeVideoIntent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
-                takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
-                takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
 
-                if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // on click action
+                    Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    takeVideoIntent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
+                    takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
+                    takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
+
+                    if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+                    }
                 }
-            }
-        });
+            });
 
         createNotificationChannel();
         setupSharedPreferences();
 
-        // check permissions for thumbnails
+        // check permissions
         if (checkReadExternalStoragePermission()) {
             mRecyclerView = findViewById(R.id.recyclerView);
             mRecyclerView.setItemViewCacheSize(20);
 
-            retrieveVideos();
+            retrieveAllVideos();
         }
+
     }
 
     @Override
@@ -102,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onResume();
     }
 
-    private void retrieveVideos() {
+    private void retrieveAllVideos() {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setReverseLayout(true);
@@ -140,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
 
             case R.id.button_combine:
+
                 confirmAndCombineVideos();
                 return true;
 
@@ -153,14 +150,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.app_name);
         builder.setMessage("Combine this week's videos?");
-       // builder.setIcon(R.drawable.);
 
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
 
-                Toast.makeText(getApplicationContext(), "Combining videos", Toast.LENGTH_LONG).show();
-
-                combineAndAddVideos();
+                combineVideos();
                 finish();
                 startActivity(getIntent());
             }
@@ -174,33 +168,37 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         alert.show();
     }
 
-    private void combineAndAddVideos() {
+    private void combineVideos() {
 
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
                 VideoCombiner combineVids = new VideoCombiner(getApplicationContext(), mDb);
-                String combinedVideoPath = combineVids.combineVideosForWeek();
 
-                // add combined video
-                VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
-                vidAdder.addVideo(combinedVideoPath, true);
+                if (combineVids.haveVideos()) {
+                    Log.d(TAG, "There are videos going to combine");
+                    final String combinedVideoPath = combineVids.combineVideosForWeek();
+                    addCombinedVideos(combinedVideoPath);
+                } else {
+                   Log.d(TAG, "There are no videos this week");
+                }
             }
         });
+    }
+
+    private void addCombinedVideos(String combinedVideoPath) {
+        VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
+        vidAdder.addVideo(combinedVideoPath, true);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+
             Uri videoUri = intent.getData();
-            Toast.makeText(getApplicationContext(),
-                    "" + videoUri,
-                    Toast.LENGTH_LONG).show();
-
-            String videoPath = getRealPathFromURI(MainActivity.this, videoUri);
-
             VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
+            String videoPath = vidAdder.getRealPathFromURI(MainActivity.this, videoUri);
             vidAdder.addVideo(videoPath, false);
 
             finish();
@@ -212,12 +210,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
                     PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "permissions: if checkSelfPermission was true");
                 return true;
             } else {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
                     Toast.makeText(getApplicationContext(), "App needs to view thumbnails", Toast.LENGTH_LONG).show();
                 }
+                Log.d(TAG, "permissions: if checkSelfPermission was false");
                 requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_REQUEST_CODE);
+
             }
         }
             return true;
@@ -228,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         switch(requestCode) {
             case READ_EXTERNAL_STORAGE_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    // call cursor loader
+
                     Toast.makeText(getApplicationContext(), "Read Permission Granted", Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -301,17 +302,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         // register listener for preference changes
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    private String getRealPathFromURI(Context context, Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String result = cursor.getString(column_index);
-        cursor.close();
-        return result;
     }
 
     @Override
