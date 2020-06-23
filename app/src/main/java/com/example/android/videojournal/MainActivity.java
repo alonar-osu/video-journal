@@ -27,7 +27,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -75,11 +74,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
 
                     if (checkReadExternalStoragePermission()) {
+                        Log.d(TAG, "clicked on + has permission");
                         if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
                             startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
                         }
                     } else {
-                        askReadExternalPermission();
+                        Log.d(TAG, "clicked on + NO permission");
+                        askReadExternalStoragePermission();
                     }
                 }
             });
@@ -90,7 +91,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
 
-        retrieveAllVideos();
+        if (checkReadExternalStoragePermission()) {
+            retrieveAllVideos();
+        } else {
+            askReadExternalStoragePermission();
+            if (checkReadExternalStoragePermission()) retrieveAllVideos();
+        }
 
     }
 
@@ -138,7 +144,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             case R.id.button_combine:
 
-                confirmAndCombineVideos();
+                if (checkReadExternalStoragePermission()) confirmAndCombineVideos();
+                else askReadExternalStoragePermission();
                 return true;
 
             default:
@@ -196,9 +203,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     }
 
     private void showNoVideosDialog() {
-
         //
-
     }
 
     private void addCombinedVideos(String combinedVideoPath) {
@@ -230,21 +235,14 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             } else {
                 Log.d(TAG, "permissions: if checkSelfPermission was false");
                 return false;
-                /*
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    Toast.makeText(getApplicationContext(), "App needs to view thumbnails", Toast.LENGTH_LONG).show();
-                }
-                Log.d(TAG, "permissions: if checkSelfPermission was false");
-                requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_REQUEST_CODE);
-                */
             }
         }
             return true;
     }
 
-    private void askReadExternalPermission() {
+    private void askReadExternalStoragePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Toast.makeText(getApplicationContext(), "App needs to view thumbnails", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "App needs to show videos", Toast.LENGTH_LONG).show();
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_REQUEST_CODE);
@@ -257,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             case READ_EXTERNAL_STORAGE_REQUEST_CODE:
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
 
-                    Toast.makeText(getApplicationContext(), "Read Permission Granted", Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "READ_EXTERNAL_STORAGE permission was granted");
                 }
                 break;
                 default:
