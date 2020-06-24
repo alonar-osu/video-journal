@@ -1,10 +1,12 @@
 package com.example.android.videojournal;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -97,18 +99,10 @@ public class PlayVideoActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.buttonDelete:
-
-                VideoDeleter vidDeleter = new VideoDeleter(PlayVideoActivity.this, mDb);
-                vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
-
-                Intent doneDeleting = new Intent(context, MainActivity.class);
-                context.startActivity(doneDeleting);
-                // finish();
+                confirmAndDeleteVideo();
                 return true;
 
             case R.id.buttonShare:
-
-                // share video
                 VideoSharer vidSharer = new VideoSharer(PlayVideoActivity.this);
                 vidSharer.shareVideo(mVideoPath);
                 return true;
@@ -116,7 +110,34 @@ public class PlayVideoActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
 
+    private void confirmAndDeleteVideo() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.app_name);
+        builder.setMessage("Delete this video?");
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                goAheadDeleteVideo();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    private void goAheadDeleteVideo() {
+
+        VideoDeleter vidDeleter = new VideoDeleter(PlayVideoActivity.this, mDb);
+        vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
+
+        Intent doneDeleting = new Intent(context, MainActivity.class);
+        context.startActivity(doneDeleting);
     }
 
     @Override

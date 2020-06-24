@@ -161,15 +161,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-
                 combineVideos();
-              //  finish();
-              //  startActivity(getIntent());
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Toast.makeText(getApplicationContext(), "User chose NO", Toast.LENGTH_LONG).show();
             }
         });
         AlertDialog alert = builder.create();
@@ -197,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void showNoVideosDialogOnUIThread() {
 
-        Log.v(TAG, "reporting back from combining thread");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
