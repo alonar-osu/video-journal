@@ -103,7 +103,6 @@ public class PlayVideoActivity extends AppCompatActivity {
 
                 Intent doneDeleting = new Intent(context, MainActivity.class);
                 context.startActivity(doneDeleting);
-
                 // finish();
                 return true;
 

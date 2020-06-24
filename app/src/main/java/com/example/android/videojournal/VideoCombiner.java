@@ -2,7 +2,6 @@ package com.example.android.videojournal;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
@@ -42,8 +41,7 @@ public class VideoCombiner {
 
     public boolean haveVideos() {
         mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(getPreviousWeekDate(), new Date());
-        if (mWeekAgoEntries.size() > 0) return true;
-        else return false;
+        return mWeekAgoEntries.size() > 0;
     }
 
     public String combineVideosForWeek() {

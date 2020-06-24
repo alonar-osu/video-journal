@@ -92,10 +92,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerView.setItemViewCacheSize(20);
 
         if (checkReadExternalStoragePermission()) {
-            retrieveAllVideos();
+            retrieveAndSetAllVideos();
         } else {
             askReadExternalStoragePermission();
-            if (checkReadExternalStoragePermission()) retrieveAllVideos();
+            if (checkReadExternalStoragePermission()) retrieveAndSetAllVideos();
         }
 
     }
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onResume();
     }
 
-    private void retrieveAllVideos() {
+    private void retrieveAndSetAllVideos() {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setReverseLayout(true);
@@ -163,8 +163,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             public void onClick(DialogInterface dialog, int id) {
 
                 combineVideos();
-                finish();
-                startActivity(getIntent());
+              //  finish();
+              //  startActivity(getIntent());
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -186,21 +186,33 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 if (combineVids.haveVideos()) {
                     final String combinedVideoPath = combineVids.combineVideosForWeek();
                     addCombinedVideos(combinedVideoPath);
+                    finish();
+                    startActivity(getIntent());
                 } else {
-                    showNoVideosDialog();
+                    showNoVideosDialogOnUIThread();
                 }
             }
         });
     }
 
-    private void showNoVideosDialog() {
-                      /*
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle(R.string.app_name);
-                    builder.setMessage("There are no new videos this week");
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                    */
+    private void showNoVideosDialogOnUIThread() {
+
+        Log.v(TAG, "reporting back from combining thread");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                showNoVideosDialog();
+            }
+        });
+    }
+
+    public void showNoVideosDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.app_name);
+        builder.setMessage("No new videos this week");
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void addCombinedVideos(String combinedVideoPath) {
