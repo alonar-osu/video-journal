@@ -188,20 +188,19 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     addCombinedVideos(combinedVideoPath);
                 } else {
                     showNoVideosDialog();
-                   /*
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle(R.string.app_name);
-                    builder.setMessage("There are no new videos this week");
-                    AlertDialog alert = builder.create();
-                    alert.show();
-                    */
                 }
             }
         });
     }
 
     private void showNoVideosDialog() {
-        //
+                      /*
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle(R.string.app_name);
+                    builder.setMessage("There are no new videos this week");
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    */
     }
 
     private void addCombinedVideos(String combinedVideoPath) {
@@ -232,10 +231,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                     PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "permissions: if checkSelfPermission was true");
                 return true;
-            } else {
-                Log.d(TAG, "permissions: if checkSelfPermission was false");
-                return false;
-            }
+            } else return false;
         }
             return true;
     }

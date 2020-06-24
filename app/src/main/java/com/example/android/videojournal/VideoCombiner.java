@@ -56,7 +56,6 @@ public class VideoCombiner {
         String mergedVideoPath = "";
         try {
             mergedVideoPath = mergeVideos(videos);
-            Log.d(TAG, "Merging: resulting combined video path= " + mergedVideoPath);
             return mergedVideoPath;
         } catch (IOException e) {
             e.printStackTrace();
@@ -70,7 +69,6 @@ public class VideoCombiner {
         Movie[] inMovies = new Movie[videos.length];
         int index = 0;
         for (String video: videos) {
-            Log.d(TAG, "Merging: vid path=" + video);
             inMovies[index] = MovieCreator.build(video);
             index++;
         }
@@ -88,7 +86,6 @@ public class VideoCombiner {
         }
 
         Movie result = new Movie();
-        Log.d(TAG, "Merging: audioTracks size = " + audioTracks.size() + " videoTracks size = " + videoTracks.size());
 
         if (audioTracks.size() > 0) {
             result.addTrack(new AppendTrack(audioTracks.toArray(new Track[audioTracks.size()])));
@@ -99,28 +96,20 @@ public class VideoCombiner {
 
         String filename = FILE_START_NAME + todaysDateAsString() + VIDEO_EXTENSION;
         String videoCombinedPath = generateFilePath(filename);
-        Log.d(TAG, "Merging: videoCombinedPath= " + videoCombinedPath);
 
         Container out = new DefaultMp4Builder().build(result);
-        Log.d(TAG, "Merging: before FileChannel fc");
         FileChannel fc = new RandomAccessFile(videoCombinedPath, "rw").getChannel();
-        Log.d(TAG, "Merging: before out.writeContainer");
         out.writeContainer(fc);
         fc.close();
-
-        Log.d(TAG, "Merging: at end of combining videos");
 
         return videoCombinedPath;
     }
 
     private String generateFilePath(String fileName) {
 
-        Log.d(TAG, "Merging: in generateFilePath() method");
-
         File[] externalStorageVolumes =
                 ContextCompat.getExternalFilesDirs(context, null);
         File primaryExternalStorage = externalStorageVolumes[0];
-        Log.d(TAG, "Merging: primaryExternalStorage = " + primaryExternalStorage);
         String dirPath = "" + primaryExternalStorage;
 
         String filePath = dirPath + "/" + fileName;

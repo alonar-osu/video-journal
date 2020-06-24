@@ -97,14 +97,21 @@ public class PlayVideoActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.buttonDelete:
-// getApplicationContext()
+
                 VideoDeleter vidDeleter = new VideoDeleter(PlayVideoActivity.this, mDb);
                 vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
 
                 Intent doneDeleting = new Intent(context, MainActivity.class);
-              context.startActivity(doneDeleting);
-               // finish();
-                    // finish();
+                context.startActivity(doneDeleting);
+
+                // finish();
+                return true;
+
+            case R.id.buttonShare:
+
+                // share video
+                VideoSharer vidSharer = new VideoSharer(PlayVideoActivity.this);
+                vidSharer.shareVideo(mVideoPath);
                 return true;
 
             default:

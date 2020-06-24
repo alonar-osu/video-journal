@@ -1,14 +1,9 @@
 package com.example.android.videojournal;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
-
-import androidx.appcompat.app.AlertDialog;
 
 
 public class VideoDeleter {
@@ -24,38 +19,9 @@ public class VideoDeleter {
 
     public void deleteJournalEntry(final String videoPath, final String thumbnailPath, final int position) {
 
-        /*
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("Delete this entry?");
-
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-
-                // delete
-                deleteVideo (videoPath);
-                deleteThumbnail(thumbnailPath);
-                deleteEntryFromDB(position);
-
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                /// no need to delete
-                Log.d(TAG, "Delete: not deleting");
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-        */
-
-
-
         deleteVideo (videoPath);
         deleteThumbnail(thumbnailPath);
         deleteEntryFromDB(position);
-
-
     }
 
     public void deleteVideo (String videoPath) {

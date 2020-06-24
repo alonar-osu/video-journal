@@ -6,7 +6,16 @@
         android:id="@+id/buttonDelete"
         android:icon="@drawable/ic_delete"
         app:showAsAction="ifRoom"
-        android:title="Delete">
+        android:title="Delete"
+        android:orderInCategory="200">
+    </item>
+
+    <item
+        android:id="@+id/buttonShare"
+        android:icon="@drawable/ic_share"
+        app:showAsAction="ifRoom"
+        android:title="Share"
+        android:orderInCategory="100">
     </item>
 
 </menu>
