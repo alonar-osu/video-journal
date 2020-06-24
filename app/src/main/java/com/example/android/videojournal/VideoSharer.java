@@ -33,7 +33,7 @@ public class VideoSharer extends FileProvider {
 
             intentShareFile.putExtra(Intent.EXTRA_STREAM, videoUri);
             intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Video from VideoJournal");
-            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Sharing video from VideoJournal app");
+            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Here is my video from VideoJournal app");
             intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             context.startActivity(Intent.createChooser(intentShareFile, "Share file"));
         }
