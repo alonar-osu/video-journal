@@ -53,9 +53,7 @@ public class VideoCombiner {
             videos[i] = mWeekAgoEntries.get(i).getVideopath();
         }
 
-        // TODO: handle empty path
         String mergedVideoPath = "";
-        // merge videos
         try {
             mergedVideoPath = mergeVideos(videos);
             Log.d(TAG, "Merging: resulting combined video path= " + mergedVideoPath);

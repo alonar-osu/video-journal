@@ -184,11 +184,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 VideoCombiner combineVids = new VideoCombiner(getApplicationContext(), mDb);
 
                 if (combineVids.haveVideos()) {
-                    Log.d(TAG, "There are videos going to combine");
                     final String combinedVideoPath = combineVids.combineVideosForWeek();
                     addCombinedVideos(combinedVideoPath);
                 } else {
-                   Log.d(TAG, "There are no videos this week");
                     showNoVideosDialog();
                    /*
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -208,7 +206,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private void addCombinedVideos(String combinedVideoPath) {
         VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
-        vidAdder.addVideo(combinedVideoPath, true);
+        if (combinedVideoPath.length() > 0) {
+            vidAdder.addVideo(combinedVideoPath, true);
+        }
     }
 
     @Override
