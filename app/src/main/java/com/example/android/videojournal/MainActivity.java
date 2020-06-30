@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private final static int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
+    private final static int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
 
-    static final int REQUEST_VIDEO_CAPTURE = 1;
+    static final int VIDEO_CAPTURE_REQUEST_CODE = 1;
     private static int REC_NOTIF_ID = 100;
     static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static int DEFAULT_NOTIF_TIME_MINS = 60;
@@ -68,19 +69,30 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 @Override
                 public void onClick(View view) {
                     // on click action
+
+                    // VIA INTENT
+                    /*
                     Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                     takeVideoIntent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
                     takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
                     takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
-
                     if (checkReadExternalStoragePermission()) {
                         Log.d(TAG, "clicked on + has permission");
                         if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                            startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+                            startActivityForResult(takeVideoIntent, VIDEO_CAPTURE_REQUEST_CODE);
                         }
                     } else {
                         Log.d(TAG, "clicked on + NO permission");
                         askReadExternalStoragePermission();
+                    }
+                    */
+
+                    // USING SAMPLE CODE
+                    if (checkPermission(Manifest.permission.CAMERA) && checkPermission(Manifest.permission.RECORD_AUDIO)) {
+                        Intent takeVideoIntent = new Intent(MainActivity.this, Camera2Activity.class);
+                        startActivity(takeVideoIntent);
+                    } else {
+                        askCameraAndAudioPermission();
                     }
                 }
             });
@@ -217,14 +229,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
+    // for when recording video via intent
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
+        if (requestCode == VIDEO_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK) {
 
             Uri videoUri = intent.getData();
             VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
             String videoPath = vidAdder.getRealPathFromURI(MainActivity.this, videoUri);
+            Log.d(TAG, "videoPath= " + videoPath);
             vidAdder.addVideo(videoPath, false);
 
             finish();
@@ -236,7 +250,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
                     PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "permissions: if checkSelfPermission was true");
+                Log.d(TAG, "permissions: checkSelfPermission extern storage was true");
                 return true;
             } else return false;
         }
@@ -330,6 +344,26 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         // register listener for preference changes
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    private boolean checkPermission(String permission) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "permissions: checkSelfPermission camera was true");
+                return true;
+            } else return false;
+        }
+        return true;
+    }
+
+    public void askCameraAndAudioPermission() {
+        //  if (ActivityCompat.shouldShowRequestPermissionRationale(getContext(), Manifest.permission.CAMERA)) {
+        //       Toast.makeText(, "App needs to use camera to record videos", Toast.LENGTH_LONG).show();
+        //   }
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, CAMERA_AND_AUDIO_REQUEST_CODE);
+        }
     }
 
     @Override

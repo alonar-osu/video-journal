@@ -98,6 +98,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         videoPlayer.getVideoComponent().addVideoListener(this);
 
         addOnScrollListener(new RecyclerView.OnScrollListener() {
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
@@ -107,7 +108,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                         thumbnailView.setVisibility(VISIBLE);
                         playIconView.setVisibility(VISIBLE);
                     }
-
                     playVideo();
                 }
             }
@@ -121,7 +121,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         addOnChildAttachStateChangeListener(new OnChildAttachStateChangeListener() {
             @Override
             public void onChildViewAttachedToWindow(@NonNull View view) {
-
             }
 
             @Override
