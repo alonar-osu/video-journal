@@ -39,10 +39,13 @@ import android.widget.Button;
 import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -55,14 +58,11 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
 
     private AppDatabase mDb;
 
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
-    private static final String TAG = "Camera2VideoFragment";
-    static {
-        ORIENTATIONS.append(Surface.ROTATION_0, 90);
-        ORIENTATIONS.append(Surface.ROTATION_90, 0);
-        ORIENTATIONS.append(Surface.ROTATION_180, 270);
-        ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }
+    private final static String FILE_START_NAME = "vj";
+    private final static String VIDEO_EXTENSION = ".mp4";
+    private String mVideoFilePath;
+    private static final String TAG = Camera2VideoFragment.class.getSimpleName();
+
     /**
      * An {@link AutoFitTextureView} for camera preview.
      */
@@ -179,7 +179,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
      */
     private static Size chooseVideoSize(Size[] choices) {
         for (Size size : choices) {
-            if (size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080) {
+            if (size.getWidth() == size.getHeight() * 4 / 3 && size.getWidth() <= 1080 ) {
                 return size;
             }
         }
@@ -291,7 +291,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
-            String cameraId = manager.getCameraIdList()[1]; // using front camera 1
+            String cameraId = manager.getCameraIdList()[1]; // using front camera 1, for back 0
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics
@@ -299,15 +299,17 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     width, height, mVideoSize);
+
             int orientation = getResources().getConfiguration().orientation;
+
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
             } else {
                 mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
             }
+
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
-
 
             if (checkPermission(Manifest.permission.CAMERA) && checkPermission(Manifest.permission.RECORD_AUDIO)) {
                 manager.openCamera(cameraId, mStateCallback, null);
@@ -315,8 +317,6 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
                 Toast.makeText(activity, "App needs permission for video and audio recording", Toast.LENGTH_SHORT).show();
                 goToMainActivity();
             }
-
-
         } catch (CameraAccessException e) {
             Toast.makeText(activity, "Cannot access the camera.", Toast.LENGTH_SHORT).show();
             activity.finish();
@@ -417,12 +417,16 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         if (null == mTextureView || null == mPreviewSize || null == activity) {
             return;
         }
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+
+      //  int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int rotation = 270;  // fix in portrait view
+
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
+
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
@@ -432,6 +436,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             matrix.postScale(scale, scale, centerX, centerY);
             matrix.postRotate(90 * (rotation - 2), centerX, centerY);
         }
+
         mTextureView.setTransform(matrix);
     }
     private void setUpMediaRecorder() throws IOException {
@@ -439,34 +444,27 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         if (null == activity) {
             return;
         }
+        createVideoFilePath(activity);
+
         mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mMediaRecorder.setOutputFile(getVideoFile(activity).getAbsolutePath());
+        mMediaRecorder.setOutputFile(mVideoFilePath);
         mMediaRecorder.setVideoEncodingBitRate(10000000);
         mMediaRecorder.setVideoFrameRate(30);
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int orientation = ORIENTATIONS.get(rotation);
+
+        int orientation = 270; // use portrait orientation
         mMediaRecorder.setOrientationHint(orientation);
         mMediaRecorder.prepare();
     }
-    private File getVideoFile(Context context) {
 
-        /*
-        File movieFile = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM); // VIDEOS
-        File videoFolder = new File(movieFile, "Camera"); // VideoJournalVideos
-        if(!videoFolder.exists()) {
-            videoFolder.mkdirs();
-        }
-        return new File(videoFolder, "vj123test.mp4");
-        */
-
-        return new File(context.getExternalFilesDir(null), "vj_video.mp4" );
+    private void createVideoFilePath(Context context) {
+        File filePath = new File(context.getExternalFilesDir(null), FILE_START_NAME + todaysDateTimeAsString() + VIDEO_EXTENSION);
+        mVideoFilePath = filePath.getAbsolutePath();
     }
-
 
     private void startRecordingVideo() {
         try {
@@ -482,27 +480,23 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     private void stopRecordingVideo() {
         // UI
         mIsRecordingVideo = false;
-        mButtonVideo.setText("record");
+//        mButtonVideo.setText("record");
         // Stop recording
         mMediaRecorder.stop();
         mMediaRecorder.reset();
 
         Activity activity = getActivity();
-        String videoPath = getVideoFile(activity).getAbsolutePath();
-
         if (null != activity) {
-            Toast.makeText(activity, "Video saved: " + videoPath,
+            Toast.makeText(activity, "Saving at path: " + mVideoFilePath,
                     Toast.LENGTH_LONG).show();
+            Log.d(TAG, "videoPath= " + mVideoFilePath);
         }
-        //startPreview();
-
-        // TODO: add video via Adder
+        // Save video
         VideoAdder vidAdder = new VideoAdder(activity, mDb);
-        vidAdder.addVideo(videoPath, false);
-
-
+        vidAdder.addVideo(mVideoFilePath, false);
         goToMainActivity();
     }
+
     /**
      * Compares two {@code Size}s based on their areas.
      */
@@ -539,6 +533,13 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             } else return false;
         }
         return true;
+    }
+
+    private String todaysDateTimeAsString() {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
+        Date now = new Date();
+        String dateStr = formatter.format(now);
+        return dateStr;
     }
 
     private void goToMainActivity() {

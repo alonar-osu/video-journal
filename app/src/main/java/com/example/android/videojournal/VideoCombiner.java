@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat;
 public class VideoCombiner {
 
     private static final String TAG = VideoCombiner.class.getSimpleName();
-    public final static String FILE_START_NAME = "vj";
+    public final static String FILE_START_NAME = "comb_vj";
     public final static String VIDEO_EXTENSION = ".mp4";
 
     Context context;
@@ -115,7 +115,7 @@ public class VideoCombiner {
     }
 
     private String todaysDateAsString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.getDefault());
         return sdf.format(new Date());
     }
 

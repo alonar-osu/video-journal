@@ -31,17 +31,17 @@ public class VideoAdder {
     }
 
     public void addVideo(String videoPath, boolean isCombined) {
-        Log.d(TAG, "Adding: new videoPath= " + videoPath);
         String thumbnailFileName = generateThumbnailFileName();
         String thumbnailPath = generateThumbnail(videoPath, thumbnailFileName);
-        Log.d(TAG, "new thumbnail path= " + thumbnailPath);
         Date date = Calendar.getInstance().getTime();
 
         // video dimensions
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(videoPath);
         int videoWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        Log.d(TAG, "Dimension: videoWidth=" + videoWidth);
         int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+        Log.d(TAG, "Dimension: videoHeight=" + videoHeight);
         retriever.release();
 
         int combinedVideo = isCombined? 1 : 0;
@@ -59,16 +59,20 @@ public class VideoAdder {
     private String generateThumbnail(String videoPath, String thumbnailFileName) {
 
         Bitmap videoThumbnail = null;
+        String thumbnailPath = "";
         try {
             videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
         } catch (Exception e) {
-            Log.d(TAG, "Exception happened when making bitmap for video thumbnail");
         }
+
+        if (videoThumbnail == null) {
+            Log.d(TAG, "Thumbnail is null");
+        } else {
         // save bitmap to file
         String videoThumbnailsFolder = THUMBNAIL_DIRECTORY_NAME;
-        String thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, thumbnailFileName);
+        thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, thumbnailFileName);
         thumbnailPath += "/" + thumbnailFileName;
-
+        }
         return thumbnailPath;
     }
 
@@ -93,7 +97,7 @@ public class VideoAdder {
         Random generator = new Random();
         int n = 10000;
         n = generator.nextInt(n);
-        return "Thumbnail-" + n + ".jpg";
+        return "vj_thumb" + n + ".jpg";
     }
 
     public String getRealPathFromURI(Context context, Uri contentUri) {
@@ -106,7 +110,5 @@ public class VideoAdder {
         cursor.close();
         return result;
     }
-
-
 
 }
