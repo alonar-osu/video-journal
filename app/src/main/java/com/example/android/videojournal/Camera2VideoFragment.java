@@ -35,7 +35,11 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -59,7 +63,6 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
 
     private final static String FILE_START_NAME = "vj";
     private final static String VIDEO_EXTENSION = ".mp4";
-    private String mVideoFilePath;
     private static final String TAG = Camera2VideoFragment.class.getSimpleName();
 
     /**
@@ -70,6 +73,14 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
      * Button to record video
      */
     private ImageView mButtonVideo;
+    /**
+     * View to show today's date
+     */
+    TextView mRecordingDate;
+    /**
+     * Absolute path to recorded video
+     */
+    private String mVideoFilePath;
     /**
      * A refernce to the opened {@link android.hardware.camera2.CameraDevice}.
      */
@@ -224,8 +235,8 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mButtonVideo = (ImageView) view.findViewById(R.id.video);
-        mButtonVideo.bringToFront();
         mButtonVideo.setOnClickListener(this);
+        mRecordingDate = (TextView) view.findViewById(R.id.rec_date_tv);
         mDb = AppDatabase.getInstance(getActivity());
     }
 
@@ -350,6 +361,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
      * Start the camera preview.
      */
     private void startPreview() {
+        mRecordingDate.setText(todaysDateForPreview());
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
             return;
         }
@@ -541,6 +553,12 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         Date now = new Date();
         String dateStr = formatter.format(now);
         return dateStr;
+    }
+
+    private String todaysDateForPreview() {
+        SimpleDateFormat formatter = new SimpleDateFormat("MMMM dd yyyy", Locale.US);
+        Date now = new Date();
+        return formatter.format(now);
     }
 
     private void goToMainActivity() {

@@ -27,5 +27,15 @@
             android:gravity="center"
             android:src="@drawable/ic_record" />
 
+        <TextView
+            android:id="@+id/rec_date_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_below="@id/video"
+            android:theme="@style/AppTheme.Autoplay"
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/colorGrey"/>
+
     </RelativeLayout>
 </RelativeLayout>
