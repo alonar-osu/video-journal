@@ -29,13 +29,12 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +69,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     /**
      * Button to record video
      */
-    private Button mButtonVideo;
+    private ImageView mButtonVideo;
     /**
      * A refernce to the opened {@link android.hardware.camera2.CameraDevice}.
      */
@@ -224,10 +223,12 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        mButtonVideo = (Button) view.findViewById(R.id.video);
+        mButtonVideo = (ImageView) view.findViewById(R.id.video);
+        mButtonVideo.bringToFront();
         mButtonVideo.setOnClickListener(this);
         mDb = AppDatabase.getInstance(getActivity());
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -455,7 +456,6 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-
         int orientation = 270; // use portrait orientation
         mMediaRecorder.setOrientationHint(orientation);
         mMediaRecorder.prepare();
@@ -469,18 +469,19 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     private void startRecordingVideo() {
         try {
             // UI
-            mButtonVideo.setText("stop");
             mIsRecordingVideo = true;
             // Start recording
             mMediaRecorder.start();
+            mButtonVideo.setColorFilter(ContextCompat.getColor(getActivity(), R.color.colorAccent), android.graphics.PorterDuff.Mode.SRC_IN);
+
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
     private void stopRecordingVideo() {
         // UI
+        mButtonVideo.setColorFilter(ContextCompat.getColor(getActivity(), R.color.colorGrey), android.graphics.PorterDuff.Mode.SRC_IN);
         mIsRecordingVideo = false;
-//        mButtonVideo.setText("record");
         // Stop recording
         mMediaRecorder.stop();
         mMediaRecorder.reset();

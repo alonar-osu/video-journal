@@ -8,15 +8,14 @@
     android:layout_height="wrap_content"
     tools:context=".PlayVideoActivity">
 
-    <!-- journal entry's fullscreen video -->
+    <!-- entry's fullscreen video -->
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/fullscreenPlayVideoView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#A6000000"
+        android:background="@color/colorBlack"
         app:show_timeout="45000"
         app:rewind_increment="3000"
-        app:fastforward_increment="3000"
-        />
+        app:fastforward_increment="3000"/>
 
 </RelativeLayout>
