@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -38,8 +37,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -65,34 +62,25 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     private final static String VIDEO_EXTENSION = ".mp4";
     private static final String TAG = Camera2VideoFragment.class.getSimpleName();
 
-    /**
-     * An {@link AutoFitTextureView} for camera preview.
-     */
-    private AutoFitTextureView mTextureView;
-    /**
-     * Button to record video
-     */
+    private AutoFitTextureView mTextureView; // for camera preview
     private ImageView mButtonVideo;
-    /**
-     * View to show today's date
-     */
+    private ImageView mButtonSwitchCamera;
     TextView mRecordingDate;
-    /**
-     * Absolute path to recorded video
-     */
     private String mVideoFilePath;
-    /**
-     * A refernce to the opened {@link android.hardware.camera2.CameraDevice}.
-     */
-    private CameraDevice mCameraDevice;
-    /**
-     * A reference to the current {@link android.hardware.camera2.CameraCaptureSession} for preview.
-     */
-    private CameraCaptureSession mPreviewSession;
-    /**
-     * {@link TextureView.SurfaceTextureListener} handles several lifecycle events on a
-     * {@link TextureView}.
-     */
+    private CameraDevice mCameraDevice; // refernce to the opened cameradevice
+    private CameraCaptureSession mPreviewSession; // reference to the current CameraCaptureSession for preview
+    private Size mPreviewSize;
+    private Size mVideoSize;
+    private CaptureRequest.Builder mPreviewBuilder;
+    private MediaRecorder mMediaRecorder;
+    private boolean mIsRecordingVideo;
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
+    private int mCameraId;
+
+
+
+    // handles several lifecycle events on a textureview
     private TextureView.SurfaceTextureListener mSurfaceTextureListener
             = new TextureView.SurfaceTextureListener() {
         @Override
@@ -113,34 +101,8 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
         }
     };
-    /**
-     * The {@link android.util.Size} of camera preview.
-     */
-    private Size mPreviewSize;
-    /**
-     * The {@link android.util.Size} of video recording.
-     */
-    private Size mVideoSize;
-    /**
-     * Camera preview.
-     */
-    private CaptureRequest.Builder mPreviewBuilder;
-    /**
-     * MediaRecorder
-     */
-    private MediaRecorder mMediaRecorder;
-    /**
-     * Whether the app is recording video now
-     */
-    private boolean mIsRecordingVideo;
-    /**
-     * An additional thread for running tasks that shouldn't block the UI.
-     */
-    private HandlerThread mBackgroundThread;
-    /**
-     * A {@link Handler} for running tasks in the background.
-     */
-    private Handler mBackgroundHandler;
+
+
     /**
      * A {@link Semaphore} to prevent the app from exiting before closing the camera.
      */
@@ -181,8 +143,8 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         return fragment;
     }
     /**
-     * In this sample, we choose a video size with 3x4 aspect ratio. Also, we don't use sizes larger
-     * than 1080p, since MediaRecorder cannot handle such a high-resolution video.
+     * Using video size with 3x4 aspect ratio. Not using sizes larger than 1080p,
+     * since MediaRecorder cannot handle such a high-resolution video.
      *
      * @param choices The list of available sizes
      * @return The video size
@@ -236,8 +198,11 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mButtonVideo = (ImageView) view.findViewById(R.id.video);
         mButtonVideo.setOnClickListener(this);
+        mButtonSwitchCamera = (ImageView) view.findViewById(R.id.switch_cams);
+        mButtonSwitchCamera.setOnClickListener(this);
         mRecordingDate = (TextView) view.findViewById(R.id.rec_date_tv);
         mDb = AppDatabase.getInstance(getActivity());
+        mCameraId = 1; // use front cam by default
     }
 
     @Override
@@ -266,6 +231,14 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
                     startRecordingVideo();
                 }
                 break;
+            }
+            case R.id.switch_cams: {
+                if (!mIsRecordingVideo) {
+                    mCameraId = Math.abs(mCameraId - 1); // switch betw 0 and 1
+
+                    closeCamera();
+                    onResume();
+                }
             }
         }
     }
@@ -303,7 +276,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
-            String cameraId = manager.getCameraIdList()[1]; // using front camera 1, for back 0
+            String cameraId = manager.getCameraIdList()[mCameraId];
             // Choose the sizes for camera preview and video recording
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics
@@ -312,14 +285,13 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     width, height, mVideoSize);
 
-            int orientation = getResources().getConfiguration().orientation;
-
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            } else {
-                mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+           // int orientation = getResources().getConfiguration().orientation; // TESTING
+            int orientation = 270;
+            if (mCameraId == 0) {
+                orientation = 90; // adjust if back camera
             }
 
+            mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
 
@@ -432,7 +404,10 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         }
 
       //  int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int rotation = 270;  // fix in portrait view
+        int rotation = 270;
+        if (mCameraId == 0) { // back camera
+            rotation = 90;
+        }
 
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
@@ -468,7 +443,10 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        int orientation = 270; // use portrait orientation
+        int orientation = 270;
+        if (mCameraId == 0) {
+            orientation = 90; // adjust if back camera
+        }
         mMediaRecorder.setOrientationHint(orientation);
         mMediaRecorder.prepare();
     }

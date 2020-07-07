@@ -31,6 +31,7 @@ public class VideoAdder {
     }
 
     public void addVideo(String videoPath, boolean isCombined) {
+
         String thumbnailFileName = generateThumbnailFileName();
         String thumbnailPath = generateThumbnail(videoPath, thumbnailFileName);
         Date date = Calendar.getInstance().getTime();

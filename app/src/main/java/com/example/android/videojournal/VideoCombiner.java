@@ -1,7 +1,10 @@
 package com.example.android.videojournal;
 
-
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.MediaMetadataRetriever;
+import android.os.Build;
+import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
@@ -58,6 +61,7 @@ public class VideoCombiner {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
 
         return mergedVideoPath;
     }

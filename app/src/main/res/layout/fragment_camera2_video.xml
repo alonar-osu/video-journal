@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
     <com.example.android.videojournal.AutoFitTextureView
         android:id="@+id/texture"
         android:layout_width="wrap_content"
@@ -19,20 +18,43 @@
         android:layout_below="@id/texture"
         android:background="#000000">
 
-        <ImageView
-            android:id="@+id/video"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/rec_layout_buttons"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:src="@drawable/ic_record" />
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:id="@+id/video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:layout_centerVertical="true"
+                android:src="@drawable/ic_record2" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toLeftOf="@+id/video" >
+
+            <ImageView
+                android:id="@+id/switch_cams"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_switch_cams" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/rec_date_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:layout_below="@id/video"
+            android:layout_marginBottom="20dp"
+            android:layout_alignParentBottom="true"
             android:theme="@style/AppTheme.Autoplay"
             android:layout_centerHorizontal="true"
             android:textColor="@color/colorGrey"/>
