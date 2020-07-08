@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -28,6 +29,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
 import android.util.Size;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.TextureView;
@@ -64,10 +66,9 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
 
     private AutoFitTextureView mTextureView; // for camera preview
     private ImageView mButtonVideo;
-    private ImageView mButtonSwitchCamera;
     TextView mRecordingDate;
     private String mVideoFilePath;
-    private CameraDevice mCameraDevice; // refernce to the opened cameradevice
+    private CameraDevice mCameraDevice; // reference to the opened cameradevice
     private CameraCaptureSession mPreviewSession; // reference to the current CameraCaptureSession for preview
     private Size mPreviewSize;
     private Size mVideoSize;
@@ -78,6 +79,14 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     private Handler mBackgroundHandler;
     private int mCameraId;
 
+
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+    static {
+        ORIENTATIONS.append(Surface.ROTATION_0, 270);
+        ORIENTATIONS.append(Surface.ROTATION_270, 0);
+        ORIENTATIONS.append(Surface.ROTATION_180, 90);
+        ORIENTATIONS.append(Surface.ROTATION_90, 180);
+    }
 
 
     // handles several lifecycle events on a textureview
@@ -198,11 +207,9 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
         mButtonVideo = (ImageView) view.findViewById(R.id.video);
         mButtonVideo.setOnClickListener(this);
-        mButtonSwitchCamera = (ImageView) view.findViewById(R.id.switch_cams);
-        mButtonSwitchCamera.setOnClickListener(this);
         mRecordingDate = (TextView) view.findViewById(R.id.rec_date_tv);
         mDb = AppDatabase.getInstance(getActivity());
-        mCameraId = 1; // use front cam by default
+        mCameraId = 1; // front camera
     }
 
     @Override
@@ -231,14 +238,6 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
                     startRecordingVideo();
                 }
                 break;
-            }
-            case R.id.switch_cams: {
-                if (!mIsRecordingVideo) {
-                    mCameraId = Math.abs(mCameraId - 1); // switch betw 0 and 1
-
-                    closeCamera();
-                    onResume();
-                }
             }
         }
     }
@@ -285,13 +284,12 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
                     width, height, mVideoSize);
 
-           // int orientation = getResources().getConfiguration().orientation; // TESTING
-            int orientation = 270;
-            if (mCameraId == 0) {
-                orientation = 90; // adjust if back camera
+            int orientation = getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+            } else {
+                mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
             }
-
-            mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
 
@@ -403,18 +401,13 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             return;
         }
 
-      //  int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
-        int rotation = 270;
-        if (mCameraId == 0) { // back camera
-            rotation = 90;
-        }
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
 
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
         float centerX = viewRect.centerX();
         float centerY = viewRect.centerY();
-
         if (Surface.ROTATION_90 == rotation || Surface.ROTATION_270 == rotation) {
             bufferRect.offset(centerX - bufferRect.centerX(), centerY - bufferRect.centerY());
             matrix.setRectToRect(viewRect, bufferRect, Matrix.ScaleToFit.FILL);
@@ -443,10 +436,8 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         mMediaRecorder.setVideoSize(mVideoSize.getWidth(), mVideoSize.getHeight());
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        int orientation = 270;
-        if (mCameraId == 0) {
-            orientation = 90; // adjust if back camera
-        }
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int orientation = ORIENTATIONS.get(rotation);
         mMediaRecorder.setOrientationHint(orientation);
         mMediaRecorder.prepare();
     }
