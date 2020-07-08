@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:gravity="center"
-            android:src="@drawable/ic_record2" />
+            android:src="@drawable/ic_record" />
 
         <TextView
             android:id="@+id/rec_date_tv"

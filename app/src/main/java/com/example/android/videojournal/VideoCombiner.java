@@ -1,6 +1,7 @@
 package com.example.android.videojournal;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
 import com.googlecode.mp4parser.authoring.Movie;
@@ -39,11 +40,13 @@ public class VideoCombiner {
     }
 
     public boolean haveVideos() {
+        Log.d(TAG, "crash debug: in haveVideos()");
         mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(getPreviousWeekDate(), new Date());
         return mWeekAgoEntries.size() > 0;
     }
 
     public String combineVideosForWeek() {
+        Log.d(TAG, "crash debug: in combineVideosForWeek() 1");
 
         final String[] videos = new String[mWeekAgoEntries.size()];
         for (int i = 0; i < mWeekAgoEntries.size(); i++) {
@@ -51,18 +54,19 @@ public class VideoCombiner {
         }
 
         String mergedVideoPath = "";
+
         try {
             mergedVideoPath = mergeVideos(videos);
             return mergedVideoPath;
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        Log.d(TAG, "crash debug: in combineVideosForWeek() 2");
         return mergedVideoPath;
     }
 
     private String mergeVideos(String[] videos) throws IOException {
-
+        Log.d(TAG, "crash debug: in mergeVideos() 1");
         Movie[] inMovies = new Movie[videos.length];
         int index = 0;
         for (String video: videos) {
@@ -98,27 +102,30 @@ public class VideoCombiner {
         FileChannel fc = new RandomAccessFile(videoCombinedPath, "rw").getChannel();
         out.writeContainer(fc);
         fc.close();
-
+        Log.d(TAG, "crash debug: in mergeVideos() 2");
         return videoCombinedPath;
     }
 
     private String generateFilePath(String fileName) {
-
+        Log.d(TAG, "crash debug: generateFilePath() 1");
         File[] externalStorageVolumes =
                 ContextCompat.getExternalFilesDirs(context, null);
         File primaryExternalStorage = externalStorageVolumes[0];
         String dirPath = "" + primaryExternalStorage;
 
         String filePath = dirPath + "/" + fileName;
+        Log.d(TAG, "crash debug: generateFilePath() 2");
         return filePath;
     }
 
     private String todaysDateAsString() {
+        Log.d(TAG, "crash debug: todaysDateAsString() 1");
         SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.getDefault());
         return sdf.format(new Date());
     }
 
     public static Date getPreviousWeekDate(){
+        Log.d(TAG, "crash debug: getPreviousWeekDate() 1");
         return new Date(System.currentTimeMillis()-7*24*60*60*1000);
     }
 

@@ -450,18 +450,17 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     private void startRecordingVideo() {
         try {
             // UI
+            mButtonVideo.setImageResource(R.drawable.ic_recstop);
             mIsRecordingVideo = true;
             // Start recording
             mMediaRecorder.start();
-            mButtonVideo.setColorFilter(ContextCompat.getColor(getActivity(), R.color.colorAccent), android.graphics.PorterDuff.Mode.SRC_IN);
-
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
     private void stopRecordingVideo() {
         // UI
-        mButtonVideo.setColorFilter(ContextCompat.getColor(getActivity(), R.color.colorGrey), android.graphics.PorterDuff.Mode.SRC_IN);
+        mButtonVideo.setImageResource(R.drawable.ic_record);
         mIsRecordingVideo = false;
         // Stop recording
         mMediaRecorder.stop();
