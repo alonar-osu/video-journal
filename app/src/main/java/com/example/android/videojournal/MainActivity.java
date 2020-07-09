@@ -6,11 +6,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -18,7 +16,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -84,10 +81,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mRecyclerView.setItemViewCacheSize(20);
         Log.d(TAG, "crash debug: in Main, after setting mRecyclerview");
         if (checkReadExternalStoragePermission()) {
-            retrieveAndSetAllVideos();
+            retrieveAndSetNonCombinedVideos();
         } else {
             askReadExternalStoragePermission();
-            if (checkReadExternalStoragePermission()) retrieveAndSetAllVideos();
+            if (checkReadExternalStoragePermission()) retrieveAndSetNonCombinedVideos();
         }
         Log.d(TAG, "crash debug: in Mat end of onCreate");
     }
@@ -97,20 +94,20 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onResume();
     }
 
-    private void retrieveAndSetAllVideos() {
+    private void retrieveAndSetNonCombinedVideos() {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllVideos();
+        final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllNonCombinedVideos();
 
         videoEntries.observe(MainActivity.this, new Observer<List<VideoEntry>>() {
 
             @Override
             public void onChanged(@Nullable List<VideoEntry> entries) {
-                Log.d(TAG, "Receiving database update from LiveData");
+                Log.d(TAG, "Receiving database update for non-combined videos");
                 mRecyclerView.setVideoEntries((ArrayList) entries);
                 VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, (ArrayList) entries);
                 mRecyclerView.setAdapter(videoAdapter);

@@ -13,8 +13,11 @@ import androidx.room.Query;
 @Dao
 public interface VideoDao {
 
-    @Query("SELECT * FROM journalvideo")
-    LiveData<List<VideoEntry>> loadAllVideos();
+    @Query("SELECT * FROM journalvideo WHERE combinedVideo = 0")
+    LiveData<List<VideoEntry>> loadAllNonCombinedVideos();
+
+    @Query("SELECT * FROM journalvideo WHERE combinedVideo = 1")
+    LiveData<List<VideoEntry>> loadAllCombinedVideos();
 
     @Query("SELECT * FROM journalvideo WHERE date BETWEEN :daystart AND :dayend AND combinedVideo = 0")
     List<VideoEntry> loadVideosForMerge(Date daystart, Date dayend);

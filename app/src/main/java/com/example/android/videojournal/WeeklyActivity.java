@@ -1,10 +1,18 @@
 package com.example.android.videojournal;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 
 public class WeeklyActivity extends AppCompatActivity {
 
@@ -17,9 +25,6 @@ public class WeeklyActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weekly);
-     //   Toolbar toolbar = findViewById(R.id.toolbar_weekly);
-      //  setSupportActionBar(toolbar);
-
         mDb = AppDatabase.getInstance(getApplicationContext());
 
         Toast.makeText(getApplicationContext(), "WeeklyActivity onCreate() is runnning", Toast.LENGTH_SHORT).show();
@@ -36,7 +41,23 @@ public class WeeklyActivity extends AppCompatActivity {
 
     private void retrieveAndSetWeeklyVideos() {
 
-    //
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+
+        final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllCombinedVideos();
+
+        videoEntries.observe(WeeklyActivity.this, new Observer<List<VideoEntry>>() {
+
+            @Override
+            public void onChanged(@Nullable List<VideoEntry> entries) {
+                Log.d(TAG, "Receiving database update for weekly videos");
+                mRecyclerView.setVideoEntries((ArrayList) entries);
+                VideoAdapter videoAdapter = new VideoAdapter(WeeklyActivity.this, (ArrayList) entries);
+                mRecyclerView.setAdapter(videoAdapter);
+            }
+        });
 
     }
 
