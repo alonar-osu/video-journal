@@ -135,103 +135,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 return true;
 
             case R.id.button_weekly:
-
-                // launch weekly activity
                 Intent showWeeklyVideosIntent = new Intent(MainActivity.this, WeeklyActivity.class);
                 startActivity(showWeeklyVideosIntent);
-
-                // TODO:
-                // move combining to after a new video was added
-             //   if (checkReadExternalStoragePermission()) confirmAndCombineVideos();
-              //  else askReadExternalStoragePermission();
                 return true;
 
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private void confirmAndCombineVideos() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("Combine this week's videos?");
-
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                combineVideos();
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-            }
-        });
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    private void combineVideos() {
-
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                VideoCombiner combineVids = new VideoCombiner(getApplicationContext(), mDb);
-
-                if (combineVids.haveVideos()) {
-                    final String combinedVideoPath = combineVids.combineVideosForWeek();
-                    Log.d(TAG, "crash debug: before addCombinedVideos()");
-                    addCombinedVideos(combinedVideoPath);
-                    Log.d(TAG, "crash debug: after addCombinedVideos()");
-                    finish();
-                    Log.d(TAG, "crash debug: before restarting activity");
-                    startActivity(getIntent());
-                } else {
-                    showNoVideosDialogOnUIThread();
-                }
-            }
-        });
-    }
-
-    private void showNoVideosDialogOnUIThread() {
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                showNoVideosDialog();
-            }
-        });
-    }
-
-    public void showNoVideosDialog() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage("No new videos this week");
-        AlertDialog alert = builder.create();
-        alert.show();
-    }
-
-    private void addCombinedVideos(String combinedVideoPath) {
-        VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
-        if (combinedVideoPath.length() > 0) {
-            vidAdder.addVideo(combinedVideoPath, true);
-        }
-    }
-
-    // for when recording video via intent
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        if (requestCode == VIDEO_CAPTURE_REQUEST_CODE && resultCode == RESULT_OK) {
-
-            Uri videoUri = intent.getData();
-            VideoAdder vidAdder = new VideoAdder(getApplicationContext(), mDb);
-            String videoPath = vidAdder.getRealPathFromURI(MainActivity.this, videoUri);
-            Log.d(TAG, "videoPath= " + videoPath);
-            vidAdder.addVideo(videoPath, false);
-
-            finish();
-            startActivity(getIntent());
         }
     }
 

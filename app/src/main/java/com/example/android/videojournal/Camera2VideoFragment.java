@@ -51,6 +51,7 @@ import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 // Based on sample code for Camera2 API
@@ -475,8 +476,30 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         // Save video
         VideoAdder vidAdder = new VideoAdder(activity, mDb);
         vidAdder.addVideo(mVideoFilePath, false);
+        // combine videos for week
+        combineAndAddCombinedVideos();
         goToMainActivity();
     }
+
+    private void combineAndAddCombinedVideos() {
+
+        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                Activity activity = getActivity();
+                VideoCombiner combineVids = new VideoCombiner(activity, mDb);
+
+                if (combineVids.haveVideos()) {
+                    final String combinedVideoPath = combineVids.combineVideosForWeek();
+                    VideoAdder vidAdder = new VideoAdder(activity, mDb);
+                    if (combinedVideoPath.length() > 0) {
+                        vidAdder.addVideo(combinedVideoPath, true);
+                    }
+                }
+            }
+        });
+    }
+
 
     /**
      * Compares two {@code Size}s based on their areas.
@@ -509,7 +532,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
                     PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "permissions: checkSelfPermission was true");
+                Log.d(TAG, "permissions: checkSelfPermission camera was true");
                 return true;
             } else return false;
         }
