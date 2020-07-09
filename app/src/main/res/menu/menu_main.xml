@@ -9,8 +9,8 @@
         android:orderInCategory="200"/>
 
     <item
-        android:id="@+id/button_combine"
-        android:title="COMBINE"
+        android:id="@+id/button_weekly"
+        android:title="@string/weekly_button"
         app:showAsAction="always"
         android:orderInCategory="100">
     </item>

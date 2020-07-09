@@ -4,6 +4,7 @@
     <string name="action_record">Record</string>
     <string name="action_reminder">Daily Reminder</string>
     <string name="video_button">Video Record Button</string>
+    <string name="weekly_button">WEEKLY</string>
 
     <string name="title_activity_play_video">PlayVideoActivity</string>
     <string name="title_activity_reminder">Daily Reminder</string>

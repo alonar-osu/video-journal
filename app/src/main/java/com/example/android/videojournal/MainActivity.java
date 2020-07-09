@@ -61,32 +61,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         mDb = AppDatabase.getInstance(getApplicationContext());
 
-        Toast.makeText(getApplicationContext(), "onCreate() is runnning", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "onCreate() is runnning", Toast.LENGTH_SHORT).show();
 
         FloatingActionButton fab = findViewById(R.id.fab);
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // on click action
 
-                    // VIA INTENT
-                    /*
-                    Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                    takeVideoIntent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
-                    takeVideoIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
-                    takeVideoIntent.putExtra("android.intent.extras.CAMERA_FACING", 1);
-                    if (checkReadExternalStoragePermission()) {
-                        Log.d(TAG, "clicked on + has permission");
-                        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
-                            startActivityForResult(takeVideoIntent, VIDEO_CAPTURE_REQUEST_CODE);
-                        }
-                    } else {
-                        Log.d(TAG, "clicked on + NO permission");
-                        askReadExternalStoragePermission();
-                    }
-                    */
-
-                    // USING SAMPLE CODE
                     if (checkPermission(Manifest.permission.CAMERA) && checkPermission(Manifest.permission.RECORD_AUDIO)) {
                         Intent takeVideoIntent = new Intent(MainActivity.this, Camera2Activity.class);
                         startActivity(takeVideoIntent);
@@ -98,17 +79,17 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         createNotificationChannel();
         setupSharedPreferences();
-
+        Log.d(TAG, "crash debug: in Main, before setting mRecyclerview");
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
-
+        Log.d(TAG, "crash debug: in Main, after setting mRecyclerview");
         if (checkReadExternalStoragePermission()) {
             retrieveAndSetAllVideos();
         } else {
             askReadExternalStoragePermission();
             if (checkReadExternalStoragePermission()) retrieveAndSetAllVideos();
         }
-
+        Log.d(TAG, "crash debug: in Mat end of onCreate");
     }
 
     @Override
@@ -153,10 +134,16 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 startActivity(startSettingsActivity);
                 return true;
 
-            case R.id.button_combine:
+            case R.id.button_weekly:
 
-                if (checkReadExternalStoragePermission()) confirmAndCombineVideos();
-                else askReadExternalStoragePermission();
+                // launch weekly activity
+                Intent showWeeklyVideosIntent = new Intent(MainActivity.this, WeeklyActivity.class);
+                startActivity(showWeeklyVideosIntent);
+
+                // TODO:
+                // move combining to after a new video was added
+             //   if (checkReadExternalStoragePermission()) confirmAndCombineVideos();
+              //  else askReadExternalStoragePermission();
                 return true;
 
             default:
@@ -192,8 +179,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
                 if (combineVids.haveVideos()) {
                     final String combinedVideoPath = combineVids.combineVideosForWeek();
+                    Log.d(TAG, "crash debug: before addCombinedVideos()");
                     addCombinedVideos(combinedVideoPath);
+                    Log.d(TAG, "crash debug: after addCombinedVideos()");
                     finish();
+                    Log.d(TAG, "crash debug: before restarting activity");
                     startActivity(getIntent());
                 } else {
                     showNoVideosDialogOnUIThread();
