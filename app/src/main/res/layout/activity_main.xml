@@ -28,9 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="?attr/actionBarSize"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:background="?attr/colorPrimary" >
-
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
     </com.example.android.videojournal.VideoRecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

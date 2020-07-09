@@ -1,8 +1,8 @@
 package com.example.android.videojournal;
 
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class WeeklyActivity extends AppCompatActivity {
     private static final String TAG = WeeklyActivity.class.getSimpleName();
 
     private VideoRecyclerView mRecyclerView;
-    private AppDatabase mDb; // database using Room
+    private AppDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +27,7 @@ public class WeeklyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_weekly);
         mDb = AppDatabase.getInstance(getApplicationContext());
 
-        Toast.makeText(getApplicationContext(), "WeeklyActivity onCreate() is runnning", Toast.LENGTH_SHORT).show();
-
+        Log.d(TAG, "WeeklyActivity onCreate() is runnning");
         mRecyclerView = findViewById(R.id.recyclerView_weekly);
         mRecyclerView.setItemViewCacheSize(20);
         retrieveAndSetWeeklyVideos();
@@ -61,7 +60,14 @@ public class WeeklyActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+        if (mRecyclerView != null) {
+            mRecyclerView.releasePlayer();
+        }
+    }
 
 
 

@@ -57,8 +57,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         setSupportActionBar(toolbar);
 
         mDb = AppDatabase.getInstance(getApplicationContext());
-
-        Toast.makeText(getApplicationContext(), "onCreate() is runnning", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onCreate() is runnning");
 
         FloatingActionButton fab = findViewById(R.id.fab);
             fab.setOnClickListener(new View.OnClickListener() {

@@ -41,6 +41,7 @@
         </activity>
         <activity
             android:name=".WeeklyActivity"
+            android:label="@string/title_activity_weekly"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait">
             <meta-data
