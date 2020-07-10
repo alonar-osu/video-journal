@@ -24,12 +24,8 @@
             android:name=".PlayVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_play_video"
-            android:parentActivityName=".MainActivity"
             android:theme="@style/FullscreenTheme"
             android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.videojournal.MainActivity" />
         </activity>
         <activity
             android:name=".Camera2Activity"

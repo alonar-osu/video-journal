@@ -93,6 +93,7 @@ public class PlayVideoActivity extends AppCompatActivity {
         return true;
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -104,6 +105,10 @@ public class PlayVideoActivity extends AppCompatActivity {
             case R.id.buttonShare:
                 VideoSharer vidSharer = new VideoSharer(PlayVideoActivity.this);
                 vidSharer.shareVideo(mVideoPath);
+                return true;
+
+            case android.R.id.home:
+                finish();
                 return true;
 
             default:
