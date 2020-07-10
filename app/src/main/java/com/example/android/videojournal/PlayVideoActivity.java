@@ -140,8 +140,7 @@ public class PlayVideoActivity extends AppCompatActivity {
         VideoDeleter vidDeleter = new VideoDeleter(PlayVideoActivity.this, mDb);
         vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
 
-        Intent doneDeleting = new Intent(context, MainActivity.class);
-        context.startActivity(doneDeleting);
+        finish();
     }
 
     @Override
