@@ -22,6 +22,8 @@ public interface VideoDao {
     @Query("SELECT * FROM journalvideo WHERE date BETWEEN :daystart AND :dayend AND combinedVideo = 0")
     List<VideoEntry> loadVideosForMerge(Date daystart, Date dayend);
 
+    @Query("SELECT * FROM journalvideo WHERE date BETWEEN :daystart AND :dayend AND combinedVideo = 1")
+    VideoEntry loadCurrentCombinedVideo(Date daystart, Date dayend);
 
     @Insert
     void insertVideo(VideoEntry videoEntry);

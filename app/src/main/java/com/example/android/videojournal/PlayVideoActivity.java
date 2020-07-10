@@ -138,7 +138,7 @@ public class PlayVideoActivity extends AppCompatActivity {
     private void goAheadDeleteVideo() {
 
         VideoDeleter vidDeleter = new VideoDeleter(PlayVideoActivity.this, mDb);
-        vidDeleter.deleteJournalEntry(mVideoPath, mThumbnailPath, mPosition);
+        vidDeleter.deleteJournalEntryByPosition(mVideoPath, mThumbnailPath, mPosition);
         finish();
     }
 

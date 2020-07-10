@@ -6,6 +6,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class DateConverter {
 
@@ -33,6 +34,19 @@ public class DateConverter {
         c.set(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
         DateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy");
         return "" + dateFormat.format(c.getTime());
+    }
+
+    public static Date precedingSundayDate(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
+        Date sundayDate = c.getTime();
+        return sundayDate;
+    }
+
+    public static String todaysDateForFileNameAsString() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.getDefault());
+        return sdf.format(new Date());
     }
 
 }

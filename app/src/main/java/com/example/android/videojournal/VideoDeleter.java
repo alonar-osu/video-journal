@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class VideoDeleter {
@@ -17,11 +18,28 @@ public class VideoDeleter {
         this.context = context;
     }
 
-    public void deleteJournalEntry(final String videoPath, final String thumbnailPath, final int position) {
+    public void deleteJournalEntryByPosition(final String videoPath, final String thumbnailPath, final int position) {
 
-        deleteVideo (videoPath);
+        deleteVideo(videoPath);
         deleteThumbnail(thumbnailPath);
         deleteEntryFromDB(position);
+    }
+
+    public void deleteCurrentMergedVideo() {
+
+                Date today = new Date();
+                Date precedingSunday = DateConverter.precedingSundayDate(today);
+
+                VideoEntry currentMergedVideo = mDb.videoDao().loadCurrentCombinedVideo(precedingSunday, today);
+
+                if (currentMergedVideo != null) {
+                    String videoPath = currentMergedVideo.getVideopath();
+                    deleteVideo(videoPath);
+                    String thumbnailPath = currentMergedVideo.getThumbnailPath();
+                    deleteThumbnail(thumbnailPath);
+
+                    mDb.videoDao().deleteVideo(currentMergedVideo);
+                }
     }
 
     public void deleteVideo (String videoPath) {

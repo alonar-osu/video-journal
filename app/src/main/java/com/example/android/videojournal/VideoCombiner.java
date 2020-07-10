@@ -40,13 +40,13 @@ public class VideoCombiner {
     }
 
     public boolean haveVideos() {
-        Log.d(TAG, "crash debug: in haveVideos()");
-        mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(getPreviousWeekDate(), new Date());
+        Date today = new Date();
+        Date precedingSunday = DateConverter.precedingSundayDate(today);
+        mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(precedingSunday, today);
         return mWeekAgoEntries.size() > 0;
     }
 
     public String combineVideosForWeek() {
-        Log.d(TAG, "crash debug: in combineVideosForWeek() 1");
 
         final String[] videos = new String[mWeekAgoEntries.size()];
         for (int i = 0; i < mWeekAgoEntries.size(); i++) {
@@ -61,12 +61,10 @@ public class VideoCombiner {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, "crash debug: in combineVideosForWeek() 2");
         return mergedVideoPath;
     }
 
     private String mergeVideos(String[] videos) throws IOException {
-        Log.d(TAG, "crash debug: in mergeVideos() 1");
         Movie[] inMovies = new Movie[videos.length];
         int index = 0;
         for (String video: videos) {
@@ -95,38 +93,24 @@ public class VideoCombiner {
             result.addTrack(new AppendTrack(videoTracks.toArray(new Track[videoTracks.size()])));
         }
 
-        String filename = FILE_START_NAME + todaysDateAsString() + VIDEO_EXTENSION;
+        String filename = FILE_START_NAME + DateConverter.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
         String videoCombinedPath = generateFilePath(filename);
 
         Container out = new DefaultMp4Builder().build(result);
         FileChannel fc = new RandomAccessFile(videoCombinedPath, "rw").getChannel();
         out.writeContainer(fc);
         fc.close();
-        Log.d(TAG, "crash debug: in mergeVideos() 2");
         return videoCombinedPath;
     }
 
     private String generateFilePath(String fileName) {
-        Log.d(TAG, "crash debug: generateFilePath() 1");
         File[] externalStorageVolumes =
                 ContextCompat.getExternalFilesDirs(context, null);
         File primaryExternalStorage = externalStorageVolumes[0];
         String dirPath = "" + primaryExternalStorage;
 
         String filePath = dirPath + "/" + fileName;
-        Log.d(TAG, "crash debug: generateFilePath() 2");
         return filePath;
-    }
-
-    private String todaysDateAsString() {
-        Log.d(TAG, "crash debug: todaysDateAsString() 1");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMddHHmmss", Locale.getDefault());
-        return sdf.format(new Date());
-    }
-
-    public static Date getPreviousWeekDate(){
-        Log.d(TAG, "crash debug: getPreviousWeekDate() 1");
-        return new Date(System.currentTimeMillis()-7*24*60*60*1000);
     }
 
 
