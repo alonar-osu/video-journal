@@ -40,8 +40,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private static final String TAG = MainActivity.class.getSimpleName();
     private final static int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
     private final static int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
-
-    static final int VIDEO_CAPTURE_REQUEST_CODE = 1;
     private static int REC_NOTIF_ID = 100;
     static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static int DEFAULT_NOTIF_TIME_MINS = 60;

@@ -14,11 +14,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import androidx.core.content.ContextCompat;
 
@@ -39,14 +37,20 @@ public class VideoCombiner {
         mDb = db;
     }
 
-    public boolean haveVideos() {
+    public int thisWeeksVideoCount() {
+        getThisWeeksVideos();
+        return mWeekAgoEntries.size();
+    }
+
+    private void getThisWeeksVideos() {
         Date today = new Date();
         Date precedingSunday = DateConverter.precedingSundayDate(today);
         mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(precedingSunday, today);
-        return mWeekAgoEntries.size() > 0;
     }
 
     public String combineVideosForWeek() {
+
+        if (mWeekAgoEntries == null) getThisWeeksVideos();
 
         final String[] videos = new String[mWeekAgoEntries.size()];
         for (int i = 0; i < mWeekAgoEntries.size(); i++) {

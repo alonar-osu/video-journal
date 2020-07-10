@@ -205,7 +205,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
-        mButtonVideo = (ImageView) view.findViewById(R.id.video);
+        mButtonVideo = (ImageView) view.findViewById(R.id.button_record_video);
         mButtonVideo.setOnClickListener(this);
         mRecordingDate = (TextView) view.findViewById(R.id.rec_date_tv);
         mDb = AppDatabase.getInstance(getActivity());
@@ -231,7 +231,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.video: {
+            case R.id.button_record_video: {
                 if (mIsRecordingVideo) {
                     stopRecordingVideo();
                 } else {
@@ -466,13 +466,8 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
         mMediaRecorder.stop();
         mMediaRecorder.reset();
 
-        Activity activity = getActivity();
-        if (null != activity) {
-            Toast.makeText(activity, "Saving at path: " + mVideoFilePath,
-                    Toast.LENGTH_LONG).show();
-            Log.d(TAG, "videoPath= " + mVideoFilePath);
-        }
         // Save video
+        Activity activity = getActivity();
         VideoAdder vidAdder = new VideoAdder(activity, mDb);
         vidAdder.addVideo(mVideoFilePath, false);
         // weekly video
@@ -492,7 +487,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
                 Activity activity = getActivity();
                 VideoCombiner combineVids = new VideoCombiner(activity, mDb);
 
-                if (combineVids.haveVideos()) {
+                if (combineVids.thisWeeksVideoCount() > 0) {
                     // combine
                     final String combinedVideoPath = combineVids.combineVideosForWeek();
                     // add combined video
@@ -535,9 +530,9 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
 
     private boolean checkPermission(String permission) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) ==
+            if (ContextCompat.checkSelfPermission(getContext(), permission) ==
                     PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "permissions: checkSelfPermission camera was true");
+                Log.d(TAG, "permissions: checkSelfPermission was true");
                 return true;
             } else return false;
         }
