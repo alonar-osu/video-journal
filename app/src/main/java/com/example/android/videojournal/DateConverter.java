@@ -4,6 +4,7 @@ import androidx.room.TypeConverter;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateConverter {
@@ -24,6 +25,14 @@ public class DateConverter {
 
         DateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy");
         return dateFormat.format(date);
+    }
+
+    public static String precedingSundayDateAsString(Date date) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.set(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
+        DateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy");
+        return "" + dateFormat.format(c.getTime());
     }
 
 }

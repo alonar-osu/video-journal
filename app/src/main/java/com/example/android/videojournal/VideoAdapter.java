@@ -12,12 +12,18 @@ import android.view.ViewGroup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import static java.util.Calendar.SUNDAY;
 
 public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -25,10 +31,13 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     static ArrayList mVideoEntries;
     Context context;
+    boolean mWeeklyVideo;
 
-    public VideoAdapter(Context context, ArrayList videoEntries) {
+
+    public VideoAdapter(Context context, ArrayList videoEntries, boolean weekly) {
        this.context = context;
        this.mVideoEntries = videoEntries;
+       this.mWeeklyVideo = weekly;
     }
 
     @NonNull
@@ -48,10 +57,16 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
         String videoPath = videoEntry.getVideopath();
 
-        // get date for video
+        // date to show
         Date videoDate = videoEntry.getDate();
-        String dateAsString = DateConverter.dateToString(videoDate);
-        ((VideoViewHolder) holder).dateView.setText(dateAsString);
+        String dateText = "";
+        if (mWeeklyVideo) {
+            dateText += "Week of " + DateConverter.precedingSundayDateAsString(videoDate);
+        } else {
+            dateText += DateConverter.dateToString(videoDate);
+        }
+
+        ((VideoViewHolder) holder).dateView.setText(dateText);
 
         // get video thumbnail from internal storage
         String thumbnailFileName = videoEntry.getThumbnailFileName();

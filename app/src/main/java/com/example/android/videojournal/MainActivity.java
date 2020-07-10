@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             public void onChanged(@Nullable List<VideoEntry> entries) {
                 Log.d(TAG, "Receiving database update for non-combined videos");
                 mRecyclerView.setVideoEntries((ArrayList) entries);
-                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, (ArrayList) entries);
+                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, (ArrayList) entries, false);
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });

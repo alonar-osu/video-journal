@@ -55,7 +55,7 @@ public class WeeklyActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<VideoEntry> entries) {
                 Log.d(TAG, "Receiving database update for weekly videos");
                 mRecyclerView.setVideoEntries((ArrayList) entries);
-                VideoAdapter videoAdapter = new VideoAdapter(WeeklyActivity.this, (ArrayList) entries);
+                VideoAdapter videoAdapter = new VideoAdapter(WeeklyActivity.this, (ArrayList) entries, true);
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
