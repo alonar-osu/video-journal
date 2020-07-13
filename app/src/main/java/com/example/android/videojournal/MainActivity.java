@@ -1,6 +1,7 @@
 package com.example.android.videojournal;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -14,12 +15,10 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     private static int DEFAULT_NOTIF_TIME_MINS = 60;
 
     private VideoRecyclerView mRecyclerView;
-    private AppDatabase mDb; // database using Room
+    private AppDatabase mDb; // database
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,28 +61,30 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 @Override
                 public void onClick(View view) {
 
-                    if (checkPermission(Manifest.permission.CAMERA) && checkPermission(Manifest.permission.RECORD_AUDIO)) {
+                    if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, MainActivity.this) && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, MainActivity.this)) {
+
                         Intent takeVideoIntent = new Intent(MainActivity.this, Camera2Activity.class);
                         startActivity(takeVideoIntent);
+
                     } else {
-                        askCameraAndAudioPermission();
+                        askPermission(new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
+                                "App needs to use camera and microphone to record videos",
+                                CAMERA_AND_AUDIO_REQUEST_CODE);
                     }
                 }
             });
 
         createNotificationChannel();
         setupSharedPreferences();
-        Log.d(TAG, "crash debug: in Main, before setting mRecyclerview");
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
-        Log.d(TAG, "crash debug: in Main, after setting mRecyclerview");
-        if (checkReadExternalStoragePermission()) {
-            retrieveAndSetNonCombinedVideos();
+        if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, MainActivity.this)) {
+            retrieveAndSetRegularVideos();
         } else {
-            askReadExternalStoragePermission();
-            if (checkReadExternalStoragePermission()) retrieveAndSetNonCombinedVideos();
+            askPermission(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+                    "App needs permission to store videos", READ_EXTERNAL_STORAGE_REQUEST_CODE);
+            if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, MainActivity.this)) retrieveAndSetRegularVideos();
         }
-        Log.d(TAG, "crash debug: in Mat end of onCreate");
     }
 
     @Override
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         super.onResume();
     }
 
-    private void retrieveAndSetNonCombinedVideos() {
+    private void retrieveAndSetRegularVideos() {
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setReverseLayout(true);
@@ -138,39 +139,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    private boolean checkReadExternalStoragePermission() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "permissions: checkSelfPermission extern storage was true");
-                return true;
-            } else return false;
-        }
-            return true;
-    }
 
-    private void askReadExternalStoragePermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            Toast.makeText(getApplicationContext(), "App needs to show videos", Toast.LENGTH_LONG).show();
-        }
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, READ_EXTERNAL_STORAGE_REQUEST_CODE);
-        }
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
-            case READ_EXTERNAL_STORAGE_REQUEST_CODE:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-
-                    Log.d(TAG, "READ_EXTERNAL_STORAGE permission was granted");
-                }
-                break;
-                default:
-                    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
 
     private void createNotificationChannel() {
         // create channel only on API 26+ otherwise not in support library
@@ -238,23 +208,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
-    private boolean checkPermission(String permission) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "permissions: checkSelfPermission camera was true");
-                return true;
-            } else return false;
+    public void askPermission(String[] permissions, String reason, int requestCode) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+            Toast.makeText(getApplicationContext(), reason, Toast.LENGTH_LONG).show();
         }
-        return true;
-    }
-
-    public void askCameraAndAudioPermission() {
-        //  if (ActivityCompat.shouldShowRequestPermissionRationale(getContext(), Manifest.permission.CAMERA)) {
-        //       Toast.makeText(, "App needs to use camera to record videos", Toast.LENGTH_LONG).show();
-        //   }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, CAMERA_AND_AUDIO_REQUEST_CODE);
+            requestPermissions(permissions, requestCode);
         }
     }
 

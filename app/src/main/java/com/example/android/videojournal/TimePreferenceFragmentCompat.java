@@ -100,10 +100,6 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
         }
     }
 
-
-
-
-
     private void updateNotificationTime() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         // if activate checkmark is on
@@ -115,12 +111,5 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
             MainActivity.setUpReminderNotification(getContext(), hours, minutes, AlarmReceiver.class);
         }
     }
-
-   // @Override
-   // public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-
-   // }
-  //  }
-
 
 }

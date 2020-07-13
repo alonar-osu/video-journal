@@ -293,7 +293,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
 
-            if (checkPermission(Manifest.permission.CAMERA) && checkPermission(Manifest.permission.RECORD_AUDIO)) {
+            if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, getActivity()) && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, getActivity())) {
                 manager.openCamera(cameraId, mStateCallback, null);
             } else {
                 Toast.makeText(activity, "App needs permission for video and audio recording", Toast.LENGTH_SHORT).show();
@@ -526,17 +526,6 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
                     })
                     .create();
         }
-    }
-
-    private boolean checkPermission(String permission) {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(getContext(), permission) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "permissions: checkSelfPermission was true");
-                return true;
-            } else return false;
-        }
-        return true;
     }
 
     private String todaysDateTimeAsString() {
