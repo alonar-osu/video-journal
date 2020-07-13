@@ -108,7 +108,7 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
             // get hours and mins from savedTime
             int hours = minutesAfterMidnight / 60;
             int minutes = minutesAfterMidnight % 60;
-            MainActivity.setUpReminderNotification(getContext(), hours, minutes, AlarmReceiver.class);
+            NotificationSetup.setUpReminderNotification(getContext(), hours, minutes, AlarmReceiver.class);
         }
     }
 

@@ -41,6 +41,6 @@ public class TimePickerFragment extends DialogFragment
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // use the time chosen by user
-        MainActivity.setUpReminderNotification(getContext(), hourOfDay, minute, AlarmReceiver.class);
+        NotificationSetup.setUpReminderNotification(getContext(), hourOfDay, minute, AlarmReceiver.class);
     }
 }

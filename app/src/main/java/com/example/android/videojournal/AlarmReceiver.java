@@ -30,8 +30,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REC_NOTIF)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_create_entry)
-                .setContentTitle("New Journal Entry")
-                .setContentText("Let's take a new video?")
+                .setContentTitle("Time for Video Journal Entry")
+                .setContentText("Let's take a new daily video")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
