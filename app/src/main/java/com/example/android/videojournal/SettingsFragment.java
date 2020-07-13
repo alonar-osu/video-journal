@@ -1,5 +1,9 @@
 package com.example.android.videojournal;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -8,9 +12,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-public class SettingsFragment extends PreferenceFragmentCompat  {
+import static android.content.Context.ALARM_SERVICE;
+
+public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
+    private static final int DEFAULT_NOTIF_TIME_MINS = 60;
+    private static final int REC_NOTIF_ID = 100;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -62,5 +70,69 @@ public class SettingsFragment extends PreferenceFragmentCompat  {
             super.onDisplayPreferenceDialog(preference);
         }
     }
+
+    public void setupSharedPreferences() {
+        Activity activity = getActivity();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+
+        boolean reminderActive = sharedPreferences.getBoolean(getString(R.string.pref_activate_reminder_key),
+                getResources().getBoolean(R.bool.pref_activate_reminder_default));
+        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
+        // get hours and mins from savedTime
+        int hours = minutesAfterMidnight / 60;
+        int minutes = minutesAfterMidnight % 60;
+        if (reminderActive) {
+            NotificationSetup.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
+        }
+
+        // register listener for preference changes
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Activity activity = getActivity();
+        // activate checkmark status changed
+        if (key.equals(getString(R.string.pref_activate_reminder_key))) {
+            // was checked - turn on notification
+            if (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
+                int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
+                // get hours and mins from savedTime
+                int hours = minutesAfterMidnight / 60;
+                int minutes = minutesAfterMidnight % 60;
+                NotificationSetup.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
+            } else { // was unchecked - turn off notifications
+                Intent intent = new Intent(activity, AlarmReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, REC_NOTIF_ID, intent, 0);
+                AlarmManager alarmManager = (AlarmManager) activity.getSystemService(ALARM_SERVICE);
+                alarmManager.cancel(pendingIntent);
+            }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // register the preference change listener
+        setupSharedPreferences();
+       // getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // unregister the preference change listener
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+  /*
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // PreferenceManager.getDefaultSharedPreferences(this)
+        //       .unregisterOnSharedPreferenceChangeListener(this);
+    }
+*/
 
 }

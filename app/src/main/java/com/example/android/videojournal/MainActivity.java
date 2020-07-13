@@ -1,13 +1,7 @@
 package com.example.android.videojournal;
 
 import android.Manifest;
-import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -21,7 +15,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -32,13 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private final static int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
-    private final static int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
-    private static int REC_NOTIF_ID = 100;
-    private static int DEFAULT_NOTIF_TIME_MINS = 60;
+    private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
+    private static final int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
 
     private VideoRecyclerView mRecyclerView;
     private AppDatabase mDb; // database
@@ -72,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             });
 
         NotificationSetup.createNotificationChannel(this);
-        setupSharedPreferences();
+
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
         if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, MainActivity.this)) {
@@ -132,46 +123,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-
-    private void setupSharedPreferences() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        boolean reminderActive = sharedPreferences.getBoolean(getString(R.string.pref_activate_reminder_key),
-                getResources().getBoolean(R.bool.pref_activate_reminder_default));
-        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
-        // get hours and mins from savedTime
-        int hours = minutesAfterMidnight / 60;
-        int minutes = minutesAfterMidnight % 60;
-        if (reminderActive) {
-            NotificationSetup.setUpReminderNotification(MainActivity.this, hours, minutes, AlarmReceiver.class);
-        }
-
-        // register listener for preference changes
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        // activate checkmark status changed
-        if (key.equals(getString(R.string.pref_activate_reminder_key))) {
-            // was checked - turn on notification
-            if (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
-                int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
-                // get hours and mins from savedTime
-                int hours = minutesAfterMidnight / 60;
-                int minutes = minutesAfterMidnight % 60;
-                NotificationSetup.setUpReminderNotification(MainActivity.this, hours, minutes, AlarmReceiver.class);
-            } else { // was unchecked - turn off notifications
-                Intent intent = new Intent(MainActivity.this, AlarmReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, REC_NOTIF_ID, intent, 0);
-                AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                alarmManager.cancel(pendingIntent);
-            }
-        }
-    }
-
-
-
     public void askPermission(String[] permissions, String reason, int requestCode) {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
             Toast.makeText(getApplicationContext(), reason, Toast.LENGTH_LONG).show();
@@ -184,8 +135,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .unregisterOnSharedPreferenceChangeListener(this);
 
         if (mRecyclerView != null) {
             mRecyclerView.releasePlayer();
