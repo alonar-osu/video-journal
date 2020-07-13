@@ -1,20 +1,17 @@
 package com.example.android.videojournal;
 
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.View;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDialogFragmentCompat;
 
 public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat {
+
+    private static final String TAG = TimePreferenceFragmentCompat.class.getSimpleName();
 
     private TimePicker mTimePicker;
 
@@ -43,8 +40,7 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
         Integer minutesAfterMidnight = null;
         DialogPreference preference = getPreference();
         if (preference instanceof TimePreference) {
-            minutesAfterMidnight =
-                    ((TimePreference) preference).getTime();
+            minutesAfterMidnight = ((TimePreference) preference).getTime();
         }
 
         // Set the time to the TimePicker
@@ -56,11 +52,8 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
             mTimePicker.setIs24HourView(is24hour);
             mTimePicker.setCurrentHour(hours);
             mTimePicker.setCurrentMinute(minutes);
-
         }
     }
-
-
 
     @Override
     public void onDialogClosed(boolean positiveResult) {
@@ -73,42 +66,20 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
             // Get the related Preference and save the value
             DialogPreference preference = getPreference();
             if (preference instanceof TimePreference) {
-                TimePreference timePreference =
-                        ((TimePreference) preference);
+                TimePreference timePreference = ((TimePreference) preference);
 
                 if (timePreference.callChangeListener(
                         minutesAfterMidnight)) {
                     // Save the value
                     timePreference.setTime(minutesAfterMidnight);
 
-                    updateNotificationTime();
+                    //updateNotificationTime();
+                    NotificationUtils.updateNotificationTime(getContext());
 
                     // update time pref's summary with chosen time
-                    String summary = "";
-                    if (hours >= 12) {
-                        if (hours >= 13) summary += hours - 12;
-                        else summary += hours;
-                        summary += " : " + minutes + " PM";
-                    } else {
-                        if (hours == 0) summary += hours + 12;
-                        else summary += hours;
-                        summary += " : " + minutes + " AM";
-                    }
-                    timePreference.setSummary(summary);
+                    timePreference.setSummary(TimeFormater.formatTime(hours, minutes));
                 }
             }
-        }
-    }
-
-    private void updateNotificationTime() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        // if activate checkmark is on
-        if (sharedPreferences.getBoolean(getString(R.string.pref_activate_reminder_key), getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
-            int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
-            // get hours and mins from savedTime
-            int hours = minutesAfterMidnight / 60;
-            int minutes = minutesAfterMidnight % 60;
-            NotificationSetup.setUpReminderNotification(getContext(), hours, minutes, AlarmReceiver.class);
         }
     }
 

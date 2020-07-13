@@ -6,14 +6,16 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import java.util.Calendar;
 
 import static android.content.Context.ALARM_SERVICE;
 
-public class NotificationSetup {
+public class NotificationUtils {
 
     static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static int REC_NOTIF_ID = 100;
@@ -43,6 +45,18 @@ public class NotificationSetup {
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+    }
+
+    public static void updateNotificationTime(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        // if activate checkmark is on
+        if (sharedPreferences.getBoolean(context.getString(R.string.pref_activate_reminder_key), context.getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
+            int minutesAfterMidnight = sharedPreferences.getInt(context.getString(R.string.pref_reminder_time_key), 60);
+            // get hours and mins from savedTime
+            int hours = minutesAfterMidnight / 60;
+            int minutes = minutesAfterMidnight % 60;
+            setUpReminderNotification(context, hours, minutes, AlarmReceiver.class);
+        }
     }
 
 }

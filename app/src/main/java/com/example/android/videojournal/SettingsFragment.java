@@ -36,19 +36,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         int hours = minutesAfterMidnight / 60;
         int minutes = minutesAfterMidnight % 60;
         // show chosen time in summary of pref
-        String summary = "";
-        if (hours >= 12) {
-            if (hours >= 13) summary += hours - 12;
-            else summary += hours;
-            summary += " : " + minutes + " PM";
-        } else {
-            if (hours == 0) summary += hours + 12;
-            else summary += hours;
-            summary += " : " + minutes + " AM";
-        }
-        timePreference.setSummary(summary);
+        timePreference.setSummary(TimeFormater.formatTime(hours, minutes));
     }
-
 
     // launch custom time picker pref dialog
     @Override
@@ -82,7 +71,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         int hours = minutesAfterMidnight / 60;
         int minutes = minutesAfterMidnight % 60;
         if (reminderActive) {
-            NotificationSetup.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
+            NotificationUtils.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
         }
 
         // register listener for preference changes
@@ -100,7 +89,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 // get hours and mins from savedTime
                 int hours = minutesAfterMidnight / 60;
                 int minutes = minutesAfterMidnight % 60;
-                NotificationSetup.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
+                NotificationUtils.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
             } else { // was unchecked - turn off notifications
                 Intent intent = new Intent(activity, AlarmReceiver.class);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, REC_NOTIF_ID, intent, 0);
@@ -115,7 +104,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         super.onStart();
         // register the preference change listener
         setupSharedPreferences();
-       // getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -126,13 +114,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
 
-  /*
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // PreferenceManager.getDefaultSharedPreferences(this)
-        //       .unregisterOnSharedPreferenceChangeListener(this);
-    }
-*/
+
 
 }

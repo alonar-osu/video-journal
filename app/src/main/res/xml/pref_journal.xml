@@ -18,7 +18,7 @@
     <com.example.android.videojournal.TimePreference
         android:key="@string/pref_reminder_time_key"
         android:title="@string/pref_reminder_time_label"
-        android:defaultValue="810"
+        android:defaultValue="725"
         style="@style/AppPreference.DialogPreference"
         app:iconSpaceReserved="true"
         app:allowDividerAbove="false" />

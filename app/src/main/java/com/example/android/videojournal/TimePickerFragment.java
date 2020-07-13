@@ -6,15 +6,9 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import android.text.format.DateFormat;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -41,6 +35,6 @@ public class TimePickerFragment extends DialogFragment
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         // use the time chosen by user
-        NotificationSetup.setUpReminderNotification(getContext(), hourOfDay, minute, AlarmReceiver.class);
+        NotificationUtils.setUpReminderNotification(getContext(), hourOfDay, minute, AlarmReceiver.class);
     }
 }

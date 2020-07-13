@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-        NotificationSetup.createNotificationChannel(this);
+        NotificationUtils.createNotificationChannel(this);
 
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
