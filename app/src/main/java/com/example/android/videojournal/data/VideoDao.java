@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.data;
 
 
 import java.util.Date;

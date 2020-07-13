@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.formatting;
 
 public class TimeFormater {
 

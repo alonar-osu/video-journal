@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.data;
 
 import androidx.room.Entity;
 import androidx.room.Ignore;

@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.utilities;
 
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
@@ -10,6 +10,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
+
+import com.example.android.videojournal.R;
+import com.example.android.videojournal.utilities.AlarmReceiver;
 
 import java.util.Calendar;
 

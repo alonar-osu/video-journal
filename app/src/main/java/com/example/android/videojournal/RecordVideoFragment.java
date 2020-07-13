@@ -9,7 +9,6 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Matrix;
 import android.graphics.RectF;
@@ -23,7 +22,6 @@ import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -39,6 +37,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.videojournal.ActionHelpers.VideoAdder;
+import com.example.android.videojournal.ActionHelpers.VideoCombiner;
+import com.example.android.videojournal.ActionHelpers.VideoDeleter;
+import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.utilities.AppExecutors;
+import com.example.android.videojournal.utilities.PermissionChecker;
+import com.example.android.videojournal.visualization.AutoFitTextureView;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -51,18 +57,16 @@ import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import androidx.core.content.ContextCompat;
-
 // Based on sample code for Camera2 API
 // https://android.googlesource.com/platform/development/+/abededd/samples/browseable/Camera2Video?autodive=0%2F
 
-public class Camera2VideoFragment extends Fragment implements View.OnClickListener  {
+public class RecordVideoFragment extends Fragment implements View.OnClickListener  {
 
     private AppDatabase mDb;
 
     private final static String FILE_START_NAME = "vj";
     private final static String VIDEO_EXTENSION = ".mp4";
-    private static final String TAG = Camera2VideoFragment.class.getSimpleName();
+    private static final String TAG = RecordVideoFragment.class.getSimpleName();
 
     private AutoFitTextureView mTextureView; // for camera preview
     private ImageView mButtonVideo;
@@ -146,8 +150,8 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
             }
         }
     };
-    public static Camera2VideoFragment newInstance() {
-        Camera2VideoFragment fragment = new Camera2VideoFragment();
+    public static RecordVideoFragment newInstance() {
+        RecordVideoFragment fragment = new RecordVideoFragment();
         fragment.setRetainInstance(true);
         return fragment;
     }
@@ -542,7 +546,7 @@ public class Camera2VideoFragment extends Fragment implements View.OnClickListen
     }
 
     private void goToMainActivity() {
-        Intent intent = new Intent(getActivity(), MainActivity.class);
+        Intent intent = new Intent(getActivity(), DailyVideoFeedActivity.class);
         startActivity(intent);
     }
 

@@ -1,10 +1,12 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.visualization;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 
 import android.util.AttributeSet;
+
+import com.example.android.videojournal.R;
 
 import androidx.preference.DialogPreference;
 

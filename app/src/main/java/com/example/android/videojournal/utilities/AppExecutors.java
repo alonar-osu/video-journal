@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.utilities;
 
 import android.os.Handler;
 import android.os.Looper;

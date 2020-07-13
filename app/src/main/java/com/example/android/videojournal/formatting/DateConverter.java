@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.formatting;
 
 import androidx.room.TypeConverter;
 

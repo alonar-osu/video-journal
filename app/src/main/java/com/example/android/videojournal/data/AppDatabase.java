@@ -1,7 +1,9 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.data;
 
 import android.content.Context;
 import android.util.Log;
+
+import com.example.android.videojournal.formatting.DateConverter;
 
 import androidx.room.Database;
 import androidx.room.Room;

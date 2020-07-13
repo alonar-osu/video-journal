@@ -1,9 +1,11 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.ActionHelpers;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
+import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.data.VideoEntry;
+import com.example.android.videojournal.formatting.DateConverter;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;

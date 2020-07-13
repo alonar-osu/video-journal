@@ -12,6 +12,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.videojournal.ActionHelpers.VideoDeleter;
+import com.example.android.videojournal.ActionHelpers.VideoSharer;
+import com.example.android.videojournal.data.AppDatabase;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;

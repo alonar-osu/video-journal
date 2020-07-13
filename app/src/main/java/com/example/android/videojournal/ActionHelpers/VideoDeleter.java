@@ -1,6 +1,12 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.ActionHelpers;
 
 import android.content.Context;
+
+import com.example.android.videojournal.VideoAdapter;
+import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.data.VideoEntry;
+import com.example.android.videojournal.formatting.DateConverter;
+import com.example.android.videojournal.utilities.AppExecutors;
 
 import java.io.File;
 import java.util.ArrayList;

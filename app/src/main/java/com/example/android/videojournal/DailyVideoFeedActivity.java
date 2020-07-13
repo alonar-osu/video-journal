@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.data.VideoEntry;
+import com.example.android.videojournal.utilities.NotificationUtils;
+import com.example.android.videojournal.utilities.PermissionChecker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.Nullable;
@@ -25,9 +29,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainActivity extends AppCompatActivity {
+public class DailyVideoFeedActivity extends AppCompatActivity {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = DailyVideoFeedActivity.class.getSimpleName();
     private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
     private static final int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
 
@@ -49,9 +53,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
 
-                    if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, MainActivity.this) && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, MainActivity.this)) {
+                    if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, DailyVideoFeedActivity.this) && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, DailyVideoFeedActivity.this)) {
 
-                        Intent takeVideoIntent = new Intent(MainActivity.this, Camera2Activity.class);
+                        Intent takeVideoIntent = new Intent(DailyVideoFeedActivity.this, RecordVideoActivity.class);
                         startActivity(takeVideoIntent);
 
                     } else {
@@ -66,12 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
-        if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, MainActivity.this)) {
+        if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DailyVideoFeedActivity.this)) {
             retrieveAndSetRegularVideos();
         } else {
             askPermission(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
                     "App needs permission to store videos", READ_EXTERNAL_STORAGE_REQUEST_CODE);
-            if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, MainActivity.this)) retrieveAndSetRegularVideos();
+            if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DailyVideoFeedActivity.this)) retrieveAndSetRegularVideos();
         }
     }
 
@@ -89,13 +93,13 @@ public class MainActivity extends AppCompatActivity {
 
         final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllNonCombinedVideos();
 
-        videoEntries.observe(MainActivity.this, new Observer<List<VideoEntry>>() {
+        videoEntries.observe(DailyVideoFeedActivity.this, new Observer<List<VideoEntry>>() {
 
             @Override
             public void onChanged(@Nullable List<VideoEntry> entries) {
                 Log.d(TAG, "Receiving database update for non-combined videos");
                 mRecyclerView.setVideoEntries((ArrayList) entries);
-                VideoAdapter videoAdapter = new VideoAdapter(MainActivity.this, (ArrayList) entries, false);
+                VideoAdapter videoAdapter = new VideoAdapter(DailyVideoFeedActivity.this, (ArrayList) entries, false);
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
@@ -115,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(startSettingsActivity);
                 return true;
             case R.id.button_weekly:
-                Intent showWeeklyVideosIntent = new Intent(MainActivity.this, WeeklyActivity.class);
+                Intent showWeeklyVideosIntent = new Intent(DailyVideoFeedActivity.this, WeeklyVideoFeedActivity.class);
                 startActivity(showWeeklyVideosIntent);
                 return true;
             default:

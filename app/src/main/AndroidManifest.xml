@@ -28,24 +28,24 @@
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".Camera2Activity"
-            android:parentActivityName=".MainActivity"
+            android:name=".RecordVideoActivity"
+            android:parentActivityName=".DailyVideoFeedActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.videojournal.MainActivity" />
+                android:value="com.example.android.videojournal.DailyVideoFeedActivity" />
         </activity>
         <activity
-            android:name=".WeeklyActivity"
+            android:name=".WeeklyVideoFeedActivity"
             android:label="@string/title_activity_weekly"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".DailyVideoFeedActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.videojournal.MainActivity" />
+                android:value="com.example.android.videojournal.DailyVideoFeedActivity" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".DailyVideoFeedActivity"
             android:launchMode="singleTop"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
@@ -56,19 +56,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".AlarmReceiver" />
+        <receiver android:name=".utilities.AlarmReceiver" />
         <activity
             android:name=".SettingsActivity"
             android:label="@string/action_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".DailyVideoFeedActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity"
+                android:value=".DailyVideoFeedActivity"
                 android:screenOrientation="portrait"/>
         </activity>
 
         <provider
-            android:name=".VideoSharer"
+            android:name=".ActionHelpers.VideoSharer"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
