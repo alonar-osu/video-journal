@@ -28,7 +28,7 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weekly);
+        setContentView(R.layout.activity_weekly_feed);
         mDb = AppDatabase.getInstance(getApplicationContext());
 
         Log.d(TAG, "WeeklyVideoFeedActivity onCreate() is runnning");

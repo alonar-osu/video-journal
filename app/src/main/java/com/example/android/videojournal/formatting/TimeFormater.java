@@ -2,6 +2,8 @@ package com.example.android.videojournal.formatting;
 
 public class TimeFormater {
 
+    private static final int MINUTES_IN_HOUR = 60;
+
     public static String formatTime(int hours, int minutes) {
         String summary = "";
         String minutesStr = "";
@@ -20,6 +22,14 @@ public class TimeFormater {
             summary += " : " + minutesStr + " AM";
         }
         return summary;
+    }
+
+    public static int findHoursFromTotalMinutes(int totalMinutes) {
+        return totalMinutes / MINUTES_IN_HOUR;
+    }
+
+    public static int findMinutesFromTotalMinutes(int totalMinutes) {
+        return totalMinutes % MINUTES_IN_HOUR;
     }
 
 }

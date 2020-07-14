@@ -41,31 +41,31 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_daily_feed);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mDb = AppDatabase.getInstance(getApplicationContext());
         Log.d(TAG, "onCreate() is runnning");
 
         FloatingActionButton fab = findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
-                    if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, DailyVideoFeedActivity.this)
-                            && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO,
-                            DailyVideoFeedActivity.this)) {
+                if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, DailyVideoFeedActivity.this)
+                        && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO,
+                        DailyVideoFeedActivity.this)) {
 
-                        Intent takeVideoIntent = new Intent(DailyVideoFeedActivity.this, RecordVideoActivity.class);
-                        startActivity(takeVideoIntent);
+                    Intent takeVideoIntent = new Intent(DailyVideoFeedActivity.this, RecordVideoActivity.class);
+                    startActivity(takeVideoIntent);
 
-                    } else {
-                        askPermission(new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
-                                "App needs to use camera and microphone to record videos",
-                                CAMERA_AND_AUDIO_REQUEST_CODE);
-                    }
+                } else {
+                    askPermission(new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
+                            "App needs to use camera and microphone to record videos",
+                            CAMERA_AND_AUDIO_REQUEST_CODE);
                 }
-            });
+            }
+        });
 
         NotificationUtils.createNotificationChannel(this);
 

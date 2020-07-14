@@ -47,4 +47,10 @@ public class DateConverter {
         return sdf.format(new Date());
     }
 
+    public static String todaysDateForWeeklyPreview() {
+        SimpleDateFormat formatter = new SimpleDateFormat("MMMM dd yyyy", Locale.US);
+        Date now = new Date();
+        return formatter.format(now);
+    }
+
 }

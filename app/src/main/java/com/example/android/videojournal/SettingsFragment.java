@@ -1,12 +1,10 @@
 package com.example.android.videojournal;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.example.android.videojournal.formatting.TimeFormater;
 import com.example.android.videojournal.utilities.AlarmReceiver;
@@ -17,31 +15,44 @@ import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import static android.content.Context.ALARM_SERVICE;
-
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
-    private static final int DEFAULT_NOTIF_TIME_MINS = 60;
-    private static final int REC_NOTIF_ID = 100;
+    private int mHours;
+    private int mMinutes;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.pref_journal);
-
         setTimePickerPreferenceSummary();
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        setupSharedPreferences();
     }
 
     private void setTimePickerPreferenceSummary() {
-        Preference timePreference = findPreference(getString(R.string.pref_reminder_time_key));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), 60);
-        // get hours and mins from savedTime
-        int hours = minutesAfterMidnight / 60;
-        int minutes = minutesAfterMidnight % 60;
+        getTimeFromSharedPrefs(sharedPreferences);
+
         // show chosen time in summary of pref
-        timePreference.setSummary(TimeFormater.formatTime(hours, minutes));
+        Preference timePreference = findPreference(getString(R.string.pref_reminder_time_key));
+        String summary = TimeFormater.formatTime(mHours, mMinutes);
+        if (summary != null) timePreference.setSummary(summary);
+        else Log.d(TAG, "summary in setTimePickerPreferenceSummary() is null");
+    }
+
+    private void setupSharedPreferences() {
+        Activity activity = getActivity();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        getTimeFromSharedPrefs(sharedPreferences);
+        if (NotificationUtils.reminderIsChecked(sharedPreferences, getContext())) {
+            NotificationUtils.setUpReminderNotification(activity, mHours, mMinutes, AlarmReceiver.class);
+        }
+        // preference change listener
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     // launch custom time picker pref dialog
@@ -50,37 +61,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
         DialogFragment dialogFragment = null;
         if (preference instanceof TimePreference) {
-
-            dialogFragment = TimePreferenceFragmentCompat
-                    .newInstance(preference.getKey());
+            dialogFragment = TimePreferenceFragmentCompat.newInstance(preference.getKey());
         }
-
         if (dialogFragment != null) {
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(this.getFragmentManager(),
-                            "PreferenceFragmentDialog");
-        }
-        else {
+            dialogFragment.show(this.getFragmentManager(), "PreferenceFragmentDialog");
+        } else {
             super.onDisplayPreferenceDialog(preference);
         }
-    }
-
-    public void setupSharedPreferences() {
-        Activity activity = getActivity();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-
-        boolean reminderActive = sharedPreferences.getBoolean(getString(R.string.pref_activate_reminder_key),
-                getResources().getBoolean(R.bool.pref_activate_reminder_default));
-        int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
-        // get hours and mins from savedTime
-        int hours = minutesAfterMidnight / 60;
-        int minutes = minutesAfterMidnight % 60;
-        if (reminderActive) {
-            NotificationUtils.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
-        }
-
-        // register listener for preference changes
-        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -88,37 +76,27 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         Activity activity = getActivity();
         // activate checkmark status changed
         if (key.equals(getString(R.string.pref_activate_reminder_key))) {
-            // was checked - turn on notification
+            // checked - turn on notification
             if (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
-                int minutesAfterMidnight = sharedPreferences.getInt(getString(R.string.pref_reminder_time_key), DEFAULT_NOTIF_TIME_MINS);
-                // get hours and mins from savedTime
-                int hours = minutesAfterMidnight / 60;
-                int minutes = minutesAfterMidnight % 60;
-                NotificationUtils.setUpReminderNotification(activity, hours, minutes, AlarmReceiver.class);
-            } else { // was unchecked - turn off notifications
-                Intent intent = new Intent(activity, AlarmReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, REC_NOTIF_ID, intent, 0);
-                AlarmManager alarmManager = (AlarmManager) activity.getSystemService(ALARM_SERVICE);
-                alarmManager.cancel(pendingIntent);
+                getTimeFromSharedPrefs(sharedPreferences);
+                NotificationUtils.setUpReminderNotification(activity, mHours, mMinutes, AlarmReceiver.class);
+            } else { // unchecked - turn off notifications
+                NotificationUtils.turnOffNotifications(activity);
             }
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // register the preference change listener
-        setupSharedPreferences();
+    private void getTimeFromSharedPrefs(SharedPreferences sharedPreferences) {
+        int minutesAfterMidnight = NotificationUtils.getTimeFromPreferences(sharedPreferences, getContext());
+        mHours = TimeFormater.findHoursFromTotalMinutes(minutesAfterMidnight);
+        mMinutes = TimeFormater.findMinutesFromTotalMinutes(minutesAfterMidnight);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        // unregister the preference change listener
         getPreferenceScreen().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
     }
-
-
 
 }

@@ -1,5 +1,6 @@
 package com.example.android.videojournal.utilities;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,6 +12,8 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 
 import com.example.android.videojournal.R;
+import com.example.android.videojournal.formatting.TimeFormater;
+
 import java.util.Calendar;
 
 import androidx.core.app.NotificationCompat;
@@ -21,9 +24,9 @@ import static android.content.Context.ALARM_SERVICE;
 
 public class NotificationUtils {
 
+    private static final String TAG = NotificationUtils.class.getSimpleName();
     private static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static int REC_NOTIF_ID = 100;
-    private static final int MINUTES_IN_HOUR = 60;
     private static final int DEFAULT_NOTIF_PREF_VALUE = 725;
 
     public static void createNotificationChannel(Context context) {
@@ -43,7 +46,6 @@ public class NotificationUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
-
         // Toast.makeText(context, "Notification set at hours= " + hour + " and min= " + minute, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(context, receiver);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
@@ -54,16 +56,22 @@ public class NotificationUtils {
 
     public static void updateNotificationTime(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        // if activate checkmark is on
-        if (sharedPreferences.getBoolean(context.getString(R.string.pref_activate_reminder_key),
-                context.getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
-
-            int minutesAfterMidnight = sharedPreferences.getInt(context.getString(R.string.pref_reminder_time_key),
-                    DEFAULT_NOTIF_PREF_VALUE);
-            int hours = minutesAfterMidnight / MINUTES_IN_HOUR;
-            int minutes = minutesAfterMidnight % MINUTES_IN_HOUR;
+        if (reminderIsChecked(sharedPreferences, context)) {
+            int minutesAfterMidnight = getTimeFromPreferences(sharedPreferences, context);
+            int hours = TimeFormater.findHoursFromTotalMinutes(minutesAfterMidnight);
+            int minutes = TimeFormater.findMinutesFromTotalMinutes(minutesAfterMidnight);
             setUpReminderNotification(context, hours, minutes, AlarmReceiver.class);
         }
+    }
+
+    public static boolean reminderIsChecked(SharedPreferences sharedPreferences, Context context) {
+        return sharedPreferences.getBoolean(context.getString(R.string.pref_activate_reminder_key),
+                context.getResources().getBoolean(R.bool.pref_activate_reminder_default));
+    }
+
+    public static int getTimeFromPreferences(SharedPreferences sharedPreferences, Context context) {
+        return sharedPreferences.getInt(context.getString(R.string.pref_reminder_time_key),
+                DEFAULT_NOTIF_PREF_VALUE);
     }
 
     public static void showNotification(Context context, PendingIntent pendingIntent) {
@@ -78,6 +86,13 @@ public class NotificationUtils {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.notify(REC_NOTIF_ID, builder.build());
+    }
+
+    public static void turnOffNotifications(Activity activity) {
+        Intent intent = new Intent(activity, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, REC_NOTIF_ID, intent, 0);
+        AlarmManager alarmManager = (AlarmManager) activity.getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
     }
 
 }
