@@ -38,22 +38,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.videojournal.ActionHelpers.VideoAdder;
-import com.example.android.videojournal.ActionHelpers.VideoCombiner;
-import com.example.android.videojournal.ActionHelpers.VideoDeleter;
+import com.example.android.videojournal.ActionHelpers.VideoWeeklyUpdater;
 import com.example.android.videojournal.data.AppDatabase;
-import com.example.android.videojournal.utilities.AppExecutors;
+import com.example.android.videojournal.formatting.DateConverter;
 import com.example.android.videojournal.utilities.PermissionChecker;
 import com.example.android.videojournal.visualization.AutoFitTextureView;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -72,8 +68,8 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     private ImageView mButtonVideo;
     TextView mRecordingDate;
     private String mVideoFilePath;
-    private CameraDevice mCameraDevice; // reference to the opened cameradevice
-    private CameraCaptureSession mPreviewSession; // reference to the current CameraCaptureSession for preview
+    private CameraDevice mCameraDevice; // opened CameraDevice
+    private CameraCaptureSession mPreviewSession; // current CameraCaptureSession for preview
     private Size mPreviewSize;
     private Size mVideoSize;
     private CaptureRequest.Builder mPreviewBuilder;
@@ -83,7 +79,6 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     private Handler mBackgroundHandler;
     private int mCameraId;
 
-
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 270);
@@ -91,7 +86,6 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         ORIENTATIONS.append(Surface.ROTATION_180, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 180);
     }
-
 
     // handles several lifecycle events on a textureview
     private TextureView.SurfaceTextureListener mSurfaceTextureListener
@@ -115,14 +109,10 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         }
     };
 
-
-    /**
-     * A {@link Semaphore} to prevent the app from exiting before closing the camera.
-     */
+    // semaphore to prevent app from exiting before closing the camera
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-    /**
-     * {@link CameraDevice.StateCallback} is called when {@link CameraDevice} changes its status.
-     */
+
+     // called when CameraDevice changes its status
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice cameraDevice) {
@@ -150,17 +140,16 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             }
         }
     };
+
     public static RecordVideoFragment newInstance() {
         RecordVideoFragment fragment = new RecordVideoFragment();
         fragment.setRetainInstance(true);
         return fragment;
     }
+
     /**
      * Using video size with 3x4 aspect ratio. Not using sizes larger than 1080p,
      * since MediaRecorder cannot handle such a high-resolution video.
-     *
-     * @param choices The list of available sizes
-     * @return The video size
      */
     private static Size chooseVideoSize(Size[] choices) {
         for (Size size : choices) {
@@ -169,8 +158,9 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             }
         }
         Log.e(TAG, "Couldn't find any suitable video size");
-        return choices[choices.length - 1];
+        return choices[choices.length - 1];  // video size
     }
+
     /**
      * Given {@code choices} of {@code Size}s supported by a camera, chooses the smallest one whose
      * width and height are at least as large as the respective requested values, and whose aspect
@@ -201,11 +191,13 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             return choices[0];
         }
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_camera2_video, container, false);
+        return inflater.inflate(R.layout.fragment_record_video, container, false);
     }
+
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         mTextureView = (AutoFitTextureView) view.findViewById(R.id.texture);
@@ -226,12 +218,14 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
     }
+
     @Override
     public void onPause() {
         closeCamera();
         stopBackgroundThread();
         super.onPause();
     }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
@@ -245,16 +239,18 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             }
         }
     }
+
     /**
-     * Starts a background thread and its {@link Handler}.
+     * Starts a background thread and its Handler
      */
     private void startBackgroundThread() {
         mBackgroundThread = new HandlerThread("CameraBackground");
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
+
     /**
-     * Stops the background thread and its {@link Handler}.
+     * Stops the background thread and its Handler
      */
     private void stopBackgroundThread() {
         mBackgroundThread.quitSafely();
@@ -266,8 +262,9 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             e.printStackTrace();
         }
     }
+
     /**
-     * Tries to open a {@link CameraDevice}. The result is listened by `mStateCallback`.
+     * Tries to open a CameraDevice. The result is listened by `mStateCallback`.
      */
     private void openCamera(int width, int height) {
         final Activity activity = getActivity();
@@ -314,6 +311,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
     }
+
     private void closeCamera() {
         try {
             mCameraOpenCloseLock.acquire();
@@ -331,11 +329,12 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             mCameraOpenCloseLock.release();
         }
     }
+
     /**
      * Start the camera preview.
      */
     private void startPreview() {
-        mRecordingDate.setText(todaysDateForPreview());
+        mRecordingDate.setText(DateConverter.todaysDateForWeeklyPreview());
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
             return;
         }
@@ -372,8 +371,9 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             e.printStackTrace();
         }
     }
+
     /**
-     * Update the camera preview. {@link #startPreview()} needs to be called in advance.
+     * Update the camera preview. startPreview() needs to be called in advance.
      */
     private void updatePreview() {
         if (null == mCameraDevice) {
@@ -388,17 +388,19 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             e.printStackTrace();
         }
     }
+
     private void setUpCaptureRequestBuilder(CaptureRequest.Builder builder) {
         builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
     }
     /**
-     * Configures the necessary {@link android.graphics.Matrix} transformation to `mTextureView`.
+     * Configures the necessary android.graphics.Matrix transformation to `mTextureView`.
      * This method should not to be called until the camera preview size is determined in
      * openCamera, or until the size of `mTextureView` is fixed.
      *
      * @param viewWidth  The width of `mTextureView`
      * @param viewHeight The height of `mTextureView`
      */
+
     private void configureTransform(int viewWidth, int viewHeight) {
         Activity activity = getActivity();
         if (null == mTextureView || null == mPreviewSize || null == activity) {
@@ -424,6 +426,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
 
         mTextureView.setTransform(matrix);
     }
+
     private void setUpMediaRecorder() throws IOException {
         final Activity activity = getActivity();
         if (null == activity) {
@@ -447,7 +450,8 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     }
 
     private void createVideoFilePath(Context context) {
-        File filePath = new File(context.getExternalFilesDir(null), FILE_START_NAME + todaysDateTimeAsString() + VIDEO_EXTENSION);
+        File filePath = new File(context.getExternalFilesDir(null),
+                FILE_START_NAME + DateConverter.todaysDateForFileNameAsString() + VIDEO_EXTENSION);
         mVideoFilePath = filePath.getAbsolutePath();
     }
 
@@ -456,54 +460,29 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             // UI
             mButtonVideo.setImageResource(R.drawable.ic_recstop);
             mIsRecordingVideo = true;
-            // Start recording
+            // start recording
             mMediaRecorder.start();
         } catch (IllegalStateException e) {
             e.printStackTrace();
         }
     }
+
     private void stopRecordingVideo() {
         // UI
         mButtonVideo.setImageResource(R.drawable.ic_record);
         mIsRecordingVideo = false;
-        // Stop recording
+        // stop recording
         mMediaRecorder.stop();
         mMediaRecorder.reset();
 
-        // Save video
+        // save video
         Activity activity = getActivity();
         VideoAdder vidAdder = new VideoAdder(activity, mDb);
         vidAdder.addVideo(mVideoFilePath, false);
         // weekly video
-        updateWeeklyVideo();
+        VideoWeeklyUpdater.updateWeeklyVideo(getActivity(), mDb);
         goToMainActivity();
     }
-
-    private void updateWeeklyVideo() {
-
-        AppExecutors.getInstance().diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                // delete existing weekly video
-                VideoDeleter vidDeleter = new VideoDeleter(getActivity(), mDb);
-                vidDeleter.deleteCurrentMergedVideo();
-
-                Activity activity = getActivity();
-                VideoCombiner combineVids = new VideoCombiner(activity, mDb);
-
-                if (combineVids.thisWeeksVideoCount() > 0) {
-                    // combine
-                    final String combinedVideoPath = combineVids.combineVideosForWeek();
-                    // add combined video
-                    VideoAdder vidAdder = new VideoAdder(activity, mDb);
-                    if (combinedVideoPath.length() > 0) {
-                        vidAdder.addVideo(combinedVideoPath, true);
-                    }
-                }
-            }
-        });
-    }
-
 
     /**
      * Compares two {@code Size}s based on their areas.
@@ -516,6 +495,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
                     (long) rhs.getWidth() * rhs.getHeight());
         }
     }
+
     public static class ErrorDialog extends DialogFragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -532,24 +512,9 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private String todaysDateTimeAsString() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyMMddHHmmss", Locale.US);
-        Date now = new Date();
-        String dateStr = formatter.format(now);
-        return dateStr;
-    }
-
-    private String todaysDateForPreview() {
-        SimpleDateFormat formatter = new SimpleDateFormat("MMMM dd yyyy", Locale.US);
-        Date now = new Date();
-        return formatter.format(now);
-    }
-
     private void goToMainActivity() {
         Intent intent = new Intent(getActivity(), DailyVideoFeedActivity.class);
         startActivity(intent);
     }
-
-
 
 }

@@ -10,7 +10,7 @@ public class RecordVideoActivity extends Activity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera2);
+        setContentView(R.layout.activity_record_video);
         if (null == savedInstanceState) {
             getFragmentManager().beginTransaction()
                     .replace(R.id.container, RecordVideoFragment.newInstance())
