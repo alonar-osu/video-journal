@@ -8,9 +8,7 @@ import android.view.TextureView;
 // Based on sample code for Camera2 API
 // https://android.googlesource.com/platform/development/+/abededd/samples/browseable/Camera2Video?autodive=0%2F
 
-/**
- * A {@link TextureView} that can be adjusted to a specified aspect ratio.
- */
+
 public class AutoFitTextureView extends TextureView {
     private int mRatioWidth = 0;
     private int mRatioHeight = 0;
@@ -23,14 +21,9 @@ public class AutoFitTextureView extends TextureView {
     public AutoFitTextureView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
-    /**
-     * Sets the aspect ratio for this view. The size of the view will be measured based on the ratio
-     * calculated from the parameters. Note that the actual sizes of parameters don't matter, that
-     * is, calling setAspectRatio(2, 3) and setAspectRatio(4, 6) make the same result.
-     *
-     * @param width  Relative horizontal size
-     * @param height Relative vertical size
-     */
+
+    // sets the aspect ratio for this view
+    // the size of the view will be measured based on the ratio
     public void setAspectRatio(int width, int height) {
         if (width < 0 || height < 0) {
             throw new IllegalArgumentException("Size cannot be negative.");
@@ -39,6 +32,7 @@ public class AutoFitTextureView extends TextureView {
         mRatioHeight = height;
         requestLayout();
     }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
