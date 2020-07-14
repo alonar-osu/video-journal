@@ -23,7 +23,6 @@ public class DateConverter {
     }
 
     public static String dateToString(Date date) {
-
         DateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy");
         return dateFormat.format(date);
     }
@@ -40,8 +39,7 @@ public class DateConverter {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         c.set(Calendar.DAY_OF_WEEK,Calendar.SUNDAY);
-        Date sundayDate = c.getTime();
-        return sundayDate;
+        return c.getTime();
     }
 
     public static String todaysDateForFileNameAsString() {

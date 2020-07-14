@@ -29,6 +29,7 @@ public class VideoEntry {
         this.combinedVideo = combinedVideo;
     }
 
+    // includes id
     public VideoEntry(int id, String videopath, Date date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName, int combinedVideo) {
         this.id = id;
         this.videopath = videopath;

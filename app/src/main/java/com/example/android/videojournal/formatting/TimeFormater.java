@@ -3,7 +3,6 @@ package com.example.android.videojournal.formatting;
 public class TimeFormater {
 
     public static String formatTime(int hours, int minutes) {
-
         String summary = "";
         String minutesStr = "";
         if (minutes < 10) {
@@ -20,9 +19,7 @@ public class TimeFormater {
             else summary += hours;
             summary += " : " + minutesStr + " AM";
         }
-     return summary;
+        return summary;
     }
-
-
 
 }
