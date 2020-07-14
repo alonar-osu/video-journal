@@ -17,7 +17,7 @@ public class VideoDeleter {
 
     private static final String TAG = VideoDeleter.class.getSimpleName();
     private AppDatabase mDb;
-    Context context;
+    private Context context;
 
     public VideoDeleter(Context context, AppDatabase db) {
         mDb = db;
@@ -25,7 +25,6 @@ public class VideoDeleter {
     }
 
     public void deleteJournalEntryByPosition(final String videoPath, final String thumbnailPath, final int position) {
-
         deleteVideo(videoPath);
         deleteThumbnail(thumbnailPath);
         deleteEntryFromDB(position);
@@ -33,22 +32,20 @@ public class VideoDeleter {
 
     public void deleteCurrentMergedVideo() {
 
-                Date today = new Date();
-                Date precedingSunday = DateConverter.precedingSundayDate(today);
+        Date today = new Date();
+        Date precedingSunday = DateConverter.precedingSundayDate(today);
+        VideoEntry currentMergedVideo = mDb.videoDao().loadCurrentCombinedVideo(precedingSunday, today);
 
-                VideoEntry currentMergedVideo = mDb.videoDao().loadCurrentCombinedVideo(precedingSunday, today);
-
-                if (currentMergedVideo != null) {
-                    String videoPath = currentMergedVideo.getVideopath();
-                    deleteVideo(videoPath);
-                    String thumbnailPath = currentMergedVideo.getThumbnailPath();
-                    deleteThumbnail(thumbnailPath);
-
-                    mDb.videoDao().deleteVideo(currentMergedVideo);
-                }
+        if (currentMergedVideo != null) {
+            String videoPath = currentMergedVideo.getVideopath();
+            deleteVideo(videoPath);
+            String thumbnailPath = currentMergedVideo.getThumbnailPath();
+            deleteThumbnail(thumbnailPath);
+            mDb.videoDao().deleteVideo(currentMergedVideo);
+        }
     }
 
-    public void deleteVideo (String videoPath) {
+    private void deleteVideo (String videoPath) {
 
         File videoFile = new File(videoPath);
         boolean videoDeleted = videoFile.delete();
@@ -57,7 +54,7 @@ public class VideoDeleter {
         }
     }
 
-    public void deleteThumbnail(String thumbnailPath) {
+    private void deleteThumbnail(String thumbnailPath) {
 
         File thumbnailFile = new File(thumbnailPath);
         boolean thumbnailDeleted = thumbnailFile.delete();
@@ -66,7 +63,7 @@ public class VideoDeleter {
         }
     }
 
-    public void deleteEntryFromDB(final int position) {
+    private void deleteEntryFromDB(final int position) {
 
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override

@@ -26,15 +26,14 @@ import androidx.core.content.ContextCompat;
 public class VideoCombiner {
 
     private static final String TAG = VideoCombiner.class.getSimpleName();
-    public final static String FILE_START_NAME = "comb_vj";
-    public final static String VIDEO_EXTENSION = ".mp4";
+    private final static String FILE_START_NAME = "comb_vj";
+    private final static String VIDEO_EXTENSION = ".mp4";
 
-    Context context;
+    private Context context;
     private AppDatabase mDb;
-    List<VideoEntry> mWeekAgoEntries;
+    private List<VideoEntry> mWeekAgoEntries;
 
     public VideoCombiner(Context context, AppDatabase db) {
-
         this.context = context;
         mDb = db;
     }
@@ -60,7 +59,6 @@ public class VideoCombiner {
         }
 
         String mergedVideoPath = "";
-
         try {
             mergedVideoPath = mergeVideos(videos);
             return mergedVideoPath;
@@ -91,7 +89,6 @@ public class VideoCombiner {
         }
 
         Movie result = new Movie();
-
         if (audioTracks.size() > 0) {
             result.addTrack(new AppendTrack(audioTracks.toArray(new Track[audioTracks.size()])));
         }
@@ -114,10 +111,7 @@ public class VideoCombiner {
                 ContextCompat.getExternalFilesDirs(context, null);
         File primaryExternalStorage = externalStorageVolumes[0];
         String dirPath = "" + primaryExternalStorage;
-
-        String filePath = dirPath + "/" + fileName;
-        return filePath;
+        return dirPath + "/" + fileName;
     }
-
 
 }

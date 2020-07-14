@@ -2,11 +2,9 @@ package com.example.android.videojournal.ActionHelpers;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
-import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -20,14 +18,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
-import androidx.loader.content.CursorLoader;
-
 public class VideoAdder {
 
     private static final String TAG = VideoAdder.class.getSimpleName();
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
     private AppDatabase mDb;
-    Context context;
+    private Context context;
 
     public VideoAdder(Context context, AppDatabase db) {
         this.context = context;
@@ -49,9 +45,8 @@ public class VideoAdder {
         Log.d(TAG, "Dimension: videoHeight=" + videoHeight);
         retriever.release();
 
-        int combinedVideo = isCombined? 1 : 0;
-
         // save data to DB
+        int combinedVideo = isCombined? 1 : 0;
         final VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName, combinedVideo);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
@@ -68,34 +63,37 @@ public class VideoAdder {
         try {
             videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
         } catch (Exception e) {
+            Log.d(TAG, "Error generating thumbnail");
         }
 
         if (videoThumbnail == null) {
             Log.d(TAG, "Thumbnail is null");
         } else {
-        // save bitmap to file
-        String videoThumbnailsFolder = THUMBNAIL_DIRECTORY_NAME;
-        thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, videoThumbnailsFolder, thumbnailFileName);
-        thumbnailPath += "/" + thumbnailFileName;
+            // save bitmap to file
+            thumbnailPath = saveVideoThumbnailToAppFolder(videoThumbnail, thumbnailFileName);
+            thumbnailPath += "/" + thumbnailFileName;
         }
         return thumbnailPath;
     }
 
-    private String saveVideoThumbnailToAppFolder(Bitmap thumbnailBitmap, String folderName, String fileName) {
+    private String saveVideoThumbnailToAppFolder(Bitmap thumbnailBitmap, String fileName) {
         ContextWrapper cw = new ContextWrapper((context));
-        File directory = cw.getDir(folderName, Context.MODE_PRIVATE);
+        File directory = cw.getDir(THUMBNAIL_DIRECTORY_NAME, Context.MODE_PRIVATE);
         if (!directory.exists()) directory.mkdir();
         File thumbnailPath = new File(directory, fileName);
+        compressBitmap(thumbnailPath, thumbnailBitmap, 100);
+        return directory.getAbsolutePath();
+    }
 
+    private void compressBitmap(File thumbnailPath, Bitmap thumbnailBitmap, int quality) {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(thumbnailPath);
-            thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, quality, fos);
             fos.close();
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
         }
-        return directory.getAbsolutePath();
     }
 
     private String generateThumbnailFileName() {
@@ -103,17 +101,6 @@ public class VideoAdder {
         int n = 10000;
         n = generator.nextInt(n);
         return "vj_thumb" + n + ".jpg";
-    }
-
-    public String getRealPathFromURI(Context context, Uri contentUri) {
-        String[] proj = { MediaStore.Images.Media.DATA };
-        CursorLoader loader = new CursorLoader(context, contentUri, proj, null, null, null);
-        Cursor cursor = loader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String result = cursor.getString(column_index);
-        cursor.close();
-        return result;
     }
 
 }
