@@ -34,11 +34,11 @@ import com.google.android.exoplayer2.util.Util;
 public class PlayVideoActivity extends AppCompatActivity {
 
     private static final String TAG = PlayVideoActivity.class.getSimpleName();
-    SimpleExoPlayer mVideoPlayer;
-    String mVideoPath;
-    String mThumbnailPath;
-    int mPosition;
-    Context context;
+    private SimpleExoPlayer mVideoPlayer;
+    private String mVideoPath;
+    private String mThumbnailPath;
+    private int mPosition;
+    private Context context;
     private AppDatabase mDb;
 
     @Override
@@ -46,19 +46,22 @@ public class PlayVideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         context = this;
+        mDb = AppDatabase.getInstance(getApplicationContext());
 
         setContentView(R.layout.activity_play_video);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        mDb = AppDatabase.getInstance(getApplicationContext());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        setupVideoPlayer();
+    }
 
+    private void setupVideoPlayer() {
         // PlayerView
         PlayerView fullscreenPlayVideoView = findViewById(R.id.fullscreenPlayVideoView);
 
@@ -70,17 +73,13 @@ public class PlayVideoActivity extends AppCompatActivity {
         mVideoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
 
         fullscreenPlayVideoView.setUseController(true);
-        fullscreenPlayVideoView.setPlayer(mVideoPlayer);
         mVideoPlayer.setVolume(1f); // volume ON
-
         fullscreenPlayVideoView.setPlayer(mVideoPlayer);
 
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, Util.getUserAgent(context, "Video Journal"));
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                Util.getUserAgent(context, "Video Journal"));
 
-        Intent intent = getIntent();
-        mVideoPath = intent.getStringExtra("VIDEO_PATH");
-        mThumbnailPath = intent.getStringExtra("THUMBNAIL_PATH");
-        mPosition = intent.getIntExtra("POSITION", 0);
+        getVideoInfo();
 
         if (mVideoPath != null) {
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
@@ -88,6 +87,13 @@ public class PlayVideoActivity extends AppCompatActivity {
             mVideoPlayer.prepare(videoSource);
             mVideoPlayer.setPlayWhenReady(true);
         }
+    }
+
+    private void getVideoInfo() {
+        Intent intent = getIntent();
+        mVideoPath = intent.getStringExtra("VIDEO_PATH");
+        mThumbnailPath = intent.getStringExtra("THUMBNAIL_PATH");
+        mPosition = intent.getIntExtra("POSITION", 0);
     }
 
     @Override
@@ -102,7 +108,7 @@ public class PlayVideoActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.buttonDelete:
-                confirmAndDeleteVideo();
+                confirmDelete();
                 return true;
 
             case R.id.buttonShare:
@@ -119,15 +125,14 @@ public class PlayVideoActivity extends AppCompatActivity {
         }
     }
 
-    private void confirmAndDeleteVideo() {
-
+    private void confirmDelete() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.app_name);
         builder.setMessage("Delete this video?");
 
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                goAheadDeleteVideo();
+                deleteVideo();
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -138,8 +143,7 @@ public class PlayVideoActivity extends AppCompatActivity {
         alert.show();
     }
 
-    private void goAheadDeleteVideo() {
-
+    private void deleteVideo() {
         VideoDeleter vidDeleter = new VideoDeleter(PlayVideoActivity.this, mDb);
         vidDeleter.deleteJournalEntryByPosition(mVideoPath, mThumbnailPath, mPosition);
         finish();
