@@ -34,17 +34,16 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
     private static final String TAG = DailyVideoFeedActivity.class.getSimpleName();
     private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
     private static final int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
-
     private VideoRecyclerView mRecyclerView;
     private AppDatabase mDb; // database
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         mDb = AppDatabase.getInstance(getApplicationContext());
         Log.d(TAG, "onCreate() is runnning");
 
@@ -53,7 +52,9 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
 
-                    if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, DailyVideoFeedActivity.this) && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, DailyVideoFeedActivity.this)) {
+                    if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, DailyVideoFeedActivity.this)
+                            && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO,
+                            DailyVideoFeedActivity.this)) {
 
                         Intent takeVideoIntent = new Intent(DailyVideoFeedActivity.this, RecordVideoActivity.class);
                         startActivity(takeVideoIntent);
@@ -70,6 +71,7 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
 
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
+
         if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DailyVideoFeedActivity.this)) {
             retrieveAndSetRegularVideos();
         } else {
@@ -77,11 +79,6 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
                     "App needs permission to store videos", READ_EXTERNAL_STORAGE_REQUEST_CODE);
             if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DailyVideoFeedActivity.this)) retrieveAndSetRegularVideos();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     private void retrieveAndSetRegularVideos() {
@@ -99,7 +96,8 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<VideoEntry> entries) {
                 Log.d(TAG, "Receiving database update for non-combined videos");
                 mRecyclerView.setVideoEntries((ArrayList) entries);
-                VideoAdapter videoAdapter = new VideoAdapter(DailyVideoFeedActivity.this, (ArrayList) entries, false);
+                VideoAdapter videoAdapter = new VideoAdapter(DailyVideoFeedActivity.this,
+                        (ArrayList) entries, false);
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
@@ -128,8 +126,10 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
     }
 
     public void askPermission(String[] permissions, String reason, int requestCode) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            Toast.makeText(getApplicationContext(), reason, Toast.LENGTH_LONG).show();
+        for (String permission : permissions) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                Toast.makeText(getApplicationContext(), reason, Toast.LENGTH_LONG).show();
+            }
         }
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             requestPermissions(permissions, requestCode);
