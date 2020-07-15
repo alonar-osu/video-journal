@@ -35,11 +35,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     private void setTimePickerPreferenceSummary() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        getTimeFromSharedPrefs(sharedPreferences);
-
+        int minutesAfterMidnight = NotificationUtils.getTimeFromPreferences(sharedPreferences, getContext());
         // show chosen time in summary of pref
         Preference timePreference = findPreference(getString(R.string.pref_reminder_time_key));
-        String summary = TimeFormater.formatTime(mHours, mMinutes);
+        String summary = TimeFormater.formatTime(minutesAfterMidnight);
         if (summary != null) timePreference.setSummary(summary);
         else Log.d(TAG, "summary in setTimePickerPreferenceSummary() is null");
     }
