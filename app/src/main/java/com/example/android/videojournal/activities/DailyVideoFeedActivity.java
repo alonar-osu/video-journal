@@ -1,13 +1,16 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.activities;
 
 import android.Manifest;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.example.android.videojournal.R;
+import com.example.android.videojournal.recyclerview.VideoAdapter;
+import com.example.android.videojournal.recyclerview.VideoRecyclerView;
 import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
-import com.example.android.videojournal.utilities.NotificationUtils;
+import com.example.android.videojournal.notifications.NotificationUtils;
 import com.example.android.videojournal.utilities.PermissionChecker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -32,10 +35,13 @@ import java.util.List;
 public class DailyVideoFeedActivity extends AppCompatActivity {
 
     private static final String TAG = DailyVideoFeedActivity.class.getSimpleName();
+
     private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
     private static final int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
+
+    private VideoDatabase mDb;
     private VideoRecyclerView mRecyclerView;
-    private VideoDatabase mDb; // database
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

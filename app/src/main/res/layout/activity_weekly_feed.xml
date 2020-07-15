@@ -6,15 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryLight"
-    tools:context=".WeeklyVideoFeedActivity">
+    tools:context=".activities.WeeklyVideoFeedActivity">
 
     <!-- custom recyclerview with autoplay -->
-    <com.example.android.videojournal.VideoRecyclerView
+    <com.example.android.videojournal.recyclerview.VideoRecyclerView
         android:id="@+id/recyclerView_weekly"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </com.example.android.videojournal.VideoRecyclerView>
+    </com.example.android.videojournal.recyclerview.VideoRecyclerView>
 
 </RelativeLayout>

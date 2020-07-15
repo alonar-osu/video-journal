@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.fragments;
 
 import android.Manifest;
 import android.app.Activity;
@@ -37,12 +37,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.videojournal.R;
 import com.example.android.videojournal.actionhelpers.VideoAdder;
 import com.example.android.videojournal.actionhelpers.VideoWeeklyUpdater;
+import com.example.android.videojournal.activities.DailyVideoFeedActivity;
 import com.example.android.videojournal.data.VideoDatabase;
-import com.example.android.videojournal.formatting.DateConverter;
+import com.example.android.videojournal.formatting.DateFormater;
 import com.example.android.videojournal.utilities.PermissionChecker;
-import com.example.android.videojournal.visualization.AutoFitTextureView;
+import com.example.android.videojournal.other.AutoFitTextureView;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,12 +60,12 @@ import java.util.concurrent.TimeUnit;
 
 public class RecordVideoFragment extends Fragment implements View.OnClickListener  {
 
-    private VideoDatabase mDb;
+    private static final String TAG = RecordVideoFragment.class.getSimpleName();
 
     private final static String FILE_START_NAME = "vj";
     private final static String VIDEO_EXTENSION = ".mp4";
-    private static final String TAG = RecordVideoFragment.class.getSimpleName();
 
+    private VideoDatabase mDb;
     private AutoFitTextureView mTextureView; // for camera preview
     private ImageView mButtonVideo;
     TextView mRecordingDate;
@@ -334,7 +336,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
      * Start the camera preview.
      */
     private void startPreview() {
-        mRecordingDate.setText(DateConverter.todaysDateForWeeklyPreview());
+        mRecordingDate.setText(DateFormater.todaysDateForWeeklyPreview());
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
             return;
         }
@@ -451,7 +453,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
 
     private void createVideoFilePath(Context context) {
         File filePath = new File(context.getExternalFilesDir(null),
-                FILE_START_NAME + DateConverter.todaysDateForFileNameAsString() + VIDEO_EXTENSION);
+                FILE_START_NAME + DateFormater.todaysDateForFileNameAsString() + VIDEO_EXTENSION);
         mVideoFilePath = filePath.getAbsolutePath();
     }
 

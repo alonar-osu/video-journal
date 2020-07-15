@@ -11,10 +11,11 @@ import androidx.core.content.FileProvider;
 public class VideoSharer extends FileProvider {
 
     private static final String TAG = VideoSharer.class.getSimpleName();
-    private Context context;
+
+    private Context mContext;
 
     public VideoSharer(Context context) {
-        this.context = context;
+        mContext = context;
     }
     public VideoSharer() {} // zero argument constructor
 
@@ -26,14 +27,14 @@ public class VideoSharer extends FileProvider {
         if(videoToShare.exists()) {
             intentShareFile.setType("video/*");
             File videoFile = new File(videoPath);
-            Uri videoUri = FileProvider.getUriForFile(context,
-                    context.getApplicationContext().getPackageName() + ".provider", videoFile);
+            Uri videoUri = FileProvider.getUriForFile(mContext,
+                    mContext.getApplicationContext().getPackageName() + ".provider", videoFile);
 
             intentShareFile.putExtra(Intent.EXTRA_STREAM, videoUri);
             intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Video from My Video Journal");
             intentShareFile.putExtra(Intent.EXTRA_TEXT, "Here is my video from My Video Journal app");
             intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            context.startActivity(Intent.createChooser(intentShareFile, "Share file"));
+            mContext.startActivity(Intent.createChooser(intentShareFile, "Share file"));
         }
     }
 

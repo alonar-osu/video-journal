@@ -1,7 +1,6 @@
-package com.example.android.videojournal.visualization;
+package com.example.android.videojournal.other;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 
 import android.util.AttributeSet;

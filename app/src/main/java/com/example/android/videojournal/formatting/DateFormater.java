@@ -8,7 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateConverter {
+public class DateFormater {
 
     // for reading from db
     @TypeConverter

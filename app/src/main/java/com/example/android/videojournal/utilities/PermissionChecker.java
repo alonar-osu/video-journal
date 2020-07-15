@@ -11,12 +11,13 @@ import androidx.core.content.ContextCompat;
 public class PermissionChecker extends AppCompatActivity {
 
     private static final String TAG = PermissionChecker.class.getSimpleName();
-    Context context;
-    Activity activity;
+
+    Context mContext;
+    Activity mActivity;
 
     public PermissionChecker(Context context, Activity activity) {
-        this.context = context;
-        this.activity = activity;
+        mContext = context;
+        mActivity = activity;
     }
 
     public static boolean checkPermission(String permission, Context context) {

@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.fragments;
 
 
 import android.os.Bundle;
@@ -6,9 +6,10 @@ import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.TimePicker;
 
+import com.example.android.videojournal.R;
 import com.example.android.videojournal.formatting.TimeFormater;
-import com.example.android.videojournal.utilities.NotificationUtils;
-import com.example.android.videojournal.visualization.TimePreference;
+import com.example.android.videojournal.notifications.NotificationUtils;
+import com.example.android.videojournal.other.TimePreference;
 
 import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDialogFragmentCompat;
@@ -16,6 +17,7 @@ import androidx.preference.PreferenceDialogFragmentCompat;
 public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat {
 
     private static final String TAG = TimePreferenceFragmentCompat.class.getSimpleName();
+
     private TimePicker mTimePicker;
 
     public static TimePreferenceFragmentCompat newInstance(String key) {

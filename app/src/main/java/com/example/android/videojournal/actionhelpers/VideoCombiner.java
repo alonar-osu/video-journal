@@ -5,7 +5,7 @@ import android.content.Context;
 import com.coremedia.iso.boxes.Container;
 import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
-import com.example.android.videojournal.formatting.DateConverter;
+import com.example.android.videojournal.formatting.DateFormater;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
@@ -26,15 +26,16 @@ import androidx.core.content.ContextCompat;
 public class VideoCombiner {
 
     private static final String TAG = VideoCombiner.class.getSimpleName();
+
     private final static String FILE_START_NAME = "comb_vj";
     private final static String VIDEO_EXTENSION = ".mp4";
 
-    private Context context;
     private VideoDatabase mDb;
+    private Context mContext;
     private List<VideoEntry> mWeekAgoEntries;
 
     public VideoCombiner(Context context, VideoDatabase db) {
-        this.context = context;
+        mContext = context;
         mDb = db;
     }
 
@@ -45,7 +46,7 @@ public class VideoCombiner {
 
     private void getThisWeeksVideos() {
         Date today = new Date();
-        Date precedingSunday = DateConverter.precedingSundayDate(today);
+        Date precedingSunday = DateFormater.precedingSundayDate(today);
         mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(precedingSunday, today);
     }
 
@@ -96,7 +97,7 @@ public class VideoCombiner {
             result.addTrack(new AppendTrack(videoTracks.toArray(new Track[videoTracks.size()])));
         }
 
-        String filename = FILE_START_NAME + DateConverter.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
+        String filename = FILE_START_NAME + DateFormater.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
         String videoCombinedPath = generateFilePath(filename);
 
         Container out = new DefaultMp4Builder().build(result);
@@ -108,7 +109,7 @@ public class VideoCombiner {
 
     private String generateFilePath(String fileName) {
         File[] externalStorageVolumes =
-                ContextCompat.getExternalFilesDirs(context, null);
+                ContextCompat.getExternalFilesDirs(mContext, null);
         File primaryExternalStorage = externalStorageVolumes[0];
         String dirPath = "" + primaryExternalStorage;
         return dirPath + "/" + fileName;

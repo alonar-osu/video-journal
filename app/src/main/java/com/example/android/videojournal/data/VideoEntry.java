@@ -9,61 +9,61 @@ import java.util.Date;
 public class VideoEntry {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
-    private String videopath;
-    private Date date;
-    private int videoHeight;
-    private int videoWidth;
-    private String thumbnailPath;
-    private String thumbnailFileName;
-    private int combinedVideo; // 1 = combined
+    private int mId;
+    private String mVideopath;
+    private Date mDate;
+    private int mVideoHeight;
+    private int mVideoWidth;
+    private String mThumbnailPath;
+    private String mThumbnailFileName;
+    private int mCombinedVideo; // 1 = combined
 
     @Ignore
     public VideoEntry(String videopath, Date date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName, int combinedVideo) {
-        this.videopath = videopath;
-        this.date = date;
-        this.videoHeight = videoHeight;
-        this.videoWidth = videoWidth;
-        this.thumbnailPath = thumbnailPath;
-        this.thumbnailFileName = thumbnailFileName;
-        this.combinedVideo = combinedVideo;
+        mVideopath = videopath;
+        mDate = date;
+        mVideoHeight = videoHeight;
+        mVideoWidth = videoWidth;
+        mThumbnailPath = thumbnailPath;
+        mThumbnailFileName = thumbnailFileName;
+        mCombinedVideo = combinedVideo;
     }
 
-    // includes id
+    // includes mId
     public VideoEntry(int id, String videopath, Date date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName, int combinedVideo) {
-        this.id = id;
-        this.videopath = videopath;
-        this.date = date;
-        this.videoHeight = videoHeight;
-        this.videoWidth = videoWidth;
-        this.thumbnailPath = thumbnailPath;
-        this.thumbnailFileName = thumbnailFileName;
-        this.combinedVideo = combinedVideo;
+        mId = id;
+        mVideopath = videopath;
+        mDate = date;
+        mVideoHeight = videoHeight;
+        mVideoWidth = videoWidth;
+        mThumbnailPath = thumbnailPath;
+        mThumbnailFileName = thumbnailFileName;
+        mCombinedVideo = combinedVideo;
     }
 
-    public int getId() {return id; }
+    public int getId() {return mId; }
 
     public String getVideopath() {
-        return videopath;
+        return mVideopath;
     }
 
     public Date getDate() {
-        return date;
+        return mDate;
     }
 
     public int getVideoHeight() {
-        return videoHeight;
+        return mVideoHeight;
     }
 
     public int getVideoWidth() {
-        return videoWidth;
+        return mVideoWidth;
     }
 
-    public String getThumbnailPath() {return thumbnailPath; }
+    public String getThumbnailPath() {return mThumbnailPath; }
 
-    public String getThumbnailFileName() {return thumbnailFileName; }
+    public String getThumbnailFileName() {return mThumbnailFileName; }
 
     public int getCombinedVideo() {
-        return combinedVideo;
+        return mCombinedVideo;
     }
 }

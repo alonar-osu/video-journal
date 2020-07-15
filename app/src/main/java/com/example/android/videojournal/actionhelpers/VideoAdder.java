@@ -21,12 +21,14 @@ import java.util.Random;
 public class VideoAdder {
 
     private static final String TAG = VideoAdder.class.getSimpleName();
+
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
+
     private VideoDatabase mDb;
-    private Context context;
+    private Context mContext;
 
     public VideoAdder(Context context, VideoDatabase db) {
-        this.context = context;
+        mContext = context;
         mDb = db;
     }
 
@@ -40,9 +42,7 @@ public class VideoAdder {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(videoPath);
         int videoWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-        Log.d(TAG, "Dimension: videoWidth=" + videoWidth);
         int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-        Log.d(TAG, "Dimension: videoHeight=" + videoHeight);
         retriever.release();
 
         // save data to DB
@@ -77,7 +77,7 @@ public class VideoAdder {
     }
 
     private String saveVideoThumbnailToAppFolder(Bitmap thumbnailBitmap, String fileName) {
-        ContextWrapper cw = new ContextWrapper((context));
+        ContextWrapper cw = new ContextWrapper((mContext));
         File directory = cw.getDir(THUMBNAIL_DIRECTORY_NAME, Context.MODE_PRIVATE);
         if (!directory.exists()) directory.mkdir();
         File thumbnailPath = new File(directory, fileName);

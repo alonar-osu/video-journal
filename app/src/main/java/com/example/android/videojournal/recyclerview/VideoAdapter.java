@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.recyclerview;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -9,8 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.videojournal.R;
 import com.example.android.videojournal.data.VideoEntry;
-import com.example.android.videojournal.formatting.DateConverter;
+import com.example.android.videojournal.formatting.DateFormater;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,14 +28,14 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private static final String TAG = VideoAdapter.class.getSimpleName();
 
     private static ArrayList mVideoEntries;
-    private Context context;
+    private Context mContext;
     private boolean mWeeklyVideo;
 
 
     public VideoAdapter(Context context, ArrayList videoEntries, boolean weekly) {
-        this.context = context;
-        this.mVideoEntries = videoEntries;
-        this.mWeeklyVideo = weekly;
+        mContext = context;
+        mVideoEntries = videoEntries;
+        mWeeklyVideo = weekly;
     }
 
     @NonNull
@@ -57,29 +58,29 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         Date videoDate = videoEntry.getDate();
         String dateText = "";
         if (mWeeklyVideo) {
-            dateText += "Week of " + DateConverter.precedingSundayDateAsString(videoDate);
+            dateText += "Week of " + DateFormater.precedingSundayDateAsString(videoDate);
         } else {
-            dateText += DateConverter.dateToString(videoDate);
+            dateText += DateFormater.dateToString(videoDate);
         }
-        holder.dateView.setText(dateText);
+        holder.mDateView.setText(dateText);
     }
 
     private void setVideoThumbnail(VideoEntry videoEntry, VideoViewHolder holder) {
         String thumbnailFileName = videoEntry.getThumbnailFileName();
-        Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, context);
+        Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, mContext);
 
         if (videoThumbnail != null) {
-            holder.thumbnailView.setAdjustViewBounds(true);
-            holder.thumbnailView.setImageBitmap(videoThumbnail);
+            holder.mThumbnailView.setAdjustViewBounds(true);
+            holder.mThumbnailView.setImageBitmap(videoThumbnail);
         } else {
             Log.d(TAG, "Video thumbnail does not exist");
         }
     }
 
     private void setInfoToHolder(VideoEntry videoEntry, VideoViewHolder holder, final int position) {
-        holder.videoPath = videoEntry.getVideopath();
-        holder.thumbnailPath = videoEntry.getThumbnailPath();
-        holder.position = position;
+        holder.mVideoPath = videoEntry.getVideopath();
+        holder.mThumbnailPath = videoEntry.getThumbnailPath();
+        holder.mItemPosition = position;
     }
 
     private Bitmap loadBitmapFromStorage(String filename, Context context) {

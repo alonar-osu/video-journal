@@ -1,7 +1,10 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.example.android.videojournal.R;
+import com.example.android.videojournal.fragments.RecordVideoFragment;
 
 // Based on sample code for Camera2 API
 // https://android.googlesource.com/platform/development/+/abededd/samples/browseable/Camera2Video?autodive=0%2F

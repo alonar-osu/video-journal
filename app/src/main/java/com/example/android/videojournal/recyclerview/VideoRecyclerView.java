@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.recyclerview;
 
 import android.content.Context;
 import android.graphics.Point;
@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.FrameLayout;
 
+import com.example.android.videojournal.R;
 import com.example.android.videojournal.data.VideoEntry;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -49,19 +50,18 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
     private static final String TAG = VideoRecyclerView.class.getSimpleName();
 
-    private ImageView thumbnailView;
-    private ImageView playIconView;
-    private View viewHolderParent;
-    private FrameLayout frameLayout;
-    private PlayerView videoSurfaceView;
-    private SimpleExoPlayer videoPlayer;
-
+    private ImageView mThumbnailView;
+    private ImageView mPlayIconView;
+    private View mViewHolderParent;
+    private FrameLayout mFrameLayout;
+    private PlayerView mVideoSurfaceView;
+    private SimpleExoPlayer mVideoPlayer;
+    private int mVideoSurfaceDefaultHeight = 0;
+    private int mScreenDefaultHeight = 0;
+    private Context mContext;
+    private int mPlayPosition = -1;
+    private boolean mIsVideoViewAdded;
     private ArrayList<VideoEntry> mVideoEntries = new ArrayList<>();
-    private int videoSurfaceDefaultHeight = 0;
-    private int screenDefaultHeight = 0;
-    private Context context;
-    private int playPosition = -1;
-    private boolean isVideoViewAdded;
 
     public VideoRecyclerView(@NonNull Context context) {
         super(context);
@@ -75,12 +75,12 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
     private void init(Context context) {
 
-        this.context = context.getApplicationContext();
+        mContext = context.getApplicationContext();
         initVideoSurfaceSize();
         initVideoPlayer(context);
 
         // detect when first video frame rendered
-        videoPlayer.getVideoComponent().addVideoListener(this);
+        mVideoPlayer.getVideoComponent().addVideoListener(this);
 
         addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -89,9 +89,9 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    if(thumbnailView != null) { // show old thumbnail
-                        thumbnailView.setVisibility(VISIBLE);
-                        playIconView.setVisibility(VISIBLE);
+                    if(mThumbnailView != null) { // show old thumbnail
+                        mThumbnailView.setVisibility(VISIBLE);
+                        mPlayIconView.setVisibility(VISIBLE);
                     }
                     playVideo();
                 }
@@ -109,13 +109,13 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
             @Override
             public void onChildViewDetachedFromWindow(@NonNull View view) {
-                if (viewHolderParent != null && viewHolderParent.equals(view)) {
+                if (mViewHolderParent != null && mViewHolderParent.equals(view)) {
                     resetVideoView();
                 }
             }
         });
 
-        videoPlayer.addListener(new Player.EventListener() {
+        mVideoPlayer.addListener(new Player.EventListener() {
             @Override
             public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) { }
 
@@ -135,8 +135,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
                     case Player.STATE_ENDED:
                         Log.d(TAG, "onPlayerStateChanged: Video ended");
-                        videoPlayer.seekTo(0);
-                        thumbnailView.setVisibility(VISIBLE);
+                        mVideoPlayer.seekTo(0);
+                        mThumbnailView.setVisibility(VISIBLE);
                         break;
 
                     case Player.STATE_IDLE:
@@ -145,7 +145,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                     case Player.STATE_READY:
                         Log.d(TAG, "onPlayerStateChanged: Ready to play");
 
-                        if(!isVideoViewAdded) {
+                        if(!mIsVideoViewAdded) {
                             addVideoView();
                         }
                         break;
@@ -180,20 +180,20 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
 
-        videoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
-        videoSurfaceView.setUseController(false);
-        videoSurfaceView.setPlayer(videoPlayer);
-        videoPlayer.setVolume(0f); // mute
+        mVideoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        mVideoSurfaceView.setUseController(false);
+        mVideoSurfaceView.setPlayer(mVideoPlayer);
+        mVideoPlayer.setVolume(0f); // mute
     }
 
     private void initVideoSurfaceSize() {
         Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         Point point = new Point();
         display.getSize(point);
-        videoSurfaceDefaultHeight = point.x;
-        screenDefaultHeight = point.y;
-        videoSurfaceView = new PlayerView(this.context);
-        videoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+        mVideoSurfaceDefaultHeight = point.x;
+        mScreenDefaultHeight = point.y;
+        mVideoSurfaceView = new PlayerView(mContext);
+        mVideoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
     }
 
     public void playVideo() {
@@ -211,28 +211,28 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
             targetPosition = startPosition;
         }
 
-        if (targetPosition == playPosition) return; // video already playing
-        playPosition = targetPosition;
-        if (videoSurfaceView == null) return;
+        if (targetPosition == mPlayPosition) return; // video already playing
+        mPlayPosition = targetPosition;
+        if (mVideoSurfaceView == null) return;
 
-        removeVideoView(videoSurfaceView); // remove any surfaceviews from previously playing videos
+        removeVideoView(mVideoSurfaceView); // remove any surfaceviews from previously playing videos
 
         int currentPosition = targetPosition - ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
 
         if (!setViewsFromHolder(currentPosition)) return;
-        videoSurfaceView.setPlayer(videoPlayer);
+        mVideoSurfaceView.setPlayer(mVideoPlayer);
         prepareVideoSourceAndPlayer(targetPosition);
     }
 
     private void prepareVideoSourceAndPlayer(int targetPosition) {
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                Util.getUserAgent(context, "Video Journal"));
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
+                Util.getUserAgent(mContext, "Video Journal"));
         String mediaUrl = mVideoEntries.get(targetPosition).getVideopath();
         if (mediaUrl != null) {
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(mediaUrl));
-            videoPlayer.prepare(videoSource);
-            videoPlayer.setPlayWhenReady(true);
+            mVideoPlayer.prepare(videoSource);
+            mVideoPlayer.setPlayWhenReady(true);
         }
     }
 
@@ -242,13 +242,13 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
         VideoViewHolder holder = (VideoViewHolder) child.getTag();
         if (holder == null) {
-            playPosition = -1;
+            mPlayPosition = -1;
             return false;
         }
-        thumbnailView = holder.thumbnailView;
-        playIconView = holder.playIconView;
-        viewHolderParent = holder.itemView;
-        frameLayout = holder.itemView.findViewById(R.id.media_container);
+        mThumbnailView = holder.mThumbnailView;
+        mPlayIconView = holder.mPlayIconView;
+        mViewHolderParent = holder.itemView;
+        mFrameLayout = holder.itemView.findViewById(R.id.media_container);
         return true;
     }
 
@@ -262,9 +262,9 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         child.getLocationInWindow(location);
 
         if (location[1] < 0) {
-            return location[1] + videoSurfaceDefaultHeight;
+            return location[1] + mVideoSurfaceDefaultHeight;
         } else {
-            return screenDefaultHeight - location[1];
+            return mScreenDefaultHeight - location[1];
         }
     }
 
@@ -276,42 +276,42 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         int index = parent.indexOfChild(videoView);
         if (index >= 0) {
             parent.removeViewAt(index);
-            isVideoViewAdded = false;
+            mIsVideoViewAdded = false;
         }
-        thumbnailView.setVisibility(VISIBLE);
-        playIconView.setVisibility(VISIBLE);
+        mThumbnailView.setVisibility(VISIBLE);
+        mPlayIconView.setVisibility(VISIBLE);
     }
 
     private void addVideoView() {
 
-        frameLayout.addView(videoSurfaceView);
-        isVideoViewAdded = true;
-        videoSurfaceView.setElevation(0);
-        videoSurfaceView.requestFocus();
-        videoSurfaceView.setVisibility(VISIBLE);
-        videoSurfaceView.setAlpha(1);
+        mFrameLayout.addView(mVideoSurfaceView);
+        mIsVideoViewAdded = true;
+        mVideoSurfaceView.setElevation(0);
+        mVideoSurfaceView.requestFocus();
+        mVideoSurfaceView.setVisibility(VISIBLE);
+        mVideoSurfaceView.setAlpha(1);
     }
 
     private void resetVideoView() {
 
-        if (isVideoViewAdded) {
-            removeVideoView(videoSurfaceView);
-            playPosition = -1;
-            thumbnailView.setVisibility(VISIBLE);
-            playIconView.setVisibility(VISIBLE);
-            videoSurfaceView.setVisibility(INVISIBLE);
+        if (mIsVideoViewAdded) {
+            removeVideoView(mVideoSurfaceView);
+            mPlayPosition = -1;
+            mThumbnailView.setVisibility(VISIBLE);
+            mPlayIconView.setVisibility(VISIBLE);
+            mVideoSurfaceView.setVisibility(INVISIBLE);
         }
     }
 
     public void releasePlayer() {
-        if (videoPlayer != null) {
-            videoPlayer.release();
-            videoPlayer = null;
+        if (mVideoPlayer != null) {
+            mVideoPlayer.release();
+            mVideoPlayer = null;
         }
-        viewHolderParent = null;
+        mViewHolderParent = null;
 
-        if (videoPlayer != null) {
-            videoPlayer.getVideoComponent().removeVideoListener(this);
+        if (mVideoPlayer != null) {
+            mVideoPlayer.getVideoComponent().removeVideoListener(this);
         }
     }
 
@@ -325,8 +325,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
     @Override
     public void onRenderedFirstFrame() {
-        thumbnailView.setVisibility(INVISIBLE);
-        playIconView.setVisibility(INVISIBLE);
+        mThumbnailView.setVisibility(INVISIBLE);
+        mPlayIconView.setVisibility(INVISIBLE);
     }
 
 

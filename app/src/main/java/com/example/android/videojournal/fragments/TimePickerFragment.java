@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.fragments;
 
 
 import android.app.Dialog;
@@ -10,8 +10,8 @@ import androidx.fragment.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
 
-import com.example.android.videojournal.utilities.AlarmReceiver;
-import com.example.android.videojournal.utilities.NotificationUtils;
+import com.example.android.videojournal.notifications.AlarmReceiver;
+import com.example.android.videojournal.notifications.NotificationUtils;
 
 import java.util.Calendar;
 

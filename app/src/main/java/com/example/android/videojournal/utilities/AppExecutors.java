@@ -11,38 +11,38 @@ import androidx.annotation.NonNull;
 public class AppExecutors {
 
     private static final Object LOCK = new Object();
-    private static AppExecutors sInstance;
-    private final Executor diskIO;
-    private final Executor mainThread;
-    private final Executor networkIO;
+    private static AppExecutors mInstance;
+    private final Executor mDiskIO;
+    private final Executor mMainThread;
+    private final Executor mNetworkIO;
 
     private AppExecutors(Executor diskIO, Executor networkIO, Executor mainThread) {
-        this.diskIO = diskIO;
-        this.networkIO = networkIO;
-        this.mainThread = mainThread;
+        mDiskIO = diskIO;
+        mNetworkIO = networkIO;
+        mMainThread = mainThread;
     }
 
     public static AppExecutors getInstance() {
-        if (sInstance == null) {
+        if (mInstance == null) {
             synchronized (LOCK) {
-                sInstance = new AppExecutors(Executors.newSingleThreadExecutor(),
+                mInstance = new AppExecutors(Executors.newSingleThreadExecutor(),
                         Executors.newFixedThreadPool(3),
                         new MainThreadExecutor());
             }
         }
-        return sInstance;
+        return mInstance;
     }
 
     public Executor diskIO() {
-        return diskIO;
+        return mDiskIO;
     }
 
     public Executor mainThread() {
-        return mainThread;
+        return mMainThread;
     }
 
     public Executor networkIO() {
-        return networkIO;
+        return mNetworkIO;
     }
 
     private static class MainThreadExecutor implements Executor {

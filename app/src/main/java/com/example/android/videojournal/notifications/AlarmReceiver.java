@@ -1,22 +1,17 @@
-package com.example.android.videojournal.utilities;
+package com.example.android.videojournal.notifications;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
-import com.example.android.videojournal.DailyVideoFeedActivity;
-import com.example.android.videojournal.R;
-
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
+import com.example.android.videojournal.activities.DailyVideoFeedActivity;
 
 
 public class AlarmReceiver extends BroadcastReceiver {
 
     private static final String TAG = AlarmReceiver.class.getSimpleName();
+
     private static int REC_NOTIF_ID = 100;
 
     @Override

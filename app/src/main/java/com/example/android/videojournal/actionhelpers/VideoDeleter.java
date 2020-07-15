@@ -2,10 +2,10 @@ package com.example.android.videojournal.actionhelpers;
 
 import android.content.Context;
 
-import com.example.android.videojournal.VideoAdapter;
+import com.example.android.videojournal.formatting.DateFormater;
+import com.example.android.videojournal.recyclerview.VideoAdapter;
 import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
-import com.example.android.videojournal.formatting.DateConverter;
 import com.example.android.videojournal.utilities.AppExecutors;
 
 import java.io.File;
@@ -16,12 +16,13 @@ import java.util.Date;
 public class VideoDeleter {
 
     private static final String TAG = VideoDeleter.class.getSimpleName();
+
     private VideoDatabase mDb;
-    private Context context;
+    private Context mContext;
 
     public VideoDeleter(Context context, VideoDatabase db) {
         mDb = db;
-        this.context = context;
+        mContext = context;
     }
 
     public void deleteJournalEntryByPosition(final String videoPath, final String thumbnailPath, final int position) {
@@ -33,7 +34,7 @@ public class VideoDeleter {
     public void deleteCurrentMergedVideo() {
 
         Date today = new Date();
-        Date precedingSunday = DateConverter.precedingSundayDate(today);
+        Date precedingSunday = DateFormater.precedingSundayDate(today);
         VideoEntry currentMergedVideo = mDb.videoDao().loadCurrentCombinedVideo(precedingSunday, today);
 
         if (currentMergedVideo != null) {
@@ -50,7 +51,7 @@ public class VideoDeleter {
         File videoFile = new File(videoPath);
         boolean videoDeleted = videoFile.delete();
         if(!videoDeleted){
-            context.deleteFile(videoFile.getName());
+            mContext.deleteFile(videoFile.getName());
         }
     }
 
@@ -59,7 +60,7 @@ public class VideoDeleter {
         File thumbnailFile = new File(thumbnailPath);
         boolean thumbnailDeleted = thumbnailFile.delete();
         if (!thumbnailDeleted) {
-            context.deleteFile(thumbnailFile.getName());
+            mContext.deleteFile(thumbnailFile.getName());
         }
     }
 

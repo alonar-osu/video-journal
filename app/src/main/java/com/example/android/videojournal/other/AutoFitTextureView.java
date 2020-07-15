@@ -1,4 +1,4 @@
-package com.example.android.videojournal.visualization;
+package com.example.android.videojournal.other;
 
 
 import android.content.Context;
@@ -10,14 +10,18 @@ import android.view.TextureView;
 
 
 public class AutoFitTextureView extends TextureView {
+
     private int mRatioWidth = 0;
     private int mRatioHeight = 0;
+
     public AutoFitTextureView(Context context) {
         this(context, null);
     }
+
     public AutoFitTextureView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
+
     public AutoFitTextureView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }

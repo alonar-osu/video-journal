@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.fragments;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -6,10 +6,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.example.android.videojournal.R;
 import com.example.android.videojournal.formatting.TimeFormater;
-import com.example.android.videojournal.utilities.AlarmReceiver;
-import com.example.android.videojournal.utilities.NotificationUtils;
-import com.example.android.videojournal.visualization.TimePreference;
+import com.example.android.videojournal.notifications.AlarmReceiver;
+import com.example.android.videojournal.notifications.NotificationUtils;
+import com.example.android.videojournal.other.TimePreference;
 
 import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
@@ -18,6 +19,7 @@ import androidx.preference.PreferenceFragmentCompat;
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
+
     private int mHours;
     private int mMinutes;
 

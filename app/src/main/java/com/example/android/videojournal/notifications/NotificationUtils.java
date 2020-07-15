@@ -1,4 +1,4 @@
-package com.example.android.videojournal.utilities;
+package com.example.android.videojournal.notifications;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -25,6 +25,7 @@ import static android.content.Context.ALARM_SERVICE;
 public class NotificationUtils {
 
     private static final String TAG = NotificationUtils.class.getSimpleName();
+
     private static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static int REC_NOTIF_ID = 100;
     private static final int DEFAULT_NOTIF_PREF_VALUE = 725;

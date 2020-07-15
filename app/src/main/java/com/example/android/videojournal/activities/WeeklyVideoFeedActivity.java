@@ -1,10 +1,13 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.android.videojournal.R;
+import com.example.android.videojournal.recyclerview.VideoAdapter;
+import com.example.android.videojournal.recyclerview.VideoRecyclerView;
 import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
 
@@ -22,8 +25,9 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
 
     private static final String TAG = WeeklyVideoFeedActivity.class.getSimpleName();
 
-    private VideoRecyclerView mRecyclerView;
     private VideoDatabase mDb;
+    private VideoRecyclerView mRecyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,8 +92,5 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
             mRecyclerView.releasePlayer();
         }
     }
-
-
-
 
 }

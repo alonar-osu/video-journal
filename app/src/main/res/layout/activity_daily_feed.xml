@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary"
-    tools:context=".DailyVideoFeedActivity">
+    tools:context=".activities.DailyVideoFeedActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -23,13 +23,13 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <!-- custom recyclerview with autoplay -->
-    <com.example.android.videojournal.VideoRecyclerView
+    <com.example.android.videojournal.recyclerview.VideoRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="?attr/actionBarSize"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-    </com.example.android.videojournal.VideoRecyclerView>
+    </com.example.android.videojournal.recyclerview.VideoRecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

@@ -21,31 +21,31 @@
         android:fullBackupContent="false"
         android:allowBackup="false">
         <activity
-            android:name=".PlayVideoActivity"
+            android:name=".activities.PlayVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_play_video"
             android:theme="@style/FullscreenTheme"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".RecordVideoActivity"
-            android:parentActivityName=".DailyVideoFeedActivity"
+            android:name=".activities.RecordVideoActivity"
+            android:parentActivityName=".activities.DailyVideoFeedActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.videojournal.DailyVideoFeedActivity" />
+                android:value="com.example.android.videojournal.activities.DailyVideoFeedActivity" />
         </activity>
         <activity
-            android:name=".WeeklyVideoFeedActivity"
+            android:name=".activities.WeeklyVideoFeedActivity"
             android:label="@string/title_activity_weekly"
-            android:parentActivityName=".DailyVideoFeedActivity"
+            android:parentActivityName=".activities.DailyVideoFeedActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.videojournal.DailyVideoFeedActivity" />
+                android:value="com.example.android.videojournal.activities.DailyVideoFeedActivity" />
         </activity>
         <activity
-            android:name=".DailyVideoFeedActivity"
+            android:name=".activities.DailyVideoFeedActivity"
             android:launchMode="singleTop"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
@@ -56,14 +56,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".utilities.AlarmReceiver" />
+        <receiver android:name=".notifications.AlarmReceiver" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/action_settings"
-            android:parentActivityName=".DailyVideoFeedActivity">
+            android:parentActivityName=".activities.DailyVideoFeedActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".DailyVideoFeedActivity"
+                android:value=".activities.DailyVideoFeedActivity"
                 android:screenOrientation="portrait"/>
         </activity>
 

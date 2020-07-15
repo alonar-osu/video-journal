@@ -1,4 +1,4 @@
-package com.example.android.videojournal;
+package com.example.android.videojournal.activities;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.videojournal.R;
 import com.example.android.videojournal.actionhelpers.VideoDeleter;
 import com.example.android.videojournal.actionhelpers.VideoSharer;
 import com.example.android.videojournal.data.VideoDatabase;
@@ -34,18 +35,20 @@ import com.google.android.exoplayer2.util.Util;
 public class PlayVideoActivity extends AppCompatActivity {
 
     private static final String TAG = PlayVideoActivity.class.getSimpleName();
+
+    private VideoDatabase mDb;
     private SimpleExoPlayer mVideoPlayer;
     private String mVideoPath;
     private String mThumbnailPath;
     private int mPosition;
-    private Context context;
-    private VideoDatabase mDb;
+    private Context mContext;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        context = this;
+        mContext = this;
         mDb = VideoDatabase.getInstance(getApplicationContext());
 
         setContentView(R.layout.activity_play_video);
@@ -70,14 +73,14 @@ public class PlayVideoActivity extends AppCompatActivity {
         TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
 
         // video player
-        mVideoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        mVideoPlayer = ExoPlayerFactory.newSimpleInstance(mContext, trackSelector);
 
         fullscreenPlayVideoView.setUseController(true);
         mVideoPlayer.setVolume(1f); // volume ON
         fullscreenPlayVideoView.setPlayer(mVideoPlayer);
 
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
-                Util.getUserAgent(context, "Video Journal"));
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
+                Util.getUserAgent(mContext, "Video Journal"));
 
         getVideoInfo();
 
