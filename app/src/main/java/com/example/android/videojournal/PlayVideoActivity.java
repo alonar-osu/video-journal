@@ -12,9 +12,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.android.videojournal.ActionHelpers.VideoDeleter;
-import com.example.android.videojournal.ActionHelpers.VideoSharer;
-import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.actionhelpers.VideoDeleter;
+import com.example.android.videojournal.actionhelpers.VideoSharer;
+import com.example.android.videojournal.data.VideoDatabase;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -39,14 +39,14 @@ public class PlayVideoActivity extends AppCompatActivity {
     private String mThumbnailPath;
     private int mPosition;
     private Context context;
-    private AppDatabase mDb;
+    private VideoDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         context = this;
-        mDb = AppDatabase.getInstance(getApplicationContext());
+        mDb = VideoDatabase.getInstance(getApplicationContext());
 
         setContentView(R.layout.activity_play_video);
         ActionBar actionBar = getSupportActionBar();

@@ -1,4 +1,4 @@
-package com.example.android.videojournal.ActionHelpers;
+package com.example.android.videojournal.actionhelpers;
 
 import android.content.Context;
 import android.content.Intent;

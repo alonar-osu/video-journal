@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
 import com.example.android.videojournal.utilities.NotificationUtils;
 import com.example.android.videojournal.utilities.PermissionChecker;
@@ -35,7 +35,7 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
     private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
     private static final int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
     private VideoRecyclerView mRecyclerView;
-    private AppDatabase mDb; // database
+    private VideoDatabase mDb; // database
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_daily_feed);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mDb = AppDatabase.getInstance(getApplicationContext());
+        mDb = VideoDatabase.getInstance(getApplicationContext());
         Log.d(TAG, "onCreate() is runnning");
 
         FloatingActionButton fab = findViewById(R.id.fab);

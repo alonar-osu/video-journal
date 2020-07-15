@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
 
 import java.util.ArrayList;
@@ -23,13 +23,13 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
     private static final String TAG = WeeklyVideoFeedActivity.class.getSimpleName();
 
     private VideoRecyclerView mRecyclerView;
-    private AppDatabase mDb;
+    private VideoDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weekly_feed);
-        mDb = AppDatabase.getInstance(getApplicationContext());
+        mDb = VideoDatabase.getInstance(getApplicationContext());
 
         Log.d(TAG, "WeeklyVideoFeedActivity onCreate() is runnning");
         mRecyclerView = findViewById(R.id.recyclerView_weekly);

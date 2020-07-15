@@ -1,9 +1,9 @@
-package com.example.android.videojournal.ActionHelpers;
+package com.example.android.videojournal.actionhelpers;
 
 import android.content.Context;
 
 import com.example.android.videojournal.VideoAdapter;
-import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
 import com.example.android.videojournal.formatting.DateConverter;
 import com.example.android.videojournal.utilities.AppExecutors;
@@ -16,10 +16,10 @@ import java.util.Date;
 public class VideoDeleter {
 
     private static final String TAG = VideoDeleter.class.getSimpleName();
-    private AppDatabase mDb;
+    private VideoDatabase mDb;
     private Context context;
 
-    public VideoDeleter(Context context, AppDatabase db) {
+    public VideoDeleter(Context context, VideoDatabase db) {
         mDb = db;
         this.context = context;
     }

@@ -1,4 +1,4 @@
-package com.example.android.videojournal.ActionHelpers;
+package com.example.android.videojournal.actionhelpers;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -8,7 +8,7 @@ import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
 import com.example.android.videojournal.utilities.AppExecutors;
 
@@ -22,10 +22,10 @@ public class VideoAdder {
 
     private static final String TAG = VideoAdder.class.getSimpleName();
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
-    private AppDatabase mDb;
+    private VideoDatabase mDb;
     private Context context;
 
-    public VideoAdder(Context context, AppDatabase db) {
+    public VideoAdder(Context context, VideoDatabase db) {
         this.context = context;
         mDb = db;
     }

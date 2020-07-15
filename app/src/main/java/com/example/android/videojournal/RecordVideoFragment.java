@@ -37,9 +37,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.videojournal.ActionHelpers.VideoAdder;
-import com.example.android.videojournal.ActionHelpers.VideoWeeklyUpdater;
-import com.example.android.videojournal.data.AppDatabase;
+import com.example.android.videojournal.actionhelpers.VideoAdder;
+import com.example.android.videojournal.actionhelpers.VideoWeeklyUpdater;
+import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.formatting.DateConverter;
 import com.example.android.videojournal.utilities.PermissionChecker;
 import com.example.android.videojournal.visualization.AutoFitTextureView;
@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RecordVideoFragment extends Fragment implements View.OnClickListener  {
 
-    private AppDatabase mDb;
+    private VideoDatabase mDb;
 
     private final static String FILE_START_NAME = "vj";
     private final static String VIDEO_EXTENSION = ".mp4";
@@ -204,7 +204,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         mButtonVideo = (ImageView) view.findViewById(R.id.button_record_video);
         mButtonVideo.setOnClickListener(this);
         mRecordingDate = (TextView) view.findViewById(R.id.rec_date_tv);
-        mDb = AppDatabase.getInstance(getActivity());
+        mDb = VideoDatabase.getInstance(getActivity());
         mCameraId = 1; // front camera
     }
 

@@ -68,7 +68,7 @@
         </activity>
 
         <provider
-            android:name=".ActionHelpers.VideoSharer"
+            android:name=".actionhelpers.VideoSharer"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
