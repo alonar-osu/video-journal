@@ -74,28 +74,12 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
     }
 
     private void init(Context context) {
+
         this.context = context.getApplicationContext();
-        Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        Point point = new Point();
-        display.getSize(point);
-        videoSurfaceDefaultHeight = point.x;
-        screenDefaultHeight = point.y;
+        initVideoSurfaceSize();
+        initVideoPlayer(context);
 
-        videoSurfaceView = new PlayerView(this.context);
-        videoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
-
-        videoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
-        // bind player to view
-        videoSurfaceView.setUseController(false);
-        videoSurfaceView.setPlayer(videoPlayer);
-        // mute player
-        videoPlayer.setVolume(0f);
-
-        // listener to detect when first video frame rendered
+        // detect when first video frame rendered
         videoPlayer.getVideoComponent().addVideoListener(this);
 
         addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -121,8 +105,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
         addOnChildAttachStateChangeListener(new OnChildAttachStateChangeListener() {
             @Override
-            public void onChildViewAttachedToWindow(@NonNull View view) {
-            }
+            public void onChildViewAttachedToWindow(@NonNull View view) { }
 
             @Override
             public void onChildViewDetachedFromWindow(@NonNull View view) {
@@ -134,19 +117,13 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
         videoPlayer.addListener(new Player.EventListener() {
             @Override
-            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) {
-
-            }
+            public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) { }
 
             @Override
-            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-            }
+            public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) { }
 
             @Override
-            public void onLoadingChanged(boolean isLoading) {
-
-            }
+            public void onLoadingChanged(boolean isLoading) { }
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
@@ -179,85 +156,77 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
             }
 
             @Override
-            public void onRepeatModeChanged(int repeatMode) {
-
-            }
+            public void onRepeatModeChanged(int repeatMode) { }
 
             @Override
-            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
-            }
+            public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) { }
 
             @Override
-            public void onPlayerError(ExoPlaybackException error) {
-
-            }
+            public void onPlayerError(ExoPlaybackException error) { }
 
             @Override
-            public void onPositionDiscontinuity(int reason) {
-
-            }
+            public void onPositionDiscontinuity(int reason) { }
 
             @Override
-            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
-            }
+            public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) { }
 
             @Override
-            public void onSeekProcessed() {
-
-            }
+            public void onSeekProcessed() { }
         });
     }
 
+    private void initVideoPlayer(Context context) {
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
+
+        videoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+        videoSurfaceView.setUseController(false);
+        videoSurfaceView.setPlayer(videoPlayer);
+        videoPlayer.setVolume(0f); // mute
+    }
+
+    private void initVideoSurfaceSize() {
+        Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+        videoSurfaceDefaultHeight = point.x;
+        screenDefaultHeight = point.y;
+        videoSurfaceView = new PlayerView(this.context);
+        videoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
+    }
+
     public void playVideo() {
+        int startPosition = ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
+        int endPosition = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
+        if (startPosition < 0 || endPosition < 0) return; // some error
 
         int targetPosition;
+        if (startPosition != endPosition) {
+            // > 1 items on screen
+            int startPositionVideoHeight = getVisibleVideoSurfaceHeight(startPosition);
+            int endPositionVideoHeight = getVisibleVideoSurfaceHeight(endPosition);
+            targetPosition = startPositionVideoHeight > endPositionVideoHeight ? startPosition : endPosition;
+        } else { // 1 item on screen
+            targetPosition = startPosition;
+        }
 
-            int startPosition = ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
-            int endPosition = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
-
-            // some error
-            if (startPosition < 0 || endPosition < 0) return;
-
-            // if > 1 list-items on screen
-            if (startPosition != endPosition) {
-                int startPositionVideoHeight = getVisibleVideoSurfaceHeight(startPosition);
-                int endPositionVideoHeight = getVisibleVideoSurfaceHeight(endPosition);
-
-                targetPosition = startPositionVideoHeight > endPositionVideoHeight ? startPosition : endPosition;
-            } else { // 1 item on screen
-                targetPosition = startPosition;
-            }
-
-        // video already playing, return
-        if (targetPosition == playPosition) return;
-
-        // set position of list-item that is to be played
+        if (targetPosition == playPosition) return; // video already playing
         playPosition = targetPosition;
         if (videoSurfaceView == null) return;
 
-        // remove any old surface views from previously playing videos
-       removeVideoView(videoSurfaceView);
+        removeVideoView(videoSurfaceView); // remove any surfaceviews from previously playing videos
 
         int currentPosition = targetPosition - ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
 
-        View child = getChildAt(currentPosition);
-        if (child == null) return;
-
-        VideoViewHolder holder = (VideoViewHolder) child.getTag();
-        if (holder == null) {
-            playPosition = -1;
-            return;
-        }
-        thumbnailView = holder.thumbnailView;
-        playIconView = holder.playIconView;
-        viewHolderParent = holder.itemView;
-        frameLayout = holder.itemView.findViewById(R.id.media_container);
-
+        if (!setViewsFromHolder(currentPosition)) return;
         videoSurfaceView.setPlayer(videoPlayer);
+        prepareVideoSourceAndPlayer(targetPosition);
+    }
 
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, Util.getUserAgent(context, "Video Journal"));
+    private void prepareVideoSourceAndPlayer(int targetPosition) {
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context,
+                Util.getUserAgent(context, "Video Journal"));
         String mediaUrl = mVideoEntries.get(targetPosition).getVideopath();
         if (mediaUrl != null) {
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
@@ -265,6 +234,22 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
             videoPlayer.prepare(videoSource);
             videoPlayer.setPlayWhenReady(true);
         }
+    }
+
+    private boolean setViewsFromHolder(int currentPosition) {
+        View child = getChildAt(currentPosition);
+        if (child == null) return true;
+
+        VideoViewHolder holder = (VideoViewHolder) child.getTag();
+        if (holder == null) {
+            playPosition = -1;
+            return false;
+        }
+        thumbnailView = holder.thumbnailView;
+        playIconView = holder.playIconView;
+        viewHolderParent = holder.itemView;
+        frameLayout = holder.itemView.findViewById(R.id.media_container);
+        return true;
     }
 
     private int getVisibleVideoSurfaceHeight(int playPosition) {
@@ -319,14 +304,15 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
     }
 
     public void releasePlayer() {
-
         if (videoPlayer != null) {
             videoPlayer.release();
             videoPlayer = null;
         }
         viewHolderParent = null;
 
-        if (videoPlayer != null) videoPlayer.getVideoComponent().removeVideoListener(this);
+        if (videoPlayer != null) {
+            videoPlayer.getVideoComponent().removeVideoListener(this);
+        }
     }
 
     public void setVideoEntries(ArrayList<VideoEntry> videoEntries) {
@@ -335,7 +321,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
     @Override
     public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
-
     }
 
     @Override
