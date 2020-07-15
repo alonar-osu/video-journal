@@ -26,15 +26,15 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private static final String TAG = VideoAdapter.class.getSimpleName();
 
-    static ArrayList mVideoEntries;
-    Context context;
-    boolean mWeeklyVideo;
+    private static ArrayList mVideoEntries;
+    private Context context;
+    private boolean mWeeklyVideo;
 
 
     public VideoAdapter(Context context, ArrayList videoEntries, boolean weekly) {
-       this.context = context;
-       this.mVideoEntries = videoEntries;
-       this.mWeeklyVideo = weekly;
+        this.context = context;
+        this.mVideoEntries = videoEntries;
+        this.mWeeklyVideo = weekly;
     }
 
     @NonNull
@@ -47,14 +47,13 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
 
-        Log.d(TAG, "view #" + position); // view's number
-        long startTime = System.currentTimeMillis(); // getting time in onBindViewHolder method
-
-        // get video info
         VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
-        String videoPath = videoEntry.getVideopath();
+        showDateForVideo(videoEntry, (VideoViewHolder) holder);
+        setVideoThumbnail(videoEntry, (VideoViewHolder) holder);
+        setInfoToHolder(videoEntry, (VideoViewHolder) holder, position);
+    }
 
-        // date to show
+    private void showDateForVideo(VideoEntry videoEntry, VideoViewHolder holder) {
         Date videoDate = videoEntry.getDate();
         String dateText = "";
         if (mWeeklyVideo) {
@@ -62,34 +61,25 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else {
             dateText += DateConverter.dateToString(videoDate);
         }
+        holder.dateView.setText(dateText);
+    }
 
-        ((VideoViewHolder) holder).dateView.setText(dateText);
-
-        // get video thumbnail from internal storage
+    private void setVideoThumbnail(VideoEntry videoEntry, VideoViewHolder holder) {
         String thumbnailFileName = videoEntry.getThumbnailFileName();
         Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, context);
 
         if (videoThumbnail != null) {
-            ((VideoViewHolder) holder).thumbnailView.setAdjustViewBounds(true);
-            // set bitmap thumbnail
-            ((VideoViewHolder) holder).thumbnailView.setImageBitmap(videoThumbnail);
+            holder.thumbnailView.setAdjustViewBounds(true);
+            holder.thumbnailView.setImageBitmap(videoThumbnail);
         } else {
             Log.d(TAG, "Video thumbnail does not exist");
         }
-        ((VideoViewHolder) holder).videoPath = videoPath;
-        ((VideoViewHolder) holder).thumbnailPath = videoEntry.getThumbnailPath();
-        ((VideoViewHolder) holder).position = position;
-
-        Log.i(TAG, "bindView time: " + (System.currentTimeMillis() - startTime)); // time in method
     }
 
-    @Override
-    public int getItemCount() {
-        return mVideoEntries.size();
-    }
-
-    public static ArrayList<VideoEntry> getVideos() {
-        return mVideoEntries;
+    private void setInfoToHolder(VideoEntry videoEntry, VideoViewHolder holder, final int position) {
+        holder.videoPath = videoEntry.getVideopath();
+        holder.thumbnailPath = videoEntry.getThumbnailPath();
+        holder.position = position;
     }
 
     private Bitmap loadBitmapFromStorage(String filename, Context context) {
@@ -103,6 +93,15 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             e.printStackTrace();
         }
         return thumbnail;
+    }
+
+    @Override
+    public int getItemCount() {
+        return mVideoEntries.size();
+    }
+
+    public static ArrayList<VideoEntry> getVideos() {
+        return mVideoEntries;
     }
 
 }
