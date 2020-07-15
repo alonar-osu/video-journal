@@ -28,12 +28,11 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "WeeklyVideoFeedActivity onCreate() is runnning");
+
         setContentView(R.layout.activity_weekly_feed);
         mDb = VideoDatabase.getInstance(getApplicationContext());
-
-        Log.d(TAG, "WeeklyVideoFeedActivity onCreate() is runnning");
-        mRecyclerView = findViewById(R.id.recyclerView_weekly);
-        mRecyclerView.setItemViewCacheSize(20);
+        prepareRecyclerView();
         retrieveAndSetWeeklyVideos();
     }
 
@@ -43,11 +42,6 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
     }
 
     private void retrieveAndSetWeeklyVideos() {
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
-        linearLayoutManager.setReverseLayout(true);
-        linearLayoutManager.setStackFromEnd(true);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
 
         final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllCombinedVideos();
 
@@ -61,7 +55,15 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
+    }
 
+    private void prepareRecyclerView() {
+        mRecyclerView = findViewById(R.id.recyclerView_weekly);
+        mRecyclerView.setItemViewCacheSize(20);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setStackFromEnd(true);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
     }
 
     @Override
