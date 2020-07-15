@@ -14,7 +14,7 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
 
     private static final String TAG = VideoViewHolder.class.getSimpleName();
 
-    FrameLayout media_container;
+    private FrameLayout media_container;
     View parent;
     ImageView thumbnailView;
     ImageView playIconView;
@@ -24,13 +24,17 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
     int position;
 
     public VideoViewHolder(View itemView) {
+
         super(itemView);
         parent = itemView;
         media_container = itemView.findViewById(R.id.media_container);
         thumbnailView = (ImageView) itemView.findViewById(R.id.thumbnail);
         playIconView = (ImageView) itemView.findViewById(R.id.play_icon);
         dateView = (TextView) itemView.findViewById(R.id.date_tv);
+        launchVideoWhenClicked(itemView);
+    }
 
+    private void launchVideoWhenClicked(View itemView) {
         itemView.setTag(this);
 
         itemView.setOnClickListener(new View.OnClickListener() {
@@ -45,4 +49,6 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
             }
         });
     }
+
+
 }
