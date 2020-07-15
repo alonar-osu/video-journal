@@ -68,16 +68,11 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-
-            case android.R.id.home:
-                goToMainActivity();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            goToMainActivity();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void goToMainActivity() {
