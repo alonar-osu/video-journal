@@ -14,6 +14,9 @@ import com.example.android.videojournal.other.TimePreference;
 import androidx.preference.DialogPreference;
 import androidx.preference.PreferenceDialogFragmentCompat;
 
+/**
+ * TimePreference with selected time for daily video notifications
+ */
 public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat {
 
     private static final String TAG = TimePreferenceFragmentCompat.class.getSimpleName();
@@ -64,6 +67,11 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
         }
     }
 
+    /**
+     * Checks if time changed in shared preferences, and if so
+     * updates notification time and sets new time in summary
+     * in Settings screen
+     */
     @Override
     public void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {

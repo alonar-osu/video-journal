@@ -19,10 +19,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * Adapter for recyclerview for video feed
+ */
 public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final String TAG = VideoAdapter.class.getSimpleName();
@@ -30,7 +32,6 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private static ArrayList mVideoEntries;
     private Context mContext;
     private boolean mWeeklyVideo;
-
 
     public VideoAdapter(Context context, ArrayList videoEntries, boolean weekly) {
         mContext = context;
@@ -45,6 +46,12 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return new VideoViewHolder(v);
     }
 
+    /**
+     * Sets video thumbnail, video date and video info for view
+     * via the holder to display video in feed
+     * @param holder the holder for recyclerview
+     * @param position video's position
+     */
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
 
@@ -54,6 +61,11 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         setInfoToHolder(videoEntry, (VideoViewHolder) holder, position);
     }
 
+    /**
+     * Sets date text summary on video in feed
+     * Will show "week of (preceding Sunday)" for Weekly video feed
+     * Will show date when video taken for Daily video feed
+     */
     private void showDateForVideo(VideoEntry videoEntry, VideoViewHolder holder) {
         Date videoDate = videoEntry.getDate();
         String dateText = "";
@@ -65,6 +77,11 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         holder.mDateView.setText(dateText);
     }
 
+    /**
+     * Gets video thumbnail bitmap from external storage in "thumbnails" directory
+     * using file name from VideoEntry
+     * Sets the bitmap to holder's thumbnail view
+     */
     private void setVideoThumbnail(VideoEntry videoEntry, VideoViewHolder holder) {
         String thumbnailFileName = videoEntry.getThumbnailFileName();
         Bitmap videoThumbnail = loadBitmapFromStorage(thumbnailFileName, mContext);

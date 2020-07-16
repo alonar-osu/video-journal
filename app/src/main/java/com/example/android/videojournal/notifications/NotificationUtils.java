@@ -22,6 +22,9 @@ import androidx.core.content.ContextCompat;
 
 import static android.content.Context.ALARM_SERVICE;
 
+/**
+ * Methods related to reminder notifications for daily videos
+ */
 public class NotificationUtils {
 
     private static final String TAG = NotificationUtils.class.getSimpleName();
@@ -30,8 +33,12 @@ public class NotificationUtils {
     private static int REC_NOTIF_ID = 100;
     private static final int DEFAULT_NOTIF_PREF_VALUE = 725;
 
+    /**
+     * Creates notification channel on API 26+ otherwise not in support library
+     * Channel for video reminder notifications
+     */
     public static void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // channel on API 26+ otherwise not in support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = context.getString(R.string.channel_name);
             String description = context.getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
@@ -43,28 +50,39 @@ public class NotificationUtils {
         }
     }
 
-    public static void setUpReminderNotification(Context context, int hour, int minute, Class receiver) {
+    /**
+     * Sets up notification to run at set time via AlarmManager
+     * at an interval of once per day
+     * @param hour for when to send notification
+     * @param minute for when to send notification
+     */
+    public static void setUpReminderNotification(Context context, int hour, int minute) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
-        // Toast.makeText(context, "Notification set at hours= " + hour + " and min= " + minute, Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(context, receiver);
+        Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
+    /**
+     * Checks if reminder is activated and will set notification at selected time
+     */
     public static void updateNotificationTime(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (reminderIsChecked(sharedPreferences, context)) {
             int minutesAfterMidnight = getTimeFromPreferences(sharedPreferences, context);
             int hours = TimeFormater.findHoursFromTotalMinutes(minutesAfterMidnight);
             int minutes = TimeFormater.findMinutesFromTotalMinutes(minutesAfterMidnight);
-            setUpReminderNotification(context, hours, minutes, AlarmReceiver.class);
+            setUpReminderNotification(context, hours, minutes);
         }
     }
 
+    /**
+     * Returns whether user selected to activate daily reminder notifications or not
+     */
     public static boolean reminderIsChecked(SharedPreferences sharedPreferences, Context context) {
         return sharedPreferences.getBoolean(context.getString(R.string.pref_activate_reminder_key),
                 context.getResources().getBoolean(R.bool.pref_activate_reminder_default));
@@ -75,12 +93,15 @@ public class NotificationUtils {
                 DEFAULT_NOTIF_PREF_VALUE);
     }
 
-    public static void showNotification(Context context, PendingIntent pendingIntent) {
+    /**
+     * Builds notification to show to user
+     */
+    public static void showNotification(Context context, PendingIntent pendingIntent, String title, String contentText) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REC_NOTIF)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_create_entry)
-                .setContentTitle("Time for Video Journal Entry")
-                .setContentText("Let's take a new daily video")
+                .setContentTitle(title)
+                .setContentText(contentText)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true);
@@ -89,6 +110,10 @@ public class NotificationUtils {
         notificationManager.notify(REC_NOTIF_ID, builder.build());
     }
 
+    /**
+     * Cancels pending intent for notification service to stop notifications
+     * Used when user un-checks reminder in Settings
+     */
     public static void turnOffNotifications(Activity activity) {
         Intent intent = new Intent(activity, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(activity, REC_NOTIF_ID, intent, 0);

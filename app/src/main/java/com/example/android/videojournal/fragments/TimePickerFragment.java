@@ -15,13 +15,19 @@ import com.example.android.videojournal.notifications.NotificationUtils;
 
 import java.util.Calendar;
 
-
+/**
+ * Time picker to show in a dialog opened from settings sreen
+ */
 public class TimePickerFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener {
 
     public TimePickerFragment() {
     }
 
+    /**
+     * Sets current time as default values on time picker
+     * and returns the time picker dialog with
+     */
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // current time as default values for the picker
@@ -33,8 +39,11 @@ public class TimePickerFragment extends DialogFragment
                 DateFormat.is24HourFormat(getActivity()));
     }
 
+    /**
+     * Activates notifications for time chosen on time picker
+     */
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        NotificationUtils.setUpReminderNotification(getContext(), hourOfDay, minute, AlarmReceiver.class);
+        NotificationUtils.setUpReminderNotification(getContext(), hourOfDay, minute);
     }
 }

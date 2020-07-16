@@ -9,8 +9,11 @@ import com.example.android.videojournal.R;
 
 import androidx.preference.DialogPreference;
 
-// adapted from https://medium.com/@JakobUlbrich/building-a-settings-screen-for-android-part-3-ae9793fd31ec
 
+/**
+ * Custom time preference to use with time picker dialog preference
+ * adapted from https://medium.com/@JakobUlbrich/building-a-settings-screen-for-android-part-3-ae9793fd31ec
+ */
 public class TimePreference extends DialogPreference {
 
     private int mTime;
@@ -34,9 +37,13 @@ public class TimePreference extends DialogPreference {
         return mTime;
     }
 
+    /**
+     * Saves time value to shared preferences
+     * @param time to be saved
+     */
     public void setTime(int time) {
         mTime = time;
-        persistInt(time); // save to Shared Preferences
+        persistInt(time);
     }
 
     @Override

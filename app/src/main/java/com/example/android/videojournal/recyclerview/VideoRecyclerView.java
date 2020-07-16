@@ -44,8 +44,10 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-// adapted from https://codingwithmitch.com/blog/playing-video-recyclerview-exoplayer-android/
-
+/**
+ * Custom recyclerview with autoplay of videos in feed using ExoPlayer
+ * adapted from https://codingwithmitch.com/blog/playing-video-recyclerview-exoplayer-android/
+ */
 public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
     private static final String TAG = VideoRecyclerView.class.getSimpleName();
@@ -73,6 +75,10 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         init(context);
     }
 
+    /**
+     * Initialize video player
+     * Autoplay videos on scrolling
+     */
     private void init(Context context) {
 
         mContext = context.getApplicationContext();
@@ -82,6 +88,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         // detect when first video frame rendered
         mVideoPlayer.getVideoComponent().addVideoListener(this);
 
+        // detect when scrolling for autoplay
         addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
@@ -175,6 +182,12 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         });
     }
 
+    /**
+     * Create ExoPlayer video player
+     * No controller since this is autoplay
+     * Sound is muted
+     * @param context
+     */
     private void initVideoPlayer(Context context) {
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
@@ -196,6 +209,9 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         mVideoSurfaceView.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
     }
 
+    /**
+     * Autoplays videos in feed depending on their position on screen
+     */
     public void playVideo() {
         int startPosition = ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
         int endPosition = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
@@ -315,6 +331,11 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         }
     }
 
+    /**
+     * Called from video feed activities to transfer the list
+     * of VideoEntry objects obtained from db via LiveData updates
+     * @param videoEntries are VideoEntry objects with videos to play
+     */
     public void setVideoEntries(ArrayList<VideoEntry> videoEntries) {
         mVideoEntries = videoEntries;
     }

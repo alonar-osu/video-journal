@@ -55,8 +55,11 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-// Based on sample code for Camera2 API
-// https://android.googlesource.com/platform/development/+/abededd/samples/browseable/Camera2Video?autodive=0%2F
+/**
+ * Camera fragment for recording videos using camera
+ * Based on sample code for Camera2 API
+ * https://android.googlesource.com/platform/development/+/abededd/samples/browseable/Camera2Video?autodive=0%2F
+ */
 
 public class RecordVideoFragment extends Fragment implements View.OnClickListener  {
 
@@ -89,7 +92,9 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         ORIENTATIONS.append(Surface.ROTATION_90, 180);
     }
 
-    // handles several lifecycle events on a textureview
+    /**
+     * Handles several lifecycle events on a textureview
+     */
     private TextureView.SurfaceTextureListener mSurfaceTextureListener
             = new TextureView.SurfaceTextureListener() {
         @Override
@@ -114,7 +119,9 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     // semaphore to prevent app from exiting before closing the camera
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
-     // called when CameraDevice changes its status
+    /**
+     * Called when CameraDevice changes its status
+     */
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice cameraDevice) {
@@ -152,6 +159,8 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     /**
      * Using video size with 3x4 aspect ratio. Not using sizes larger than 1080p,
      * since MediaRecorder cannot handle such a high-resolution video.
+     * @param choices The list of available sizes
+     * @return The video size
      */
     private static Size chooseVideoSize(Size[] choices) {
         for (Size size : choices) {
@@ -164,7 +173,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     }
 
     /**
-     * Given {@code choices} of {@code Size}s supported by a camera, chooses the smallest one whose
+     * Given choices of Sizes supported by a camera, chooses the smallest one whose
      * width and height are at least as large as the respective requested values, and whose aspect
      * ratio matches with the specified value.
      *
@@ -495,7 +504,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     }
 
     /**
-     * Compares two {@code Size}s based on their areas.
+     * Compares two Sizes based on their areas.
      */
     static class CompareSizesByArea implements Comparator<Size> {
         @Override

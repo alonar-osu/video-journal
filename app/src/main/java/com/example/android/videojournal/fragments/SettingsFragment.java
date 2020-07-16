@@ -16,6 +16,9 @@ import androidx.fragment.app.DialogFragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+/**
+ * Fragment for Settings screen
+ */
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
@@ -35,28 +38,37 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         setupSharedPreferences();
     }
 
+    /**
+     * Gets selected time from sharedPrefs and shows as summary in Settings screen
+     */
     private void setTimePickerPreferenceSummary() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         int minutesAfterMidnight = NotificationUtils.getTimeFromPreferences(sharedPreferences, getContext());
-        // show chosen time in summary of pref
         Preference timePreference = findPreference(getString(R.string.pref_reminder_time_key));
+
         String summary = TimeFormater.formatTime(minutesAfterMidnight);
         if (summary != null) timePreference.setSummary(summary);
         else Log.d(TAG, "summary in setTimePickerPreferenceSummary() is null");
     }
 
+    /**
+     * Updates selected time (mHours and mMinutes)
+     * Checks if reminder is activated, and if so activates notification at chosen time
+     * Sets a preference change listener
+     */
     private void setupSharedPreferences() {
         Activity activity = getActivity();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
         getTimeFromSharedPrefs(sharedPreferences);
         if (NotificationUtils.reminderIsChecked(sharedPreferences, getContext())) {
-            NotificationUtils.setUpReminderNotification(activity, mHours, mMinutes, AlarmReceiver.class);
+            NotificationUtils.setUpReminderNotification(activity, mHours, mMinutes);
         }
-        // preference change listener
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
-    // launch custom time picker pref dialog
+    /**
+     * Launches custom time picker preference dialog
+     */
     @Override
     public void onDisplayPreferenceDialog(Preference preference) {
 
@@ -72,16 +84,22 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         }
     }
 
+    /**
+     * Checks if activate checkmark status has changed
+     * If it was checked, turns on notification
+     * If was unchecked, turns off notifications
+     * @param sharedPreferences
+     * @param key
+     */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Activity activity = getActivity();
-        // activate checkmark status changed
+
         if (key.equals(getString(R.string.pref_activate_reminder_key))) {
-            // checked - turn on notification
             if (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
                 getTimeFromSharedPrefs(sharedPreferences);
-                NotificationUtils.setUpReminderNotification(activity, mHours, mMinutes, AlarmReceiver.class);
-            } else { // unchecked - turn off notifications
+                NotificationUtils.setUpReminderNotification(activity, mHours, mMinutes);
+            } else {
                 NotificationUtils.turnOffNotifications(activity);
             }
         }

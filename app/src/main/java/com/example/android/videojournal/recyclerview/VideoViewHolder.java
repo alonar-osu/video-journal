@@ -12,6 +12,9 @@ import com.example.android.videojournal.activities.PlayVideoActivity;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * ViewHolder for video recycler view for video feed
+ */
 public class VideoViewHolder extends RecyclerView.ViewHolder {
 
     private static final String TAG = VideoViewHolder.class.getSimpleName();
@@ -35,6 +38,10 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
         launchVideoWhenClicked(itemView);
     }
 
+    /**
+     * Launches video playback using PlayVideoActivity
+     * @param itemView is the view with the video to play
+     */
     private void launchVideoWhenClicked(View itemView) {
         itemView.setTag(this);
 

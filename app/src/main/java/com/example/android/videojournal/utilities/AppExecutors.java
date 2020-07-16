@@ -8,6 +8,10 @@ import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
 
+/**
+ * Thread executors for running tasks on separate threads
+ * to avoid blocking the UI
+ */
 public class AppExecutors {
 
     private static final Object LOCK = new Object();
