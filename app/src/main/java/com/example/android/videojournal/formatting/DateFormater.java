@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * Methods for date-related formating and conversions
+ * Methods for date-related formatting and conversions
  */
 public class DateFormater {
 

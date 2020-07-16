@@ -14,8 +14,7 @@ import com.example.android.videojournal.activities.DailyVideoFeedActivity;
 public class AlarmReceiver extends BroadcastReceiver {
 
     private static final String TAG = AlarmReceiver.class.getSimpleName();
-
-    private static int REC_NOTIF_ID = 100;
+    private static final int REC_NOTIF_ID = 100;
 
     @Override
     public void onReceive(Context context, Intent intent) {

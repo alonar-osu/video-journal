@@ -36,11 +36,13 @@ public class VideoSharer extends FileProvider {
             intentShareFile.setType("video/*");
             File videoFile = new File(videoPath);
             Uri videoUri = FileProvider.getUriForFile(mContext,
-                    mContext.getApplicationContext().getPackageName() + ".provider", videoFile);
+                    mContext.getApplicationContext().getPackageName()
+                            + ".provider", videoFile);
 
             intentShareFile.putExtra(Intent.EXTRA_STREAM, videoUri);
             intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Video from My Video Journal");
-            intentShareFile.putExtra(Intent.EXTRA_TEXT, "Here is my video from My Video Journal app");
+            intentShareFile.putExtra(Intent.EXTRA_TEXT,
+                    "Here is my video from My Video Journal app");
             intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             mContext.startActivity(Intent.createChooser(intentShareFile, "Share file"));
         }

@@ -51,13 +51,16 @@ public class VideoAdder {
         // video dimensions
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(videoPath);
-        int videoWidth = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-        int videoHeight = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+        int videoWidth = Integer.valueOf(retriever
+                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+        int videoHeight = Integer.valueOf(retriever
+                .extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
         retriever.release();
 
         // save data to DB
         int combinedVideo = isCombined? 1 : 0;
-        final VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth, thumbnailPath, thumbnailFileName, combinedVideo);
+        final VideoEntry videoEntry = new VideoEntry(videoPath, date, videoHeight, videoWidth,
+                thumbnailPath, thumbnailFileName, combinedVideo);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -71,7 +74,8 @@ public class VideoAdder {
         Bitmap videoThumbnail = null;
         String thumbnailPath = "";
         try {
-            videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
+            videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath,
+                    MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
         } catch (Exception e) {
             Log.e(TAG, "Exception in generateThumbnail()");
         }

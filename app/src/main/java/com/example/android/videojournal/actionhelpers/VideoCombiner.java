@@ -106,7 +106,8 @@ public class VideoCombiner {
             result.addTrack(new AppendTrack(videoTracks.toArray(new Track[videoTracks.size()])));
         }
 
-        String filename = FILE_START_NAME + DateFormater.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
+        String filename = FILE_START_NAME +
+                DateFormater.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
         String videoCombinedPath = generateFilePath(filename);
 
         Container out = new DefaultMp4Builder().build(result);

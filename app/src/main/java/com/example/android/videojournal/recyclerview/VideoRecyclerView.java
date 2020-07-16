@@ -190,7 +190,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
      */
     private void initVideoPlayer(Context context) {
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelection.Factory videoTracksSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
 
         mVideoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
@@ -200,7 +201,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
     }
 
     private void initVideoSurfaceSize() {
-        Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Display display = ((WindowManager) getContext()
+                .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         Point point = new Point();
         display.getSize(point);
         mVideoSurfaceDefaultHeight = point.x;
@@ -233,7 +235,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
         removeVideoView(mVideoSurfaceView); // remove any surfaceviews from previously playing videos
 
-        int currentPosition = targetPosition - ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
+        int currentPosition = targetPosition -
+                ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
 
         if (!setViewsFromHolder(currentPosition)) return;
         mVideoSurfaceView.setPlayer(mVideoPlayer);
@@ -341,7 +344,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
     }
 
     @Override
-    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees, float pixelWidthHeightRatio) {
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
+                                   float pixelWidthHeightRatio) {
     }
 
     @Override

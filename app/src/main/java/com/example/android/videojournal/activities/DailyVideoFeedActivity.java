@@ -72,7 +72,8 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
                         && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO,
                         DailyVideoFeedActivity.this)) {
 
-                    Intent takeVideoIntent = new Intent(DailyVideoFeedActivity.this, RecordVideoActivity.class);
+                    Intent takeVideoIntent = new Intent(DailyVideoFeedActivity.this,
+                            RecordVideoActivity.class);
                     startActivity(takeVideoIntent);
 
                 } else {
@@ -88,12 +89,14 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setItemViewCacheSize(20);
 
-        if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DailyVideoFeedActivity.this)) {
+        if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
+                DailyVideoFeedActivity.this)) {
             retrieveAndSetRegularVideos();
         } else {
             askPermission(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
                     "App needs permission to store videos", READ_EXTERNAL_STORAGE_REQUEST_CODE);
-            if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE, DailyVideoFeedActivity.this)) retrieveAndSetRegularVideos();
+            if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
+                    DailyVideoFeedActivity.this)) retrieveAndSetRegularVideos();
         }
     }
 
@@ -129,11 +132,13 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+                Intent startSettingsActivity = new Intent(this,
+                        SettingsActivity.class);
                 startActivity(startSettingsActivity);
                 return true;
             case R.id.button_weekly:
-                Intent showWeeklyVideosIntent = new Intent(DailyVideoFeedActivity.this, WeeklyVideoFeedActivity.class);
+                Intent showWeeklyVideosIntent = new Intent(DailyVideoFeedActivity.this,
+                        WeeklyVideoFeedActivity.class);
                 startActivity(showWeeklyVideosIntent);
                 return true;
             default:

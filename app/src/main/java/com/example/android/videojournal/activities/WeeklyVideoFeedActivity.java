@@ -61,7 +61,8 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<VideoEntry> entries) {
                 Log.d(TAG, "Receiving database update for weekly videos");
                 mRecyclerView.setVideoEntries((ArrayList) entries);
-                VideoAdapter videoAdapter = new VideoAdapter(WeeklyVideoFeedActivity.this, (ArrayList) entries, true);
+                VideoAdapter videoAdapter = new VideoAdapter(WeeklyVideoFeedActivity.this,
+                        (ArrayList) entries, true);
                 mRecyclerView.setAdapter(videoAdapter);
             }
         });
@@ -79,13 +80,13 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            goToMainActivity();
+            goToHomeActivity();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void goToMainActivity() {
+    private void goToHomeActivity() {
         Intent intent = new Intent(this, DailyVideoFeedActivity.class);
         startActivity(intent);
     }

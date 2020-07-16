@@ -74,7 +74,8 @@ public class PlayVideoActivity extends AppCompatActivity {
         PlayerView fullscreenPlayVideoView = findViewById(R.id.fullscreenPlayVideoView);
 
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTracksSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelection.Factory videoTracksSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
         TrackSelector trackSelector = new DefaultTrackSelector(videoTracksSelectionFactory);
 
         // video player

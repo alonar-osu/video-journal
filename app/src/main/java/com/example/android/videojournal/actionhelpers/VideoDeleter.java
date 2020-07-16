@@ -34,7 +34,8 @@ public class VideoDeleter {
      * @param thumbnailPath absolute path to thumbnail file
      * @param position position of video view from recyclerview holder
      */
-    public void deleteJournalEntryByPosition(final String videoPath, final String thumbnailPath, final int position) {
+    public void deleteJournalEntryByPosition(final String videoPath,
+                                             final String thumbnailPath, final int position) {
         deleteVideo(videoPath);
         deleteThumbnail(thumbnailPath);
         deleteEntryFromDB(position);
@@ -49,7 +50,8 @@ public class VideoDeleter {
 
         Date today = new Date();
         Date precedingSunday = DateFormater.precedingSundayDate(today);
-        VideoEntry currentMergedVideo = mDb.videoDao().loadCurrentCombinedVideo(precedingSunday, today);
+        VideoEntry currentMergedVideo = mDb.videoDao()
+                .loadCurrentCombinedVideo(precedingSunday, today);
 
         if (currentMergedVideo != null) {
             String videoPath = currentMergedVideo.getVideopath();

@@ -30,7 +30,7 @@ public class NotificationUtils {
     private static final String TAG = NotificationUtils.class.getSimpleName();
 
     private static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
-    private static int REC_NOTIF_ID = 100;
+    private static final int REC_NOTIF_ID = 100;
     private static final int DEFAULT_NOTIF_PREF_VALUE = 725;
 
     /**
@@ -45,7 +45,8 @@ public class NotificationUtils {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID_REC_NOTIF, name, importance);
             channel.setDescription(description);
 
-            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(channel);
         }
     }
@@ -64,7 +65,8 @@ public class NotificationUtils {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REC_NOTIF_ID, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     /**
@@ -96,7 +98,8 @@ public class NotificationUtils {
     /**
      * Builds notification to show to user
      */
-    public static void showNotification(Context context, PendingIntent pendingIntent, String title, String contentText) {
+    public static void showNotification(Context context, PendingIntent pendingIntent,
+                                        String title, String contentText) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID_REC_NOTIF)
                 .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
                 .setSmallIcon(R.drawable.ic_create_entry)

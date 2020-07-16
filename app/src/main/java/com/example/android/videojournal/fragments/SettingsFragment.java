@@ -19,7 +19,8 @@ import androidx.preference.PreferenceFragmentCompat;
 /**
  * Fragment for Settings screen
  */
-public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends PreferenceFragmentCompat
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
@@ -96,7 +97,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         Activity activity = getActivity();
 
         if (key.equals(getString(R.string.pref_activate_reminder_key))) {
-            if (sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_activate_reminder_default))) {
+            if (sharedPreferences.getBoolean(key, getResources()
+                    .getBoolean(R.bool.pref_activate_reminder_default))) {
                 getTimeFromSharedPrefs(sharedPreferences);
                 NotificationUtils.setUpReminderNotification(activity, mHours, mMinutes);
             } else {

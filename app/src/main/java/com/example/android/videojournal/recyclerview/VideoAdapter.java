@@ -29,20 +29,21 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private static final String TAG = VideoAdapter.class.getSimpleName();
 
-    private static ArrayList mVideoEntries;
+    private static ArrayList sVideoEntries;
     private Context mContext;
     private boolean mWeeklyVideo;
 
     public VideoAdapter(Context context, ArrayList videoEntries, boolean weekly) {
         mContext = context;
-        mVideoEntries = videoEntries;
+        sVideoEntries = videoEntries;
         mWeeklyVideo = weekly;
     }
 
     @NonNull
     @Override
     public VideoViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.feed_entry, viewGroup, false);
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.feed_entry,
+                viewGroup, false);
         return new VideoViewHolder(v);
     }
 
@@ -55,7 +56,7 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
 
-        VideoEntry videoEntry = (VideoEntry) mVideoEntries.get(position);
+        VideoEntry videoEntry = (VideoEntry) sVideoEntries.get(position);
         showDateForVideo(videoEntry, (VideoViewHolder) holder);
         setVideoThumbnail(videoEntry, (VideoViewHolder) holder);
         setInfoToHolder(videoEntry, (VideoViewHolder) holder, position);
@@ -116,11 +117,11 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mVideoEntries.size();
+        return sVideoEntries.size();
     }
 
     public static ArrayList<VideoEntry> getVideos() {
-        return mVideoEntries;
+        return sVideoEntries;
     }
 
 }

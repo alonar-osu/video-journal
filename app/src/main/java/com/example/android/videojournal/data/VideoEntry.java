@@ -23,7 +23,8 @@ public class VideoEntry {
     private int mCombinedVideo; // 1 = combined
 
     @Ignore
-    public VideoEntry(String videopath, Date date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName, int combinedVideo) {
+    public VideoEntry(String videopath, Date date, int videoHeight, int videoWidth,
+                      String thumbnailPath, String thumbnailFileName, int combinedVideo) {
         mVideopath = videopath;
         mDate = date;
         mVideoHeight = videoHeight;
@@ -34,7 +35,8 @@ public class VideoEntry {
     }
 
     // includes mId
-    public VideoEntry(int id, String videopath, Date date, int videoHeight, int videoWidth, String thumbnailPath, String thumbnailFileName, int combinedVideo) {
+    public VideoEntry(int id, String videopath, Date date, int videoHeight, int videoWidth,
+                      String thumbnailPath, String thumbnailFileName, int combinedVideo) {
         mId = id;
         mVideopath = videopath;
         mDate = date;

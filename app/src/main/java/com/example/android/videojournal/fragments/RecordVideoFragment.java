@@ -305,11 +305,13 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
 
-            if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, getActivity()) && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, getActivity())) {
+            if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, getActivity())
+                    && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, getActivity())) {
                 manager.openCamera(cameraId, mStateCallback, null);
             } else {
-                Toast.makeText(activity, "App needs permission for video and audio recording", Toast.LENGTH_SHORT).show();
-                goToMainActivity();
+                Toast.makeText(activity, "App needs permission for video and audio recording",
+                        Toast.LENGTH_SHORT).show();
+                goToHomeActivity();
             }
         } catch (CameraAccessException e) {
             Log.e(TAG, "Exception in openCamera()");
@@ -500,7 +502,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         vidAdder.addVideo(mVideoFilePath, false);
         // weekly video
         VideoWeeklyUpdater.updateWeeklyVideo(getActivity(), mDb);
-        goToMainActivity();
+        goToHomeActivity();
     }
 
     /**
@@ -531,7 +533,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void goToMainActivity() {
+    private void goToHomeActivity() {
         Intent intent = new Intent(getActivity(), DailyVideoFeedActivity.class);
         startActivity(intent);
     }

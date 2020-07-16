@@ -24,19 +24,19 @@ public abstract class VideoDatabase extends RoomDatabase {
     private static final Object LOCK = new Object();
     private static final String DATABASE_NAME = "videojournal";
 
-    private static VideoDatabase mInstance;
+    private static VideoDatabase sInstance;
 
     public static VideoDatabase getInstance(Context context) {
-        if (mInstance == null) {
+        if (sInstance == null) {
             synchronized (LOCK) {
                 Log.d(TAG, "Creating new database instance");
-                mInstance = Room.databaseBuilder(context.getApplicationContext(),
+                sInstance = Room.databaseBuilder(context.getApplicationContext(),
                         VideoDatabase.class, VideoDatabase.DATABASE_NAME)
                         .build();
             }
         }
         Log.d(TAG, "Getting the database instance");
-        return mInstance;
+        return sInstance;
     }
 
     /**
