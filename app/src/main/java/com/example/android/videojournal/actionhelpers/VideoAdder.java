@@ -63,7 +63,7 @@ public class VideoAdder {
         try {
             videoThumbnail = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.FULL_SCREEN_KIND);
         } catch (Exception e) {
-            Log.d(TAG, "Error generating thumbnail");
+            Log.e(TAG, "Exception in generateThumbnail()");
         }
 
         if (videoThumbnail == null) {
@@ -92,7 +92,7 @@ public class VideoAdder {
             thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, quality, fos);
             fos.close();
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
+            Log.e(TAG, "Exception in compressBitmap()");
         }
     }
 

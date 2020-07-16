@@ -1,6 +1,7 @@
 package com.example.android.videojournal.actionhelpers;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.coremedia.iso.boxes.Container;
 import com.example.android.videojournal.data.VideoDatabase;
@@ -64,6 +65,7 @@ public class VideoCombiner {
             mergedVideoPath = mergeVideos(videos);
             return mergedVideoPath;
         } catch (IOException e) {
+            Log.e(TAG, "Exception in combineVideosForWeek()");
             e.printStackTrace();
         }
         return mergedVideoPath;

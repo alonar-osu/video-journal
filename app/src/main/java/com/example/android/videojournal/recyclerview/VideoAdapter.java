@@ -91,6 +91,7 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             File file = new File(thumbnailPath, filename);
             thumbnail = BitmapFactory.decodeStream(new FileInputStream(file));
         } catch (FileNotFoundException e) {
+            Log.e(TAG, "Exception in loadBitmapFromStorage()");
             e.printStackTrace();
         }
         return thumbnail;

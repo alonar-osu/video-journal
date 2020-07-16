@@ -261,7 +261,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             mBackgroundThread = null;
             mBackgroundHandler = null;
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Exception in stopBackgroundThread()");
         }
     }
 
@@ -303,13 +303,16 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
                 goToMainActivity();
             }
         } catch (CameraAccessException e) {
+            Log.e(TAG, "Exception in openCamera()");
             Toast.makeText(activity, "Cannot access the camera.", Toast.LENGTH_SHORT).show();
             activity.finish();
         } catch (NullPointerException e) {
             // Currently an NPE is thrown when the Camera2API is used but not supported on the
             // device this code runs.
+            Log.e(TAG, "Exception in openCamera()");
             new ErrorDialog().show(getFragmentManager(), "dialog");
         } catch (InterruptedException e) {
+            Log.e(TAG, "Exception in openCamera()");
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
     }
@@ -326,6 +329,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
                 mMediaRecorder = null;
             }
         } catch (InterruptedException e) {
+            Log.e(TAG, "Exception in closeCamera()");
             throw new RuntimeException("Interrupted while trying to lock camera closing.");
         } finally {
             mCameraOpenCloseLock.release();
@@ -368,8 +372,10 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
                 }
             }, mBackgroundHandler);
         } catch (CameraAccessException e) {
+            Log.e(TAG, "Exception in startPreview()");
             e.printStackTrace();
         } catch (IOException e) {
+            Log.e(TAG, "Exception in startPreview()");
             e.printStackTrace();
         }
     }
@@ -387,6 +393,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             thread.start();
             mPreviewSession.setRepeatingRequest(mPreviewBuilder.build(), null, mBackgroundHandler);
         } catch (CameraAccessException e) {
+            Log.e(TAG, "Exception in updatePreview()");
             e.printStackTrace();
         }
     }
@@ -465,6 +472,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             // start recording
             mMediaRecorder.start();
         } catch (IllegalStateException e) {
+            Log.e(TAG, "Exception in startRecordingVideo()");
             e.printStackTrace();
         }
     }
