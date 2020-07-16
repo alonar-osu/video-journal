@@ -5,12 +5,23 @@ import android.app.Activity;
 import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.utilities.AppExecutors;
 
+/**
+ * Allows updating combined video from current week by deleting
+ * existing video and adding a new merged video
+ */
 public class VideoWeeklyUpdater {
 
     private static final String TAG = VideoWeeklyUpdater.class.getSimpleName();
 
     public VideoWeeklyUpdater() { }
 
+    /**
+     * Updates weekly video by deleting current combined video, merging the
+     * regular videos from this week, and adding the new combined video
+     * to db
+     * @param activity from where called
+     * @param mDb instance of database to use
+     */
     public static void updateWeeklyVideo(final Activity activity, final VideoDatabase mDb) {
 
         AppExecutors.getInstance().diskIO().execute(new Runnable() {

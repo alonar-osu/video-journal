@@ -18,6 +18,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
+
+/**
+ *  Allows adding video info to database as VideoEntry
+ *  Allows generating video bitmap
+ */
 public class VideoAdder {
 
     private static final String TAG = VideoAdder.class.getSimpleName();
@@ -32,6 +37,11 @@ public class VideoAdder {
         mDb = db;
     }
 
+    /**
+     * Saves video info in database as VideoEntry
+     * @param videoPath absoulte path for saved video
+     * @param isCombined is true for weekly merged video, false for regular
+     */
     public void addVideo(String videoPath, boolean isCombined) {
 
         String thumbnailFileName = generateThumbnailFileName();

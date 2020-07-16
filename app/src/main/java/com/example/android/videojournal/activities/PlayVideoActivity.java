@@ -31,7 +31,9 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
-
+/**
+ * Allows playing a given video in fullscreen mode using ExoPlayer
+ */
 public class PlayVideoActivity extends AppCompatActivity {
 
     private static final String TAG = PlayVideoActivity.class.getSimpleName();
@@ -42,7 +44,6 @@ public class PlayVideoActivity extends AppCompatActivity {
     private String mThumbnailPath;
     private int mPosition;
     private Context mContext;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,10 @@ public class PlayVideoActivity extends AppCompatActivity {
         setupVideoPlayer();
     }
 
+    /**
+     * Sets the fullscreen view for playing video and initializes
+     * ExoPlayer video player, sets path for video to play
+     */
     private void setupVideoPlayer() {
         // PlayerView
         PlayerView fullscreenPlayVideoView = findViewById(R.id.fullscreenPlayVideoView);
@@ -92,6 +97,10 @@ public class PlayVideoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Gets videopath, thumbnailpath and item position for video
+     * from view's holder that launched the activity via intent
+     */
     private void getVideoInfo() {
         Intent intent = getIntent();
         mVideoPath = intent.getStringExtra("VIDEO_PATH");
@@ -104,7 +113,6 @@ public class PlayVideoActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_play_video, menu);
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

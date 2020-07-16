@@ -10,6 +10,9 @@ import android.view.MenuItem;
 
 import com.example.android.videojournal.R;
 
+/**
+ * Settings screen activity
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     @Override

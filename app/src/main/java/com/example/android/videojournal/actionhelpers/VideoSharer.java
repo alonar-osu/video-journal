@@ -8,6 +8,9 @@ import java.io.File;
 
 import androidx.core.content.FileProvider;
 
+/**
+ * Allows sharing a specific video using its file path
+ */
 public class VideoSharer extends FileProvider {
 
     private static final String TAG = VideoSharer.class.getSimpleName();
@@ -19,6 +22,11 @@ public class VideoSharer extends FileProvider {
     }
     public VideoSharer() {} // zero argument constructor
 
+    /**
+     * Shares video using its file path via intent
+     * Paths that are searched for video file should exist in provider_paths.xml
+     * @param videoPath absolute path to video file to share
+     */
     public void shareVideo(String videoPath) {
 
         Intent intentShareFile = new Intent(Intent.ACTION_SEND);
@@ -37,6 +45,5 @@ public class VideoSharer extends FileProvider {
             mContext.startActivity(Intent.createChooser(intentShareFile, "Share file"));
         }
     }
-
 
 }

@@ -12,7 +12,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
-
+/**
+ * Allows deleting any specific regular video
+ * And allows deleting current combined weekly video
+ */
 public class VideoDeleter {
 
     private static final String TAG = VideoDeleter.class.getSimpleName();
@@ -25,12 +28,23 @@ public class VideoDeleter {
         mContext = context;
     }
 
+    /**
+     * Deletes video file, its thumbnail file, and video info from db
+     * @param videoPath absolute path to video file
+     * @param thumbnailPath absolute path to thumbnail file
+     * @param position position of video view from recyclerview holder
+     */
     public void deleteJournalEntryByPosition(final String videoPath, final String thumbnailPath, final int position) {
         deleteVideo(videoPath);
         deleteThumbnail(thumbnailPath);
         deleteEntryFromDB(position);
     }
 
+    /**
+     * Checks database for a combined video added after last Sunday
+     * Deletes video file using its path, deletes its thumbnail and deletes its
+     * associated info from db
+     */
     public void deleteCurrentMergedVideo() {
 
         Date today = new Date();

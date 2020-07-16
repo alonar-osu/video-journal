@@ -23,7 +23,10 @@ import java.util.List;
 
 import androidx.core.content.ContextCompat;
 
-
+/**
+ * Allows combining regular videos recorded during the week since last Sunday
+ * and currently in db into one weekly video
+ */
 public class VideoCombiner {
 
     private static final String TAG = VideoCombiner.class.getSimpleName();
@@ -40,17 +43,21 @@ public class VideoCombiner {
         mDb = db;
     }
 
+    /**
+     * Number of regular video in the past week
+     * @return number of regular non-merged videos recorded since last Sunday
+     * and currently in db
+     */
     public int thisWeeksVideoCount() {
         getThisWeeksVideos();
         return mWeekAgoEntries.size();
     }
 
-    private void getThisWeeksVideos() {
-        Date today = new Date();
-        Date precedingSunday = DateFormater.precedingSundayDate(today);
-        mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(precedingSunday, today);
-    }
-
+    /**
+     * Fetches paths for all regular videos from this week from db
+     * and merges videos using mp4parser library
+     * @return absolute path to merged video file
+     */
     public String combineVideosForWeek() {
 
         if (mWeekAgoEntries == null) getThisWeeksVideos();
@@ -107,6 +114,13 @@ public class VideoCombiner {
         out.writeContainer(fc);
         fc.close();
         return videoCombinedPath;
+    }
+
+
+    private void getThisWeeksVideos() {
+        Date today = new Date();
+        Date precedingSunday = DateFormater.precedingSundayDate(today);
+        mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(precedingSunday, today);
     }
 
     private String generateFilePath(String fileName) {

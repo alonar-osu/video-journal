@@ -20,14 +20,16 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-
+/**
+ * Shows a feed of all combined weekly videos
+ * Videos autoplay on scrolling
+ */
 public class WeeklyVideoFeedActivity extends AppCompatActivity {
 
     private static final String TAG = WeeklyVideoFeedActivity.class.getSimpleName();
 
     private VideoDatabase mDb;
     private VideoRecyclerView mRecyclerView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,10 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    /**
+     * Gets all combined videos from db via LiveData and sets them to recyclerview
+     * for the feed
+     */
     private void retrieveAndSetWeeklyVideos() {
 
         final LiveData<List<VideoEntry>> videoEntries = mDb.videoDao().loadAllCombinedVideos();

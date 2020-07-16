@@ -6,8 +6,11 @@ import android.os.Bundle;
 import com.example.android.videojournal.R;
 import com.example.android.videojournal.fragments.RecordVideoFragment;
 
-// Based on sample code for Camera2 API
-// https://android.googlesource.com/platform/development/+/abededd/samples/browseable/Camera2Video?autodive=0%2F
+/**
+ * Camera activity for recording videos using camera
+ * Based on sample code for Camera2 API
+ * https://android.googlesource.com/platform/development/+/abededd/samples/browseable/Camera2Video?autodive=0%2F
+ */
 
 public class RecordVideoActivity extends Activity  {
     @Override

@@ -31,7 +31,10 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Shows a feed of all regular (non-combined) videos recorded in the app
+ * Videos autoplay on scrolling
+ */
 public class DailyVideoFeedActivity extends AppCompatActivity {
 
     private static final String TAG = DailyVideoFeedActivity.class.getSimpleName();
@@ -42,7 +45,10 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
     private VideoDatabase mDb;
     private VideoRecyclerView mRecyclerView;
 
-
+    /**
+     * Initializes feed layout elements, db, action button for launching
+     * video recording, notification channel, sets videos on recyclerview feed
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +61,10 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
+            /**
+             * On tap of "+" action button launches video recording implemented using Camera2 API
+             * Checks permissions for Camera and Microphone
+             */
             @Override
             public void onClick(View view) {
 
@@ -131,7 +141,7 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
         }
     }
 
-    public void askPermission(String[] permissions, String reason, int requestCode) {
+    private void askPermission(String[] permissions, String reason, int requestCode) {
         for (String permission : permissions) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
                 Toast.makeText(getApplicationContext(), reason, Toast.LENGTH_LONG).show();
