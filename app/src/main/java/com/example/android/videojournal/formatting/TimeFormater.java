@@ -1,9 +1,19 @@
 package com.example.android.videojournal.formatting;
 
+/**
+ * Helps convert between hours, minutes, and format time for displaying
+ */
 public class TimeFormater {
 
     private static final int MINUTES_IN_HOUR = 60;
 
+    /**
+     * Formats time to be displayed in Reminder Time summary
+     * text in Settings.
+     * Formats to 12-hour AM-PM format
+     * @param minutesAfterMidnight total time after midnight in minutes
+     * @return String for summary to be displayed showing time in 12hr AM-PM format
+     */
     public static String formatTime(int minutesAfterMidnight) {
 
         int hours = findHoursFromTotalMinutes(minutesAfterMidnight);

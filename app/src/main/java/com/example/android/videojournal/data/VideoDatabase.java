@@ -10,6 +10,11 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+/**
+ * Database class using Room persistence library
+ * Makes singleton instance
+ * Uses VideoEntry objects as data access objects (DAO)
+ */
 @Database(entities = {VideoEntry.class}, version = 1, exportSchema = false)
 @TypeConverters(DateFormater.class)
 public abstract class VideoDatabase extends RoomDatabase {
@@ -34,5 +39,9 @@ public abstract class VideoDatabase extends RoomDatabase {
         return mInstance;
     }
 
+    /**
+     * For accessing VideoDao interface that contains
+     * methods for performing db queries
+     */
     public abstract VideoDao videoDao();
 }

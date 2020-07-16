@@ -5,6 +5,10 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import java.util.Date;
 
+/**
+ * VideoEntry class allows making objects for storing video-related info.
+ * VideoEntry objects are also used for db DAO using Room
+ */
 @Entity(tableName = "journalvideo")
 public class VideoEntry {
 
