@@ -146,8 +146,8 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
             case Player.STATE_ENDED:
                 Log.d(TAG, "onPlayerStateChanged: Video ended");
-                mVideoPlayer.seekTo(0);
                 mThumbnailView.setVisibility(VISIBLE);
+                mPlayIconView.setVisibility(VISIBLE);
                 break;
 
             case Player.STATE_IDLE:
