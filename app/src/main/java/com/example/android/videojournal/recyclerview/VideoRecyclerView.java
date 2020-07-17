@@ -80,35 +80,11 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
      * Autoplay videos on scrolling
      */
     private void init(Context context) {
-
         mContext = context.getApplicationContext();
+
         initVideoSurfaceSize();
         initVideoPlayer(context);
-
-        // detect when first video frame rendered
-        mVideoPlayer.getVideoComponent().addVideoListener(this);
-
-        // detect when scrolling for autoplay
-        addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    if(mThumbnailView != null) { // show old thumbnail
-                        mThumbnailView.setVisibility(VISIBLE);
-                        mPlayIconView.setVisibility(VISIBLE);
-                    }
-                    playVideo();
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
+        respondToScrolling();
 
         addOnChildAttachStateChangeListener(new OnChildAttachStateChangeListener() {
             @Override
@@ -122,6 +98,10 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
             }
         });
 
+        handlePlayerChanges();
+    }
+
+    private void handlePlayerChanges() {
         mVideoPlayer.addListener(new Player.EventListener() {
             @Override
             public void onTimelineChanged(Timeline timeline, @Nullable Object manifest, int reason) { }
@@ -134,32 +114,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
             @Override
             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                switch(playbackState) {
-
-                    case Player.STATE_BUFFERING:
-                        Log.d(TAG, "onPlayerStateChanged: Buffering video");
-                        break;
-
-                    case Player.STATE_ENDED:
-                        Log.d(TAG, "onPlayerStateChanged: Video ended");
-                        mVideoPlayer.seekTo(0);
-                        mThumbnailView.setVisibility(VISIBLE);
-                        break;
-
-                    case Player.STATE_IDLE:
-                        break;
-
-                    case Player.STATE_READY:
-                        Log.d(TAG, "onPlayerStateChanged: Ready to play");
-
-                        if(!mIsVideoViewAdded) {
-                            addVideoView();
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
+                handlePlaybackStateChanges(playbackState);
             }
 
             @Override
@@ -179,6 +134,61 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
             @Override
             public void onSeekProcessed() { }
+        });
+    }
+
+    private void handlePlaybackStateChanges(int playbackState) {
+        switch(playbackState) {
+
+            case Player.STATE_BUFFERING:
+                Log.d(TAG, "onPlayerStateChanged: Buffering video");
+                break;
+
+            case Player.STATE_ENDED:
+                Log.d(TAG, "onPlayerStateChanged: Video ended");
+                mVideoPlayer.seekTo(0);
+                mThumbnailView.setVisibility(VISIBLE);
+                break;
+
+            case Player.STATE_IDLE:
+                break;
+
+            case Player.STATE_READY:
+                Log.d(TAG, "onPlayerStateChanged: Ready to play");
+
+                if(!mIsVideoViewAdded) {
+                    addVideoView();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void respondToScrolling() {
+        // detect when first video frame rendered
+        mVideoPlayer.getVideoComponent().addVideoListener(this);
+
+        // detect when scrolling for autoplay
+        addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    if(mThumbnailView != null) { // show old thumbnail
+                        mThumbnailView.setVisibility(VISIBLE);
+                        mPlayIconView.setVisibility(VISIBLE);
+                    }
+                    playVideo();
+                }
+            }
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
         });
     }
 
