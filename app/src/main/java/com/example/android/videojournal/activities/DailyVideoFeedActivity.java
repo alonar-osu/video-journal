@@ -56,15 +56,35 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_daily_feed);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        mDb = VideoDatabase.getInstance(getApplicationContext());
-        Log.d(TAG, "onCreate() is runnning");
 
+        mDb = VideoDatabase.getInstance(getApplicationContext());
+        initActionButton();
+        NotificationUtils.createNotificationChannel(this);
+        initRecyclerView();
+    }
+
+    private void initRecyclerView() {
+        mRecyclerView = findViewById(R.id.recyclerView);
+        mRecyclerView.setItemViewCacheSize(20);
+
+        if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
+                DailyVideoFeedActivity.this)) {
+            retrieveAndSetRegularVideos();
+        } else {
+            askPermission(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+                    "App needs permission to store videos", READ_EXTERNAL_STORAGE_REQUEST_CODE);
+            if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
+                    DailyVideoFeedActivity.this)) retrieveAndSetRegularVideos();
+        }
+    }
+
+    /**
+     * On tap of "+" action button launches video recording implemented using Camera2 API
+     * Checks permissions for Camera and Microphone
+     */
+    private void initActionButton() {
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
-            /**
-             * On tap of "+" action button launches video recording implemented using Camera2 API
-             * Checks permissions for Camera and Microphone
-             */
             @Override
             public void onClick(View view) {
 
@@ -83,21 +103,6 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
                 }
             }
         });
-
-        NotificationUtils.createNotificationChannel(this);
-
-        mRecyclerView = findViewById(R.id.recyclerView);
-        mRecyclerView.setItemViewCacheSize(20);
-
-        if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
-                DailyVideoFeedActivity.this)) {
-            retrieveAndSetRegularVideos();
-        } else {
-            askPermission(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
-                    "App needs permission to store videos", READ_EXTERNAL_STORAGE_REQUEST_CODE);
-            if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
-                    DailyVideoFeedActivity.this)) retrieveAndSetRegularVideos();
-        }
     }
 
     private void retrieveAndSetRegularVideos() {
