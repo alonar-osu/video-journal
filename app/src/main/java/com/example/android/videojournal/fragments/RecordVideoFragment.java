@@ -275,7 +275,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     }
 
     /**
-     * Tries to open a CameraDevice. The result is listened by `mStateCallback`.
+     * Tries to open a CameraDevice. The result is listened to by `mStateCallback`.
      */
     private void openCamera(int width, int height) {
         final Activity activity = getActivity();
@@ -284,27 +284,11 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         }
         CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
-            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-                throw new RuntimeException("Time out waiting to lock camera opening.");
-            }
             String cameraId = manager.getCameraIdList()[mCameraId];
-            // Choose the sizes for camera preview and video recording
-            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-            StreamConfigurationMap map = characteristics
-                    .get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
-            mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
-                    width, height, mVideoSize);
+            StreamConfigurationMap map = setConfigMap(manager, cameraId);
+            chooseSizesAndAspectRatio(map, width, height);
 
-            int orientation = getResources().getConfiguration().orientation;
-            if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            } else {
-                mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
-            }
-            configureTransform(width, height);
             mMediaRecorder = new MediaRecorder();
-
             if (PermissionChecker.checkPermission(Manifest.permission.CAMERA, getActivity())
                     && PermissionChecker.checkPermission(Manifest.permission.RECORD_AUDIO, getActivity())) {
                 manager.openCamera(cameraId, mStateCallback, null);
@@ -326,6 +310,30 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             Log.e(TAG, "Exception in openCamera()");
             throw new RuntimeException("Interrupted while trying to lock camera opening.");
         }
+    }
+
+    private void chooseSizesAndAspectRatio(StreamConfigurationMap map, int width, int height) {
+        mVideoSize = chooseVideoSize(map.getOutputSizes(MediaRecorder.class));
+        mPreviewSize = chooseOptimalSize(map.getOutputSizes(SurfaceTexture.class),
+                width, height, mVideoSize);
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        } else {
+            mTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        }
+        configureTransform(width, height);
+    }
+
+    private StreamConfigurationMap setConfigMap(CameraManager manager, String cameraId)
+            throws InterruptedException, CameraAccessException {
+
+        if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+            throw new RuntimeException("Time out waiting to lock camera opening.");
+        }
+        CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+        return characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
     }
 
     private void closeCamera() {
@@ -356,18 +364,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
             return;
         }
         try {
-            setUpMediaRecorder();
-            SurfaceTexture texture = mTextureView.getSurfaceTexture();
-            assert texture != null;
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
-            List<Surface> surfaces = new ArrayList<Surface>();
-            Surface previewSurface = new Surface(texture);
-            surfaces.add(previewSurface);
-            mPreviewBuilder.addTarget(previewSurface);
-            Surface recorderSurface = mMediaRecorder.getSurface();
-            surfaces.add(recorderSurface);
-            mPreviewBuilder.addTarget(recorderSurface);
+            List<Surface> surfaces = prepareRecorderAndSurfaces();
             mCameraDevice.createCaptureSession(surfaces, new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(CameraCaptureSession cameraCaptureSession) {
@@ -391,6 +388,23 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    private List<Surface> prepareRecorderAndSurfaces() throws IOException, CameraAccessException {
+        setUpMediaRecorder();
+        SurfaceTexture texture = mTextureView.getSurfaceTexture();
+        assert texture != null;
+        texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+
+        mPreviewBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
+        List<Surface> surfaces = new ArrayList<Surface>();
+        Surface previewSurface = new Surface(texture);
+        surfaces.add(previewSurface);
+        mPreviewBuilder.addTarget(previewSurface);
+        Surface recorderSurface = mMediaRecorder.getSurface();
+        surfaces.add(recorderSurface);
+        mPreviewBuilder.addTarget(recorderSurface);
+        return surfaces;
+    }
+
     /**
      * Update the camera preview. startPreview() needs to be called in advance.
      */
@@ -412,6 +426,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     private void setUpCaptureRequestBuilder(CaptureRequest.Builder builder) {
         builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
     }
+
     /**
      * Configures the necessary android.graphics.Matrix transformation to `mTextureView`.
      * This method should not to be called until the camera preview size is determined in
@@ -420,7 +435,6 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
      * @param viewWidth  The width of `mTextureView`
      * @param viewHeight The height of `mTextureView`
      */
-
     private void configureTransform(int viewWidth, int viewHeight) {
         Activity activity = getActivity();
         if (null == mTextureView || null == mPreviewSize || null == activity) {
