@@ -44,7 +44,7 @@ public class VideoCombiner {
     }
 
     /**
-     * Number of regular video in the past week
+     * Number of regular videos in the past week
      * @return number of regular non-merged videos recorded since last Sunday
      * and currently in db
      */
@@ -79,6 +79,11 @@ public class VideoCombiner {
     }
 
     private String mergeVideos(String[] videos) throws IOException {
+
+        return saveVideoFile(buildCombinedVideo(videos));
+    }
+
+    private Movie buildCombinedVideo(String[] videos) throws IOException {
         Movie[] inMovies = new Movie[videos.length];
         int index = 0;
         for (String video: videos) {
@@ -97,15 +102,20 @@ public class VideoCombiner {
                 }
             }
         }
-
         Movie result = new Movie();
-        if (audioTracks.size() > 0) {
-            result.addTrack(new AppendTrack(audioTracks.toArray(new Track[audioTracks.size()])));
-        }
-        if (videoTracks.size() > 0) {
-            result.addTrack(new AppendTrack(videoTracks.toArray(new Track[videoTracks.size()])));
-        }
+        result = addVideoTracks(result, audioTracks);
+        result = addVideoTracks(result, videoTracks);
+        return result;
+    }
 
+    private Movie addVideoTracks(Movie movie, List<Track> tracks) throws IOException {
+        if (tracks.size() > 0) {
+            movie.addTrack(new AppendTrack(tracks.toArray(new Track[tracks.size()])));
+        }
+        return movie;
+    }
+
+    private String saveVideoFile(Movie result) throws IOException {
         String filename = FILE_START_NAME +
                 DateFormater.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
         String videoCombinedPath = generateFilePath(filename);
