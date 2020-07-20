@@ -3,7 +3,7 @@ package com.example.android.videojournal.formatting;
 /**
  * Helps convert between hours, minutes, and format time for displaying
  */
-public class TimeFormater {
+public class TimeFormatter {
 
     private static final int MINUTES_IN_HOUR = 60;
 

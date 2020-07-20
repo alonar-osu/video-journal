@@ -10,13 +10,12 @@ import androidx.fragment.app.DialogFragment;
 import android.text.format.DateFormat;
 import android.widget.TimePicker;
 
-import com.example.android.videojournal.notifications.AlarmReceiver;
 import com.example.android.videojournal.notifications.NotificationUtils;
 
 import java.util.Calendar;
 
 /**
- * Time picker to show in a dialog opened from settings sreen
+ * Time picker to show in a dialog opened from settings screen
  */
 public class TimePickerFragment extends DialogFragment
         implements TimePickerDialog.OnTimeSetListener {

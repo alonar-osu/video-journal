@@ -3,7 +3,7 @@ package com.example.android.videojournal.data;
 import android.content.Context;
 import android.util.Log;
 
-import com.example.android.videojournal.formatting.DateFormater;
+import com.example.android.videojournal.formatting.DateFormatter;
 
 import androidx.room.Database;
 import androidx.room.Room;
@@ -16,7 +16,7 @@ import androidx.room.TypeConverters;
  * Uses VideoEntry objects as data access objects (DAO)
  */
 @Database(entities = {VideoEntry.class}, version = 1, exportSchema = false)
-@TypeConverters(DateFormater.class)
+@TypeConverters(DateFormatter.class)
 public abstract class VideoDatabase extends RoomDatabase {
 
     private static final String TAG = VideoDatabase.class.getSimpleName();

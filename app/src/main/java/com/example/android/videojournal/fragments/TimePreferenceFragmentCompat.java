@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.TimePicker;
 
 import com.example.android.videojournal.R;
-import com.example.android.videojournal.formatting.TimeFormater;
+import com.example.android.videojournal.formatting.TimeFormatter;
 import com.example.android.videojournal.notifications.NotificationUtils;
 import com.example.android.videojournal.other.TimePreference;
 
@@ -19,7 +19,6 @@ import androidx.preference.PreferenceDialogFragmentCompat;
  */
 public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat {
 
-    private static final String TAG = TimePreferenceFragmentCompat.class.getSimpleName();
 
     private TimePicker mTimePicker;
 
@@ -57,8 +56,8 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
 
     private void setTimeOnTimePicker(Integer minutesAfterMidnight) {
         if (minutesAfterMidnight != null) {
-            int hours = TimeFormater.findHoursFromTotalMinutes(minutesAfterMidnight);
-            int minutes = TimeFormater.findMinutesFromTotalMinutes(minutesAfterMidnight);
+            int hours = TimeFormatter.findHoursFromTotalMinutes(minutesAfterMidnight);
+            int minutes = TimeFormatter.findMinutesFromTotalMinutes(minutesAfterMidnight);
             boolean is24hour = DateFormat.is24HourFormat(getContext());
 
             mTimePicker.setIs24HourView(is24hour);
@@ -82,7 +81,7 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
     private int getTimeFromTimePicker() {
         int hours = mTimePicker.getCurrentHour();
         int minutes = mTimePicker.getCurrentMinute();
-        return TimeFormater.findTotalMinutesFromHoursAndMins(hours, minutes);
+        return TimeFormatter.findTotalMinutesFromHoursAndMins(hours, minutes);
     }
 
     private void updateTimePreference(int minutesAfterMidnight) {
@@ -93,7 +92,7 @@ public class TimePreferenceFragmentCompat extends PreferenceDialogFragmentCompat
             if (timePreference.callChangeListener(minutesAfterMidnight)) {
                 timePreference.setTime(minutesAfterMidnight);
                 NotificationUtils.updateNotificationTime(getContext());
-                timePreference.setSummary(TimeFormater.formatTime(minutesAfterMidnight));
+                timePreference.setSummary(TimeFormatter.formatTime(minutesAfterMidnight));
             }
         }
     }

@@ -42,7 +42,7 @@ import com.example.android.videojournal.actionhelpers.VideoAdder;
 import com.example.android.videojournal.actionhelpers.VideoWeeklyUpdater;
 import com.example.android.videojournal.activities.DailyVideoFeedActivity;
 import com.example.android.videojournal.data.VideoDatabase;
-import com.example.android.videojournal.formatting.DateFormater;
+import com.example.android.videojournal.formatting.DateFormatter;
 import com.example.android.videojournal.utilities.PermissionChecker;
 import com.example.android.videojournal.other.AutoFitTextureView;
 
@@ -71,7 +71,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
     private VideoDatabase mDb;
     private AutoFitTextureView mTextureView; // for camera preview
     private ImageView mButtonVideo;
-    TextView mRecordingDate;
+    private TextView mRecordingDate;
     private String mVideoFilePath;
     private CameraDevice mCameraDevice; // opened CameraDevice
     private CameraCaptureSession mPreviewSession; // current CameraCaptureSession for preview
@@ -239,16 +239,13 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.button_record_video: {
+        if (view.getId() == R.id.button_record_video) {
                 if (mIsRecordingVideo) {
                     stopRecordingVideo();
                 } else {
                     startRecordingVideo();
                 }
-                break;
             }
-        }
     }
 
     /**
@@ -359,7 +356,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
      * Start the camera preview.
      */
     private void startPreview() {
-        mRecordingDate.setText(DateFormater.todaysDateForWeeklyPreview());
+        mRecordingDate.setText(DateFormatter.todaysDateForWeeklyPreview());
         if (null == mCameraDevice || !mTextureView.isAvailable() || null == mPreviewSize) {
             return;
         }
@@ -380,10 +377,10 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
                 }
             }, mBackgroundHandler);
         } catch (CameraAccessException e) {
-            Log.e(TAG, "Exception in startPreview()");
+            Log.e(TAG, "CameraAccessException in startPreview()");
             e.printStackTrace();
         } catch (IOException e) {
-            Log.e(TAG, "Exception in startPreview()");
+            Log.e(TAG, "IOException in startPreview()");
             e.printStackTrace();
         }
     }
@@ -485,7 +482,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
 
     private void createVideoFilePath(Context context) {
         File filePath = new File(context.getExternalFilesDir(null),
-                FILE_START_NAME + DateFormater.todaysDateForFileNameAsString() + VIDEO_EXTENSION);
+                FILE_START_NAME + DateFormatter.todaysDateForFileNameAsString() + VIDEO_EXTENSION);
         mVideoFilePath = filePath.getAbsolutePath();
     }
 

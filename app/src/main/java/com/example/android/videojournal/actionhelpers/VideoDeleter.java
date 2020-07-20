@@ -2,7 +2,7 @@ package com.example.android.videojournal.actionhelpers;
 
 import android.content.Context;
 
-import com.example.android.videojournal.formatting.DateFormater;
+import com.example.android.videojournal.formatting.DateFormatter;
 import com.example.android.videojournal.recyclerview.VideoAdapter;
 import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
@@ -18,10 +18,8 @@ import java.util.Date;
  */
 public class VideoDeleter {
 
-    private static final String TAG = VideoDeleter.class.getSimpleName();
-
-    private VideoDatabase mDb;
-    private Context mContext;
+    private final VideoDatabase mDb;
+    private final Context mContext;
 
     public VideoDeleter(Context context, VideoDatabase db) {
         mDb = db;
@@ -49,7 +47,7 @@ public class VideoDeleter {
     public void deleteCurrentMergedVideo() {
 
         Date today = new Date();
-        Date precedingSunday = DateFormater.precedingSundayDate(today);
+        Date precedingSunday = DateFormatter.precedingSundayDate(today);
         VideoEntry currentMergedVideo = mDb.videoDao()
                 .loadCurrentCombinedVideo(precedingSunday, today);
 

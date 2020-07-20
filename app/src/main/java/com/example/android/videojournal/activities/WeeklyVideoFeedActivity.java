@@ -34,17 +34,12 @@ public class WeeklyVideoFeedActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "WeeklyVideoFeedActivity onCreate() is runnning");
+        Log.d(TAG, "WeeklyVideoFeedActivity onCreate() is running");
 
         setContentView(R.layout.activity_weekly_feed);
         mDb = VideoDatabase.getInstance(getApplicationContext());
         prepareRecyclerView();
         retrieveAndSetWeeklyVideos();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     /**

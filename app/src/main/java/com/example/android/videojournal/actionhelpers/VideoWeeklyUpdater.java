@@ -11,8 +11,6 @@ import com.example.android.videojournal.utilities.AppExecutors;
  */
 public class VideoWeeklyUpdater {
 
-    private static final String TAG = VideoWeeklyUpdater.class.getSimpleName();
-
     public VideoWeeklyUpdater() { }
 
     /**

@@ -11,7 +11,7 @@ import java.util.Locale;
 /**
  * Methods for date-related formatting and conversions
  */
-public class DateFormater {
+public class DateFormatter {
 
     /**
      * Used for reading from db
@@ -27,7 +27,7 @@ public class DateFormater {
     /**
      * Used for writing from db
      * @param date as Date object
-     * @return a Long, numberic date
+     * @return a Long, numeric date
      */
     @TypeConverter
     public static Long toTimestamp(Date date) {

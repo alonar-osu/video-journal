@@ -13,8 +13,6 @@ import androidx.core.content.FileProvider;
  */
 public class VideoSharer extends FileProvider {
 
-    private static final String TAG = VideoSharer.class.getSimpleName();
-
     private Context mContext;
 
     public VideoSharer(Context context) {

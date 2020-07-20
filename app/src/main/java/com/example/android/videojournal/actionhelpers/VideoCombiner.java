@@ -6,7 +6,7 @@ import android.util.Log;
 import com.coremedia.iso.boxes.Container;
 import com.example.android.videojournal.data.VideoDatabase;
 import com.example.android.videojournal.data.VideoEntry;
-import com.example.android.videojournal.formatting.DateFormater;
+import com.example.android.videojournal.formatting.DateFormatter;
 import com.googlecode.mp4parser.authoring.Movie;
 import com.googlecode.mp4parser.authoring.Track;
 import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
@@ -34,8 +34,8 @@ public class VideoCombiner {
     private final static String FILE_START_NAME = "comb_vj";
     private final static String VIDEO_EXTENSION = ".mp4";
 
-    private VideoDatabase mDb;
-    private Context mContext;
+    private final VideoDatabase mDb;
+    private final Context mContext;
     private List<VideoEntry> mWeekAgoEntries;
 
     public VideoCombiner(Context context, VideoDatabase db) {
@@ -117,7 +117,7 @@ public class VideoCombiner {
 
     private String saveVideoFile(Movie result) throws IOException {
         String filename = FILE_START_NAME +
-                DateFormater.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
+                DateFormatter.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
         String videoCombinedPath = generateFilePath(filename);
 
         Container out = new DefaultMp4Builder().build(result);
@@ -130,7 +130,7 @@ public class VideoCombiner {
 
     private void getThisWeeksVideos() {
         Date today = new Date();
-        Date precedingSunday = DateFormater.precedingSundayDate(today);
+        Date precedingSunday = DateFormatter.precedingSundayDate(today);
         mWeekAgoEntries = mDb.videoDao().loadVideosForMerge(precedingSunday, today);
     }
 

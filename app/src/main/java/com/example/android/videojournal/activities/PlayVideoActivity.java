@@ -36,8 +36,6 @@ import com.google.android.exoplayer2.util.Util;
  */
 public class PlayVideoActivity extends AppCompatActivity {
 
-    private static final String TAG = PlayVideoActivity.class.getSimpleName();
-
     private VideoDatabase mDb;
     private SimpleExoPlayer mVideoPlayer;
     private String mVideoPath;

@@ -12,7 +12,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 
 import com.example.android.videojournal.R;
-import com.example.android.videojournal.formatting.TimeFormater;
+import com.example.android.videojournal.formatting.TimeFormatter;
 
 import java.util.Calendar;
 
@@ -26,8 +26,6 @@ import static android.content.Context.ALARM_SERVICE;
  * Methods related to reminder notifications for daily videos
  */
 public class NotificationUtils {
-
-    private static final String TAG = NotificationUtils.class.getSimpleName();
 
     private static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
     private static final int REC_NOTIF_ID = 100;
@@ -76,8 +74,8 @@ public class NotificationUtils {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         if (reminderIsChecked(sharedPreferences, context)) {
             int minutesAfterMidnight = getTimeFromPreferences(sharedPreferences, context);
-            int hours = TimeFormater.findHoursFromTotalMinutes(minutesAfterMidnight);
-            int minutes = TimeFormater.findMinutesFromTotalMinutes(minutesAfterMidnight);
+            int hours = TimeFormatter.findHoursFromTotalMinutes(minutesAfterMidnight);
+            int minutes = TimeFormatter.findMinutesFromTotalMinutes(minutesAfterMidnight);
             setUpReminderNotification(context, hours, minutes);
         }
     }

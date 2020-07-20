@@ -14,13 +14,13 @@ public class VideoEntry {
 
     @PrimaryKey(autoGenerate = true)
     private int mId;
-    private String mVideopath;
-    private Date mDate;
-    private int mVideoHeight;
-    private int mVideoWidth;
-    private String mThumbnailPath;
-    private String mThumbnailFileName;
-    private int mCombinedVideo; // 1 = combined
+    private final String mVideopath;
+    private final Date mDate;
+    private final int mVideoHeight;
+    private final int mVideoWidth;
+    private final String mThumbnailPath;
+    private final String mThumbnailFileName;
+    private final int mCombinedVideo; // 1 = combined
 
     @Ignore
     public VideoEntry(String videopath, Date date, int videoHeight, int videoWidth,

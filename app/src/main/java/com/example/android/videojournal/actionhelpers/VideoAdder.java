@@ -28,9 +28,10 @@ public class VideoAdder {
     private static final String TAG = VideoAdder.class.getSimpleName();
 
     private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
+    private static final int BITMAP_COMPRESS_QUALITY = 100;
 
-    private VideoDatabase mDb;
-    private Context mContext;
+    private final VideoDatabase mDb;
+    private final Context mContext;
 
     public VideoAdder(Context context, VideoDatabase db) {
         mContext = context;
@@ -39,7 +40,7 @@ public class VideoAdder {
 
     /**
      * Saves video info in database as VideoEntry
-     * @param videoPath absoulte path for saved video
+     * @param videoPath absolute path for saved video
      * @param isCombined is true for weekly merged video, false for regular
      */
     public void addVideo(String videoPath, boolean isCombined) {
@@ -95,15 +96,15 @@ public class VideoAdder {
         File directory = cw.getDir(THUMBNAIL_DIRECTORY_NAME, Context.MODE_PRIVATE);
         if (!directory.exists()) directory.mkdir();
         File thumbnailPath = new File(directory, fileName);
-        compressBitmap(thumbnailPath, thumbnailBitmap, 100);
+        compressBitmap(thumbnailPath, thumbnailBitmap);
         return directory.getAbsolutePath();
     }
 
-    private void compressBitmap(File thumbnailPath, Bitmap thumbnailBitmap, int quality) {
-        FileOutputStream fos = null;
+    private void compressBitmap(File thumbnailPath, Bitmap thumbnailBitmap) {
+
         try {
-            fos = new FileOutputStream(thumbnailPath);
-            thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, quality, fos);
+            FileOutputStream fos = new FileOutputStream(thumbnailPath);
+            thumbnailBitmap.compress(Bitmap.CompressFormat.JPEG, BITMAP_COMPRESS_QUALITY, fos);
             fos.close();
         } catch (Exception e) {
             Log.e(TAG, "Exception in compressBitmap()");

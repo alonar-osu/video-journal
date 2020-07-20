@@ -7,8 +7,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.android.videojournal.R;
-import com.example.android.videojournal.formatting.TimeFormater;
-import com.example.android.videojournal.notifications.AlarmReceiver;
+import com.example.android.videojournal.formatting.TimeFormatter;
 import com.example.android.videojournal.notifications.NotificationUtils;
 import com.example.android.videojournal.other.TimePreference;
 
@@ -47,7 +46,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         int minutesAfterMidnight = NotificationUtils.getTimeFromPreferences(sharedPreferences, getContext());
         Preference timePreference = findPreference(getString(R.string.pref_reminder_time_key));
 
-        String summary = TimeFormater.formatTime(minutesAfterMidnight);
+        String summary = TimeFormatter.formatTime(minutesAfterMidnight);
         if (summary != null) timePreference.setSummary(summary);
         else Log.d(TAG, "summary in setTimePickerPreferenceSummary() is null");
     }
@@ -79,7 +78,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         }
         if (dialogFragment != null) {
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(this.getFragmentManager(), "PreferenceFragmentDialog");
+            dialogFragment.show(this.getParentFragmentManager(), "PreferenceFragmentDialog");
         } else {
             super.onDisplayPreferenceDialog(preference);
         }
@@ -89,8 +88,6 @@ public class SettingsFragment extends PreferenceFragmentCompat
      * Checks if activate checkmark status has changed
      * If it was checked, turns on notification
      * If was unchecked, turns off notifications
-     * @param sharedPreferences
-     * @param key
      */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -109,8 +106,8 @@ public class SettingsFragment extends PreferenceFragmentCompat
 
     private void getTimeFromSharedPrefs(SharedPreferences sharedPreferences) {
         int minutesAfterMidnight = NotificationUtils.getTimeFromPreferences(sharedPreferences, getContext());
-        mHours = TimeFormater.findHoursFromTotalMinutes(minutesAfterMidnight);
-        mMinutes = TimeFormater.findMinutesFromTotalMinutes(minutesAfterMidnight);
+        mHours = TimeFormatter.findHoursFromTotalMinutes(minutesAfterMidnight);
+        mMinutes = TimeFormatter.findMinutesFromTotalMinutes(minutesAfterMidnight);
     }
 
     @Override

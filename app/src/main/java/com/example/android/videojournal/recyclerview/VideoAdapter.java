@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 
 import com.example.android.videojournal.R;
 import com.example.android.videojournal.data.VideoEntry;
-import com.example.android.videojournal.formatting.DateFormater;
+import com.example.android.videojournal.formatting.DateFormatter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,9 +71,9 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         Date videoDate = videoEntry.getDate();
         String dateText = "";
         if (mWeeklyVideo) {
-            dateText += "Week of " + DateFormater.precedingSundayDateAsString(videoDate);
+            dateText += "Week of " + DateFormatter.precedingSundayDateAsString(videoDate);
         } else {
-            dateText += DateFormater.dateToString(videoDate);
+            dateText += DateFormatter.dateToString(videoDate);
         }
         holder.mDateView.setText(dateText);
     }
