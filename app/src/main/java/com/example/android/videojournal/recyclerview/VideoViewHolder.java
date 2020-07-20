@@ -17,8 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class VideoViewHolder extends RecyclerView.ViewHolder {
 
-    private static final String TAG = VideoViewHolder.class.getSimpleName();
-
     private FrameLayout mMedia_container;
     private View mParent;
     ImageView mThumbnailView;
@@ -32,9 +30,9 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mParent = itemView;
         mMedia_container = itemView.findViewById(R.id.media_container);
-        mThumbnailView = (ImageView) itemView.findViewById(R.id.thumbnail);
-        mPlayIconView = (ImageView) itemView.findViewById(R.id.play_icon);
-        mDateView = (TextView) itemView.findViewById(R.id.date_tv);
+        mThumbnailView = itemView.findViewById(R.id.thumbnail);
+        mPlayIconView = itemView.findViewById(R.id.play_icon);
+        mDateView = itemView.findViewById(R.id.date_tv);
         launchVideoWhenClicked(itemView);
     }
 

@@ -151,6 +151,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                 break;
 
             case Player.STATE_IDLE:
+                Log.d(TAG, "onPlayerStateChanged: Idle");
                 break;
 
             case Player.STATE_READY:
@@ -174,7 +175,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
         addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
@@ -186,7 +187,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
                 }
             }
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
@@ -196,7 +197,6 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
      * Create ExoPlayer video player
      * No controller since this is autoplay
      * Sound is muted
-     * @param context
      */
     private void initVideoPlayer(Context context) {
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -224,7 +224,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
     /**
      * Autoplays videos in feed depending on their position on screen
      */
-    public void playVideo() {
+    private void playVideo() {
         int startPosition = ((LinearLayoutManager) getLayoutManager()).findFirstVisibleItemPosition();
         int endPosition = ((LinearLayoutManager) getLayoutManager()).findLastVisibleItemPosition();
         if (startPosition < 0 || endPosition < 0) return; // some error

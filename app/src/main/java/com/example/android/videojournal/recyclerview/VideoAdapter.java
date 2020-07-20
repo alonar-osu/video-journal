@@ -30,8 +30,8 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private static final String TAG = VideoAdapter.class.getSimpleName();
 
     private static ArrayList sVideoEntries;
-    private Context mContext;
-    private boolean mWeeklyVideo;
+    private final Context mContext;
+    private final boolean mWeeklyVideo;
 
     public VideoAdapter(Context context, ArrayList videoEntries, boolean weekly) {
         mContext = context;

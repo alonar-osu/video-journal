@@ -13,15 +13,7 @@ import androidx.core.content.ContextCompat;
  */
 public class PermissionChecker extends AppCompatActivity {
 
-    private static final String TAG = PermissionChecker.class.getSimpleName();
-
-    Context mContext;
-    Activity mActivity;
-
-    public PermissionChecker(Context context, Activity activity) {
-        mContext = context;
-        mActivity = activity;
-    }
+    public PermissionChecker() { }
 
     /**
      * Checks if given permission was granted on Android M or above
@@ -30,16 +22,10 @@ public class PermissionChecker extends AppCompatActivity {
      */
     public static boolean checkPermission(String permission, Context context) {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(context, permission) ==
-                    PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else return false;
+            return ContextCompat.checkSelfPermission(context, permission) ==
+                    PackageManager.PERMISSION_GRANTED;
         }
         return true;
     }
-
-
-
-
 
 }
