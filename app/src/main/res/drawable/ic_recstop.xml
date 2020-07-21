@@ -3,7 +3,7 @@
     <path android:fillAlpha="0.945" android:fillColor="#e9ebee"
         android:pathData="M11.4999,11.4999m-10.4229,0a10.4229,10.4229 0,1 1,20.8457 0a10.4229,10.4229 0,1 1,-20.8457 0"
         android:strokeAlpha="0.945" android:strokeColor="#e9ebee" android:strokeWidth="2.154"/>
-    <path android:fillAlpha="0.945" android:fillColor="#ff0000"
+    <path android:fillAlpha="0.945" android:fillColor="@color/colorRed"
         android:pathData="M8.0077,7.3391L14.992,7.3391A0.6686,0.6686 0,0 1,15.6606 8.0077L15.6606,14.992A0.6686,0.6686 0,0 1,14.992 15.6606L8.0077,15.6606A0.6686,0.6686 0,0 1,7.3391 14.992L7.3391,8.0077A0.6686,0.6686 0,0 1,8.0077 7.3391z"
         android:strokeAlpha="0.945" android:strokeColor="#e9ebee" android:strokeWidth="0"/>
 </vector>

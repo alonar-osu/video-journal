@@ -41,7 +41,9 @@
         android:layout_marginTop="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="@dimen/fab_margin"
-        app:backgroundTint="?attr/colorAccent"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:backgroundTint="@color/colorAccent"
+        app:srcCompat="@drawable/ic_add_video" />
+
+    <!--    -->
 
 </RelativeLayout>
