@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorPrimary"
+    android:background="@color/colorPrimaryLight"
     tools:context=".activities.DailyVideoFeedActivity">
 
     <com.google.android.material.appbar.AppBarLayout

@@ -5,5 +5,3 @@
     android:name="com.example.android.videojournal.fragments.SettingsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
-
-    <!-- android:name="android.com.example.android.videojournal" -->
