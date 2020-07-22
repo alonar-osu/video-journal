@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.android.videojournal">
+    package="com.alonar.android.videojournal">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
@@ -21,31 +21,31 @@
         android:fullBackupContent="false"
         android:allowBackup="false">
         <activity
-            android:name=".activities.PlayVideoActivity"
+            android:name="com.alonar.android.videojournal.activities.PlayVideoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_play_video"
             android:theme="@style/FullscreenTheme"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.RecordVideoActivity"
-            android:parentActivityName=".activities.DailyVideoFeedActivity"
+            android:name="com.alonar.android.videojournal.activities.RecordVideoActivity"
+            android:parentActivityName="com.alonar.android.videojournal.activities.DailyVideoFeedActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.videojournal.activities.DailyVideoFeedActivity" />
+                android:value="com.alonar.android.videojournal.activities.DailyVideoFeedActivity" />
         </activity>
         <activity
-            android:name=".activities.WeeklyVideoFeedActivity"
+            android:name="com.alonar.android.videojournal.activities.WeeklyVideoFeedActivity"
             android:label="@string/title_activity_weekly"
-            android:parentActivityName=".activities.DailyVideoFeedActivity"
+            android:parentActivityName="com.alonar.android.videojournal.activities.DailyVideoFeedActivity"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.videojournal.activities.DailyVideoFeedActivity" />
+                android:value="com.alonar.android.videojournal.activities.DailyVideoFeedActivity" />
         </activity>
         <activity
-            android:name=".activities.DailyVideoFeedActivity"
+            android:name="com.alonar.android.videojournal.activities.DailyVideoFeedActivity"
             android:launchMode="singleTop"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
@@ -56,19 +56,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".notifications.AlarmReceiver" />
+        <receiver android:name="com.alonar.android.videojournal.notifications.AlarmReceiver" />
         <activity
-            android:name=".activities.SettingsActivity"
+            android:name="com.alonar.android.videojournal.activities.SettingsActivity"
             android:label="@string/action_settings"
-            android:parentActivityName=".activities.DailyVideoFeedActivity">
+            android:parentActivityName="com.alonar.android.videojournal.activities.DailyVideoFeedActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.DailyVideoFeedActivity"
+                android:value="com.alonar.android.videojournal.activities.DailyVideoFeedActivity"
                 android:screenOrientation="portrait"/>
         </activity>
 
         <provider
-            android:name=".actionhelpers.VideoSharer"
+            android:name="com.alonar.android.videojournal.actionhelpers.VideoSharer"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">

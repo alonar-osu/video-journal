@@ -9,12 +9,12 @@
     tools:context=".activities.WeeklyVideoFeedActivity">
 
     <!-- custom recyclerview with autoplay -->
-    <com.example.android.videojournal.recyclerview.VideoRecyclerView
+    <com.alonar.android.videojournal.recyclerview.VideoRecyclerView
         android:id="@+id/recyclerView_weekly"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </com.example.android.videojournal.recyclerview.VideoRecyclerView>
+    </com.alonar.android.videojournal.recyclerview.VideoRecyclerView>
 
 </RelativeLayout>

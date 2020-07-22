@@ -2,6 +2,6 @@
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/activity_settings"
-    android:name="com.example.android.videojournal.fragments.SettingsFragment"
+    android:name="com.alonar.android.videojournal.fragments.SettingsFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent" />

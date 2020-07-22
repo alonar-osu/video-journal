@@ -15,7 +15,7 @@
         app:iconSpaceReserved="true" />
 
     <!-- add custom time picker for daily reminder  -->
-    <com.example.android.videojournal.other.TimePreference
+    <com.alonar.android.videojournal.other.TimePreference
         android:key="@string/pref_reminder_time_key"
         android:title="@string/pref_reminder_time_label"
         android:defaultValue="725"
