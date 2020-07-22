@@ -21,15 +21,14 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import static android.content.Context.ALARM_SERVICE;
+import static com.example.android.videojournal.utilities.Constants.CHANNEL_ID_REC_NOTIF;
+import static com.example.android.videojournal.utilities.Constants.REC_NOTIF_ID;
+import static com.example.android.videojournal.utilities.Constants.DEFAULT_NOTIF_PREF_VALUE;
 
 /**
  * Methods related to reminder notifications for daily videos
  */
 public class NotificationUtils {
-
-    private static final String CHANNEL_ID_REC_NOTIF = "record_reminder";
-    private static final int REC_NOTIF_ID = 100;
-    private static final int DEFAULT_NOTIF_PREF_VALUE = 725;
 
     /**
      * Creates notification channel on API 26+ otherwise not in support library

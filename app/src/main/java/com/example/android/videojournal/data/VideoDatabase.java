@@ -10,6 +10,8 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
+import static com.example.android.videojournal.utilities.Constants.DATABASE_NAME;
+
 /**
  * Database class using Room persistence library
  * Makes singleton instance
@@ -22,8 +24,6 @@ public abstract class VideoDatabase extends RoomDatabase {
     private static final String TAG = VideoDatabase.class.getSimpleName();
 
     private static final Object LOCK = new Object();
-    private static final String DATABASE_NAME = "videojournal";
-
     private static VideoDatabase sInstance;
 
     public static VideoDatabase getInstance(Context context) {
@@ -31,7 +31,7 @@ public abstract class VideoDatabase extends RoomDatabase {
             synchronized (LOCK) {
                 Log.d(TAG, "Creating new database instance");
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
-                        VideoDatabase.class, VideoDatabase.DATABASE_NAME)
+                        VideoDatabase.class, DATABASE_NAME)
                         .build();
             }
         }

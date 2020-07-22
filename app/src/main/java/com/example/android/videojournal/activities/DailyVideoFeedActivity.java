@@ -31,6 +31,9 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.android.videojournal.utilities.Constants.READ_EXTERNAL_STORAGE_REQUEST_CODE;
+import static com.example.android.videojournal.utilities.Constants.CAMERA_AND_AUDIO_REQUEST_CODE;
+
 /**
  * Shows a feed of all regular (non-combined) videos recorded in the app
  * Videos autoplay on scrolling
@@ -38,9 +41,6 @@ import java.util.List;
 public class DailyVideoFeedActivity extends AppCompatActivity {
 
     private static final String TAG = DailyVideoFeedActivity.class.getSimpleName();
-
-    private static final int READ_EXTERNAL_STORAGE_REQUEST_CODE = 1;
-    private static final int CAMERA_AND_AUDIO_REQUEST_CODE = 2;
 
     private VideoDatabase mDb;
     private VideoRecyclerView mRecyclerView;

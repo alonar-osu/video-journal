@@ -18,6 +18,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
+import static com.example.android.videojournal.utilities.Constants.THUMBNAIL_DIRECTORY_NAME;
+import static com.example.android.videojournal.utilities.Constants.BITMAP_COMPRESS_QUALITY;
 
 /**
  *  Allows adding video info to database as VideoEntry
@@ -26,9 +28,6 @@ import java.util.Random;
 public class VideoAdder {
 
     private static final String TAG = VideoAdder.class.getSimpleName();
-
-    private static final String THUMBNAIL_DIRECTORY_NAME = "thumbnails";
-    private static final int BITMAP_COMPRESS_QUALITY = 100;
 
     private final VideoDatabase mDb;
     private final Context mContext;

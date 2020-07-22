@@ -55,6 +55,9 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import static com.example.android.videojournal.utilities.Constants.DAILY_FILE_START_NAME;
+import static com.example.android.videojournal.utilities.Constants.VIDEO_EXTENSION;
+
 /**
  * Camera fragment for recording videos using camera
  * Based on sample code for Camera2 API
@@ -64,9 +67,6 @@ import java.util.concurrent.TimeUnit;
 public class RecordVideoFragment extends Fragment implements View.OnClickListener  {
 
     private static final String TAG = RecordVideoFragment.class.getSimpleName();
-
-    private final static String FILE_START_NAME = "vj";
-    private final static String VIDEO_EXTENSION = ".mp4";
 
     private VideoDatabase mDb;
     private AutoFitTextureView mTextureView; // for camera preview
@@ -482,7 +482,7 @@ public class RecordVideoFragment extends Fragment implements View.OnClickListene
 
     private void createVideoFilePath(Context context) {
         File filePath = new File(context.getExternalFilesDir(null),
-                FILE_START_NAME + DateFormatter.todaysDateForFileNameAsString() + VIDEO_EXTENSION);
+                DAILY_FILE_START_NAME + DateFormatter.todaysDateForFileNameAsString() + VIDEO_EXTENSION);
         mVideoFilePath = filePath.getAbsolutePath();
     }
 

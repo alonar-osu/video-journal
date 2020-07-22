@@ -1,11 +1,11 @@
 package com.example.android.videojournal.formatting;
 
+import static com.example.android.videojournal.utilities.Constants.MINUTES_IN_HOUR;
+
 /**
  * Helps convert between hours, minutes, and format time for displaying
  */
 public class TimeFormatter {
-
-    private static final int MINUTES_IN_HOUR = 60;
 
     /**
      * Formats time to be displayed in Reminder Time summary

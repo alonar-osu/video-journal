@@ -23,6 +23,9 @@ import java.util.List;
 
 import androidx.core.content.ContextCompat;
 
+import static com.example.android.videojournal.utilities.Constants.WEEKLY_FILE_START_NAME;
+import static com.example.android.videojournal.utilities.Constants.VIDEO_EXTENSION;
+
 /**
  * Allows combining regular videos recorded during the week since last Sunday
  * and currently in db into one weekly video
@@ -30,9 +33,6 @@ import androidx.core.content.ContextCompat;
 public class VideoCombiner {
 
     private static final String TAG = VideoCombiner.class.getSimpleName();
-
-    private final static String FILE_START_NAME = "comb_vj";
-    private final static String VIDEO_EXTENSION = ".mp4";
 
     private final VideoDatabase mDb;
     private final Context mContext;
@@ -116,7 +116,7 @@ public class VideoCombiner {
     }
 
     private String saveVideoFile(Movie result) throws IOException {
-        String filename = FILE_START_NAME +
+        String filename = WEEKLY_FILE_START_NAME +
                 DateFormatter.todaysDateForFileNameAsString() + VIDEO_EXTENSION;
         String videoCombinedPath = generateFilePath(filename);
 

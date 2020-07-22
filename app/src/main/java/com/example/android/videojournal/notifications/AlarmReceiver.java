@@ -7,14 +7,13 @@ import android.content.Intent;
 
 import com.example.android.videojournal.R;
 import com.example.android.videojournal.activities.DailyVideoFeedActivity;
+import static com.example.android.videojournal.utilities.Constants.REC_NOTIF_ID;
 
 /**
  * Broadcast receiver for notifications service
  * to prompt user for daily videos
  */
 public class AlarmReceiver extends BroadcastReceiver {
-
-    private static final int REC_NOTIF_ID = 100;
 
     @Override
     public void onReceive(Context context, Intent intent) {
