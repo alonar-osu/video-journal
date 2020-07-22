@@ -84,7 +84,7 @@ public class PlayVideoActivity extends AppCompatActivity {
         fullscreenPlayVideoView.setPlayer(mVideoPlayer);
 
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
-                Util.getUserAgent(mContext, "Video Journal"));
+                Util.getUserAgent(mContext, getString(R.string.app_name)));
 
         getVideoInfo();
 
@@ -138,14 +138,14 @@ public class PlayVideoActivity extends AppCompatActivity {
     private void confirmDelete() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.app_name);
-        builder.setMessage("Delete this video?");
+        builder.setMessage(getString(R.string.confirm_delete));
 
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.respond_yes), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 deleteVideo();
             }
         });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(getString(R.string.respond_no), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
             }
         });

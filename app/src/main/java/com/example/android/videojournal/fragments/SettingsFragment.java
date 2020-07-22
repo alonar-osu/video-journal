@@ -78,7 +78,7 @@ public class SettingsFragment extends PreferenceFragmentCompat
         }
         if (dialogFragment != null) {
             dialogFragment.setTargetFragment(this, 0);
-            dialogFragment.show(this.getParentFragmentManager(), "PreferenceFragmentDialog");
+            dialogFragment.show(this.getParentFragmentManager(), getString(R.string.pref_fragm_dialog));
         } else {
             super.onDisplayPreferenceDialog(preference);
         }

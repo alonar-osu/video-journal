@@ -72,7 +72,7 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
             retrieveAndSetRegularVideos();
         } else {
             askPermission(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
-                    "App needs permission to store videos", READ_EXTERNAL_STORAGE_REQUEST_CODE);
+                    getString(R.string.permiss_reason_storage), READ_EXTERNAL_STORAGE_REQUEST_CODE);
             if (PermissionChecker.checkPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
                     DailyVideoFeedActivity.this)) retrieveAndSetRegularVideos();
         }
@@ -98,7 +98,7 @@ public class DailyVideoFeedActivity extends AppCompatActivity {
 
                 } else {
                     askPermission(new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
-                            "App needs to use camera and microphone to record videos",
+                            getString(R.string.permiss_reason_camera_audio),
                             CAMERA_AND_AUDIO_REQUEST_CODE);
                 }
             }

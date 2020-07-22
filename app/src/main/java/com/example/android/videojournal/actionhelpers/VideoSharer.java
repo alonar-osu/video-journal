@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.example.android.videojournal.R;
+
 import java.io.File;
 
 import androidx.core.content.FileProvider;
@@ -38,11 +40,13 @@ public class VideoSharer extends FileProvider {
                             + ".provider", videoFile);
 
             intentShareFile.putExtra(Intent.EXTRA_STREAM, videoUri);
-            intentShareFile.putExtra(Intent.EXTRA_SUBJECT, "Video from My Video Journal");
+            intentShareFile.putExtra(Intent.EXTRA_SUBJECT, mContext.getString(R.string.share_video_subject));
             intentShareFile.putExtra(Intent.EXTRA_TEXT,
-                    "Here is my video from My Video Journal app");
+                    mContext.getString(R.string.share_video_text) + " " +
+                            mContext.getString(R.string.app_name));
             intentShareFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            mContext.startActivity(Intent.createChooser(intentShareFile, "Share file"));
+            mContext.startActivity(Intent.createChooser(intentShareFile,
+                    mContext.getString(R.string.share_chooser_title)));
         }
     }
 

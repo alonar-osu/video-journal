@@ -71,7 +71,8 @@ public class VideoAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         Date videoDate = videoEntry.getDate();
         String dateText = "";
         if (mWeeklyVideo) {
-            dateText += "Week of " + DateFormatter.precedingSundayDateAsString(videoDate);
+            dateText += mContext.getString(R.string.date_of_weekly_video) + " " +
+                    DateFormatter.precedingSundayDateAsString(videoDate);
         } else {
             dateText += DateFormatter.dateToString(videoDate);
         }

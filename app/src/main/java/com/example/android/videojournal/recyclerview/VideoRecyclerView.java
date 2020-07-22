@@ -255,7 +255,7 @@ public class VideoRecyclerView extends RecyclerView implements VideoListener {
 
     private void prepareVideoSourceAndPlayer(int targetPosition) {
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext,
-                Util.getUserAgent(mContext, "Video Journal"));
+                Util.getUserAgent(mContext, mContext.getString(R.string.app_name)));
         String mediaUrl = mVideoEntries.get(targetPosition).getVideopath();
         if (mediaUrl != null) {
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)

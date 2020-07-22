@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.example.android.videojournal.R;
 import com.example.android.videojournal.activities.DailyVideoFeedActivity;
 
 /**
@@ -22,8 +23,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         repeatingIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, REC_NOTIF_ID,
                 repeatingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        String title = "Time for Video Journal Entry";
-        String contentText = "Let's take a new daily video";
+        String title = context.getString(R.string.remind_message_title);
+        String contentText = context.getString(R.string.remind_message_text);
         NotificationUtils.showNotification(context, pendingIntent, title, contentText);
     }
 
