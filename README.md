@@ -2,7 +2,7 @@
 ViJournal is an Android app that lets users create a video journal.
 
 ## About
-With this app you can record and collect daily videos of life's interesting moments. Scroll through your memories and see them autoplay. Get combined videos for each week. Share your videos. Set a reminder to take daily videos and keep adding new ones.
+With this app you can record and collect daily videos. Scroll through your memories and see them autoplay. Get combined videos for each week. Share your videos. Set a reminder to take daily videos and keep adding new ones.
 
 ## Try it out
 ViJournal on Play Store: https://play.google.com/store/apps/details?id=com.alonar.android.videojournal
