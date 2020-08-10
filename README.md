@@ -1,15 +1,26 @@
 # ViJournal App
 ViJournal is an Android app that lets users create a video journal.
-See it on Play Store: https://play.google.com/store/apps/details?id=com.alonar.android.videojournal
+
+## About
+With this app you can record and collect daily videos of life's interesting moments. Scroll through your memories and see them autoplay. Get combined videos for each week. Share your videos. Set a reminder to take daily videos and keep adding new ones.
+
+## Try it out
+ViJournal on Play Store: https://play.google.com/store/apps/details?id=com.alonar.android.videojournal
+
 Install it and try it out on your phone!
 
-# About the app
-Video Journal lets you record and collect videos. It will generate combined montage of videos for each week. 
-Scroll through your memories and see them autoplay. Share your videos. Set a reminder to take daily videos and keep adding new ones.
-
-# Setup
+## Setup project
 Download this repo and open it in Android Studio.
 
-# Technologies
-I use ExoPlayer and a custom RecyclerView to autoplay videos. I use Room and LiveData to manage data. I implement camera functionality using Camera2 API.
+## Technologies Used
+- Autoplay videos in feed using custom RecyclerView
+- Room and LiveData to manage data
+- Camera2 API to implement camera functionality
+- ExoPlayer to play videos
 
+## Limitations 
+The current version only supports front camera for videos
+
+## License
+MIT License
+Copyright (c) 2020 Alona Rudchenko
