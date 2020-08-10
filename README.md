@@ -12,7 +12,7 @@ Install it and try it out on your phone!
 ## Setup project
 Download this repo and open it in Android Studio.
 
-## Technologies Used
+## Custom features and APIs
 - Autoplay videos in feed using custom RecyclerView
 - Room and LiveData to manage data
 - Camera2 API to implement camera functionality
