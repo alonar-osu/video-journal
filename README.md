@@ -1,4 +1,4 @@
-# ViJournal App
+# VideoJournal App
 ViJournal is an Android app that lets users create a video journal.
 
 ## About
