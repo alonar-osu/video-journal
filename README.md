@@ -1,5 +1,5 @@
 # VideoJournal App
-ViJournal is an Android app that lets users create a video journal.
+VideoJournal is an Android app that lets users create a video journal.
 
 ## About
 With this app you can record and collect daily videos. Scroll through your memories and see them autoplay. Get combined videos for each week. Share your videos. Set a reminder to take daily videos and keep adding new ones.
